@@ -860,6 +860,50 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
 }
 
 </style>
+<style>
+/* ===== v4: Compact header, Clean View, Search tab, Numberdar Login, Rabta card, Paimaish coordinates ===== */
+/* --- Compact header bar --- */
+#top{padding:8px 10px;border-radius:16px}
+.tsub{font-size:9px;letter-spacing:.8px;color:#38bdf8;font-weight:700;margin-left:6px;vertical-align:2px}
+#top .title{white-space:nowrap}
+.hbtn{width:34px;height:34px;border-radius:11px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;cursor:pointer}
+.hbtn:active{transform:scale(.92)}
+@media(max-width:480px){.tsub{display:none}#acc{font-size:10px;padding:3px 6px}#top .title{font-size:13px}}
+/* --- Collapsible location card (summary default) --- */
+#loc{margin-top:7px;padding:0;overflow:hidden}
+#locSum{display:flex;align-items:center;gap:7px;padding:8px 10px;cursor:pointer;min-height:34px}
+#locSumTxt{flex:1;min-width:0;font-size:13.5px;font-weight:800;color:#34d399;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#locChev{color:#94a3b8;font-size:13px;transition:transform .2s;flex-shrink:0}
+#loc.open #locChev{transform:rotate(180deg)}
+#locBody{display:none;padding:0 10px 9px}
+#loc.open #locBody{display:block}
+/* --- Tabs: 5 tabs ke liye thora compact --- */
+.tab{font-size:12px;padding:10px 2px;letter-spacing:0}
+/* --- Numberdar Login (sidebar option) --- */
+.ndlogin{display:block;width:calc(100% - 28px);margin:10px 14px 0;min-height:46px;border-radius:12px;border:1.5px solid #b8860b;background:rgba(245,158,11,.10);color:#fde68a;font-size:14px;font-weight:800;cursor:pointer}
+.ndlogin:active{transform:scale(.98)}
+.ndlogin.on{background:#065f46;border-color:#10b981;color:#d1fae5}
+/* --- Numberdar Rabta card (public) --- */
+.ndcard{border-color:#b8860b!important}
+.ndcard .ndh{font-size:13px;color:#fbbf24;font-weight:800;letter-spacing:.4px;margin-bottom:8px}
+.ndcard .ndname{font-size:16px;color:#fff;font-weight:800}
+.ndcard .ndsub{font-size:12px;color:#94a3b8;margin:3px 0 6px;line-height:1.5}
+.ndcard .ndline{font-size:12.5px;color:#cbd5e1;padding:2px 0;font-variant-numeric:tabular-nums}
+.ndbtns{display:flex;gap:6px;margin:9px 0 5px}
+.ndbtn{flex:1;text-align:center;text-decoration:none;min-height:42px;display:flex;align-items:center;justify-content:center;border-radius:11px;font-size:13px;font-weight:800;color:#fff;padding:4px 2px}
+.ndbtn.wa{background:#1faa55}.ndbtn.call{background:#1d4ed8}.ndbtn.mail{background:#475569}
+.ndbtn:active{transform:scale(.97)}
+/* --- Full Screen Clean View --- */
+#cleanExit{display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:10px;z-index:2500;width:44px;height:44px;border-radius:50%;border:1px solid #475569;background:rgba(15,23,42,.85);color:#fff;font-size:18px;align-items:center;justify-content:center;cursor:pointer}
+body.cleanview #cleanExit{display:flex}
+body.cleanview #top,body.cleanview .fab,body.cleanview #find,body.cleanview #panel,body.cleanview #north,body.cleanview #pmBar,body.cleanview #ownerCard,body.cleanview #pmChip,body.cleanview #dash{display:none!important}
+body.cleanview .leaflet-control-attribution{margin:0!important}
+body.cleanview .leaflet-control-scale{margin-bottom:12px!important}
+/* --- Paimaish: points ke coordinates --- */
+.pmcoord{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;border:1px solid #334155;border-radius:10px;background:#0f172a;margin:0 0 5px;font-size:12.5px}
+.pmcoord b{color:#facc15;flex-shrink:0}
+.pmcoord span{color:#e2e8f0;font-variant-numeric:tabular-nums}
+</style>
 </head>
 <body>
 <div id="map"></div>
@@ -873,27 +917,45 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
   </div>
   <div class="stats" id="dashStats"></div>
   <div class="tabs">
-    <button class="tab on" id="tabbtn-ov" onclick="switchDashTab('ov')">Overview</button>
+    <button class="tab on" id="tabbtn-sr" onclick="switchDashTab('sr')">Search</button>
+    <button class="tab" id="tabbtn-ov" onclick="switchDashTab('ov')">Overview</button>
     <button class="tab" id="tabbtn-ly" onclick="switchDashTab('ly')">Layers</button>
     <button class="tab" id="tabbtn-pm" onclick="switchDashTab('pm')">Paimaish</button>
     <button class="tab" id="tabbtn-rc" onclick="switchDashTab('rc')">Records</button>
   </div>
+  <button id="ndBtn" class="ndlogin" onclick="numberdarLogin()">&#128272; Numberdar Login</button>
 
-  <div class="tabbody" id="tab-ov">
-    <h5>Chak 130/1-L &mdash; Taaruf</h5>
-    <p>Ye Chak 130/1-L ka offline digital naqsha hai &mdash; Tehsil Khanpur, Zila Rahim Yar Khan, Punjab, Pakistan. Gaon ki zameen mustatil (murabba) aur qilon mein taqseem hai. Is naqshe mein kul <b id="ovMur">...</b> mustatil aur <b id="ovQila">...</b> qile map kiye gaye hain. Har mustatil mein 5&times;5 = <b>25 qile</b> hote hain aur har qila lagbhag <b>1 acre (160 Marla)</b> ka hota hai.</p>
-    <div class="card"><b style="color:#facc15">Khaas baat:</b> <span style="font-size:12.5px;color:#cbd5e1">Ye map bina internet chalta hai. Ek baar satellite download karne ke baad GPS location, mustatil/qila ki pehchan aur paimaish &mdash; sab kuch baghair net ke kaam karta hai.</span></div>
+  <div class="tabbody" id="tab-sr">
     <h5>Dhoondhein (Search)</h5>
     <div class="searchrow">
-      <input id="dashSearch" list="murList" placeholder="Masalan: 447/12" autocomplete="off" onkeydown="if(event.key==='Enter')dashSearchGo()">
+      <input id="dashSearch" list="murList" placeholder="Naam, khata, muraba, qila, CNIC, number..." autocomplete="off" onkeydown="if(event.key==='Enter')dashSearchGo()">
       <datalist id="murList"></datalist>
       <button onclick="dashSearchGo()">Dhoondhein</button>
     </div>
     <div id="gsRes" class="gsres" style="display:none"></div>
-    <p class="hint">Mustatil ka naam likhein (masalan 447/12). Neeche Qila number likhne se seedha us qila par le jayega. Map par kisi jagah tap karne se bhi mustatil aur qila maloom ho jata hai &mdash; pehla tap mustatil, dusra tap qila select karta hai.</p>
+    <p class="hint">Farmer (maalik) ka naam, walid ka naam, khata number, muraba number ya qila number &mdash; kisi se bhi search karein. Maalikan wale results Numberdar ke records mein hain, is liye wo <b>Numberdar Login</b> (PIN) ke baad nazar aate hain. Mustatil ka naam likhein (masalan 447/12), neeche Qila number likhne se seedha us qila par le jayega.</p>
     <div class="searchrow">
       <input id="dashQ" type="number" min="1" max="25" placeholder="Qila number (1-25) &mdash; ikhtiyari">
       <button onclick="dashSearchGo()">Chalein</button>
+    </div>
+    <p class="hint">Map par kisi jagah tap karne se bhi mustatil aur qila maloom ho jata hai &mdash; pehla tap mustatil, dusra tap qila select karta hai.</p>
+  </div>
+
+  <div class="tabbody" id="tab-ov" style="display:none">
+    <h5>Chak 130/1-L &mdash; Taaruf</h5>
+    <p>Ye Chak 130/1-L ka offline digital naqsha hai &mdash; Tehsil Khanpur, Zila Rahim Yar Khan, Punjab, Pakistan. Gaon ki zameen mustatil (murabba) aur qilon mein taqseem hai. Is naqshe mein kul <b id="ovMur">...</b> mustatil aur <b id="ovQila">...</b> qile map kiye gaye hain. Har mustatil mein 5&times;5 = <b>25 qile</b> hote hain aur har qila lagbhag <b>1 acre (160 Marla)</b> ka hota hai.</p>
+    <div class="card"><b style="color:#facc15">Khaas baat:</b> <span style="font-size:12.5px;color:#cbd5e1">Ye map bina internet chalta hai. Ek baar satellite download karne ke baad GPS location, mustatil/qila ki pehchan aur paimaish &mdash; sab kuch baghair net ke kaam karta hai.</span></div>
+    <div class="card ndcard">
+      <div class="ndh">&#128100; Numberdar Se Rabta</div>
+      <div class="ndname">Muhammad Atif</div>
+      <div class="ndsub">Numberdar &mdash; Chak No. 130/1-L, Tehsil Khanpur, District Rahim Yar Khan</div>
+      <div class="ndbtns">
+        <a class="ndbtn wa" href="https://wa.me/923458145930" target="_blank" rel="noopener">&#128172; WhatsApp</a>
+        <a class="ndbtn call" href="tel:+923458145930">&#128222; Call Karein</a>
+        <a class="ndbtn mail" href="mailto:atifaliofficial75@gmail.com">&#9993; Email</a>
+      </div>
+      <div class="ndline">&#128241; 03458145930</div>
+      <div class="ndline">&#9993; atifaliofficial75@gmail.com</div>
     </div>
     <h5>Rangon ki pehchan (Legend)</h5>
     <div class="legend">
@@ -909,7 +971,9 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
     <ul>
       <li><b>Live Location:</b> neelay button se GPS location chalein &mdash; map khud batayega aap kis mustatil aur kis qila mein kharay hain.</li>
       <li><b>Paimaish:</b> Paimaish tab se tool on karein, map par tap karke plot ke kone chunein &mdash; area Marla, Kanal, Acre aur Square Feet mein live nazar ayega.</li>
-      <li><b>Zameen Records:</b> Records tab mein maalik ka naam, walid, khata number, muraba ya qila number search karke kisi farmer ki zameen dhoondhein, map par dekhein aur printout bhi nikalein.</li>
+      <li><b>Search:</b> upar wale &#128269; button ya dashboard ke <b>Search</b> tab se naam, khata, muraba ya qila number likh kar foran dhoondhein.</li>
+      <li><b>Full Screen:</b> upar wale &#9974; button se tamam buttons aur cards ghayab ho jate hain &mdash; sirf map aur muraba/qila numbers rehte hain. Wapas aane ke liye &#10005; button ya Esc dabayen.</li>
+      <li><b>Zameen Records:</b> Dashboard mein <b>Numberdar Login</b> se PIN darj karein, phir Records tab mein maalik ka naam, walid, khata number, muraba ya qila number se kisi farmer ki zameen dhoondhein, map par dekhein aur printout bhi nikalein.</li>
       <li><b>Rasta line:</b> kisi qila ko select karne par location se line khud nahi banti &mdash; location card mein <b>Rasta</b> button dabane par hi fasla wali line nazar aati hai.</li>
       <li><b>Satellite offline:</b> gear (settings) button se panel khol kar satellite tiles download kar lein, taake baghair internet ke satellite photo bhi nazar aye.</li>
       <li><b>Grid Adjust:</b> agar asli jagah aur grid lines mein thora farq lage to settings panel se grid ko 5 meter ke qadam se theek jagah par rakha ja sakta hai.</li>
@@ -952,6 +1016,12 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
       <button onclick="pmUndo()">&#8617; Aakhri Point Hatao</button>
       <button onclick="pmClear()">Saaf Karo</button>
     </div>
+    <div id="pmCoordsWrap" style="display:none">
+      <h5>Points ke Coordinates (Konay)</h5>
+      <div id="pmCoords"></div>
+      <div class="btnrow"><button onclick="pmCopyCoords()">&#128203; Sab Coordinates Copy Karein</button></div>
+      <p class="hint">Har point ka latitude aur longitude (masalan plot ke charon konay) &mdash; copy karke kahin bhi istemal karein.</p>
+    </div>
     <h5>Plot sizes &mdash; reference</h5>
     <div class="presets"><table>
       <tr><td>1 Marla</td><td>272.25 sq ft</td></tr>
@@ -977,21 +1047,26 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
   <div class="dash-foot">Chak 130/1-L Map &mdash; CALLMEATIF75</div>
 </aside>
 <div id="pmChip" class="glass" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:1200;border-radius:14px;padding:10px 16px;font-size:14px;font-weight:800;color:#facc15;text-align:center;cursor:pointer;max-width:86vw" onclick="toggleDash(true);switchDashTab('pm')"><span id="pmChipTxt">Points: 0</span></div>
+<button id="cleanExit" onclick="toggleCleanView()" aria-label="Clean view band karein">&#10005;</button>
 <div id="toast"></div>
 
 
 <header id="top" class="glass">
   <div class="row">
     <button id="bDash" class="dashbtn" onclick="toggleDash()" aria-label="Dashboard">&#9776;</button>
-    <div class="title"><span id="dot" class="dot"></span>Chak 130/1-L</div>
+    <div class="title"><span id="dot" class="dot"></span>Chak 130/1-L<span class="tsub">OFFLINE MAP</span></div>
+    <button class="hbtn" onclick="openSearchTab()" aria-label="Search">&#128269;</button>
+    <button class="hbtn" onclick="toggleCleanView()" aria-label="Full screen — sirf map aur numbers">&#9974;</button>
     <div id="acc" class="badge">GPS: dhoond raha hai...</div>
   </div>
-  <div class="off">OFFLINE MAP &middot; INTERNET KI ZAROORAT NAHI</div>
   <div id="loc">
-    <small>Aap Ki Live Location</small>
-    <div id="pos">GPS on karein...</div>
-    <div id="nav"><span id="navtxt"></span><button onclick="clearTarget()">&#10005;</button></div>
-    <div id="coord"></div>
+    <div id="locSum" onclick="toggleLocCard()"><span aria-hidden="true">&#128205;</span><span id="locSumTxt">GPS on karein...</span><span id="locChev">&#9662;</span></div>
+    <div id="locBody">
+      <small>Aap Ki Live Location</small>
+      <div id="pos">GPS on karein...</div>
+      <div id="nav"><span id="navtxt"></span><button onclick="clearTarget()">&#10005;</button></div>
+      <div id="coord"></div>
+    </div>
   </div>
 </header>
 
@@ -2130,6 +2205,105 @@ document.addEventListener('DOMContentLoaded',init);
     route:function(){ return showRoute; },
     pin:{ unlocked:pinIsUnlocked, submit:pinSubmit, lock:lockRecords, require:requirePin,
           hashOf:sha256Sync, lockedHits:function(){ return lastLockedHits; } } };
+})();
+</script>
+<script>
+/* ===== Chak 130/1-L v4: Compact header, Clean View, Search tab, Numberdar Login, Rabta, Paimaish coordinates ===== */
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+
+  /* --- Compact location card: summary mode default, tap par purri tafseel --- */
+  window.toggleLocCard = function(){
+    var l=$('loc'); if(l) l.classList.toggle('open');
+  };
+  function mirrorLoc(){
+    var p=$('pos'), s=$('locSumTxt'); if(!p||!s) return;
+    var t=(p.textContent||'').replace(/\s+/g,' ').trim();
+    if(t) s.textContent=t;
+  }
+
+  /* --- Full Screen Clean View: tamam UI hide, sirf map + muraba/qila numbers --- */
+  window.toggleCleanView = function(){
+    var on=document.body.classList.toggle('cleanview');
+    if(on){
+      if(window.toggleDash) toggleDash(false);
+      var p=$('panel'); if(p) p.style.display='none';
+      if(window.showToast) showToast('Clean view — sirf map aur muraba/qila numbers. Band karne ke liye ✕ ya Esc');
+    }
+  };
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape' && document.body.classList.contains('cleanview')) toggleCleanView();
+  });
+
+  /* --- Dashboard tabs: 'sr' (Search) shamil — v3 wala Records PIN behaviour barqarar --- */
+  window.switchDashTab = function(t){
+    if(t==='rc' && window.pinIsUnlocked && !pinIsUnlocked()){ requirePin(function(){ window.switchDashTab('rc'); }); return; }
+    ['sr','ov','ly','pm','rc'].forEach(function(x){
+      var el=$('tab-'+x), b=$('tabbtn-'+x);
+      if(el) el.style.display = (x===t)?'block':'none';
+      if(b) b.className = 'tab'+(x===t?' on':'');
+    });
+    var bb=$('tab-'+t); if(bb) bb.scrollTop=0;
+  };
+  window.openSearchTab = function(){
+    if(window.toggleDash) toggleDash(true);
+    window.switchDashTab('sr');
+    setTimeout(function(){ var i=$('dashSearch'); if(i) i.focus(); }, 330);
+  };
+
+  /* --- Numberdar Login: sidebar ka alag option (PIN gate yahin se) --- */
+  function syncNdBtn(){
+    var b=$('ndBtn'); if(!b) return;
+    var un = !!(window.pinIsUnlocked && pinIsUnlocked());
+    b.className='ndlogin'+(un?' on':'');
+    b.innerHTML = un ? '&#128275; Numberdar — Records Khule Hain (Lock Karein)' : '&#128272; Numberdar Login';
+  }
+  window.numberdarLogin = function(){
+    if(window.pinIsUnlocked && pinIsUnlocked()){ lockRecords(); syncNdBtn(); return; }
+    requirePin(function(){ syncNdBtn(); if(window.showToast) showToast('Numberdar login ho gaya — Records khul gaye'); });
+  };
+  /* PIN unlock / lock par Numberdar button ki haalat sync rakho */
+  var _pinSubmit = window.pinSubmit, _lockRecords = window.lockRecords;
+  if(_pinSubmit) window.pinSubmit = function(){ var r=_pinSubmit(); if(r && r.then) r.then(function(){ setTimeout(syncNdBtn, 40); }); return r; };
+  if(_lockRecords) window.lockRecords = function(){ var r=_lockRecords(); syncNdBtn(); return r; };
+
+  /* --- Paimaish: har point ke coordinates ki numbered list + copy --- */
+  function fmtLL(p){ return p.lat.toFixed(5)+', '+p.lng.toFixed(5); }
+  function pmPtsNow(){ return (window.__v3 && __v3.pm && __v3.pm.pts()) || []; }
+  function renderPmCoords(){
+    var wrap=$('pmCoordsWrap'), box=$('pmCoords'); if(!wrap||!box) return;
+    var pts=pmPtsNow();
+    if(!pts.length){ wrap.style.display='none'; box.innerHTML=''; return; }
+    wrap.style.display='block';
+    box.innerHTML = pts.map(function(p,i){
+      return '<div class="pmcoord"><b>Point '+(i+1)+'</b><span>'+fmtLL(p)+'</span></div>';
+    }).join('');
+  }
+  window.pmCopyCoords = function(){
+    var pts=pmPtsNow();
+    if(!pts.length){ if(window.showToast) showToast('Pehle map par points lagayen'); return; }
+    var txt='Chak 130/1-L — Paimaish Points\n'+pts.map(function(p,i){ return 'Point '+(i+1)+': '+fmtLL(p); }).join('\n');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ if(window.showToast) showToast('Coordinates copy ho gaye'); },
+        function(){ window.prompt('Coordinates copy karein:', txt); });
+    } else window.prompt('Coordinates copy karein:', txt);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    mirrorLoc();
+    var p=$('pos');
+    if(p && window.MutationObserver) new MutationObserver(mirrorLoc).observe(p,{childList:true,characterData:true,subtree:true});
+    var pe=$('pmPts');
+    if(pe && window.MutationObserver) new MutationObserver(renderPmCoords).observe(pe,{childList:true,characterData:true,subtree:true});
+    renderPmCoords();
+    syncNdBtn();
+  });
+
+  /* test hooks */
+  window.__v4 = { clean:function(){ return document.body.classList.contains('cleanview'); },
+    locOpen:function(){ var l=$('loc'); return !!(l && l.classList.contains('open')); },
+    pmCoordsRender:renderPmCoords, syncNdBtn:syncNdBtn };
 })();
 </script>
 </body>
