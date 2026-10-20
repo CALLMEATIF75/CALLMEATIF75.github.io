@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<link rel="manifest" href="manifest.webmanifest">
-<title>Chak 130/1-L Offline Map</title>
+
+<title>Chak 130/1-L — Village Map, Dashboard & Paimaish</title>
+<meta name="description" content="Chak 130/1-L (Khanpur, Rahim Yar Khan, Punjab) ka offline village map: mustatil/qila grid, live GPS location, offline satellite aur paimaish tool — zameen ka area Marla, Kanal, Acre aur Square Feet mein naapein.">
 <style>/* required styles */
 
 .leaflet-pane,
@@ -724,12 +725,188 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
 .reset.go{background:#0369a1;margin-top:4px}
 #pick{display:none}
 </style>
+<style>
+/* ===== Chak 130/1-L Dashboard v2 (matches dark premium theme #0b1220) ===== */
+.dashbtn{width:34px;height:34px;border-radius:11px;border:1px solid #334155;background:#1e293b;color:#fbbf24;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dashbtn:active{transform:scale(.92)}
+#loader{position:fixed;inset:0;z-index:5000;background:#0b1220;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;color:#cbd5e1;font-weight:700;transition:opacity .45s}
+#loader.hide{opacity:0;pointer-events:none}
+#loader .spin{width:44px;height:44px;border-radius:50%;border:4px solid #1e293b;border-top-color:#fbbf24;animation:ldspin 1s linear infinite}
+@keyframes ldspin{to{transform:rotate(360deg)}}
+#toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:4000;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#north{position:absolute;z-index:900;top:calc(env(safe-area-inset-top,0px) + 10px);right:10px;background:rgba(15,23,42,.85);border:1px solid #334155;border-radius:12px;color:#fbbf24;font-weight:800;font-size:14px;width:40px;height:40px;display:none;align-items:center;justify-content:center}
+@media(min-width:768px){#north{display:flex}}
+#map.measuring{cursor:crosshair}
+/* Dashboard drawer */
+#dash{position:fixed;z-index:1500;top:0;left:0;bottom:0;width:344px;max-width:90vw;transform:translateX(-106%);transition:transform .28s ease;display:flex;flex-direction:column;border-radius:0 20px 20px 0;border-left:0}
+#dash.open{transform:none}
+.dash-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#0ea5e9,#22c55e);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;font-weight:800}
+.brand b{display:block;font-size:16px;color:#fbbf24;letter-spacing:.2px}
+.brand small{font-size:11px;color:#94a3b8}
+.xbtn{width:36px;height:36px;min-width:36px;border-radius:11px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:16px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px 4px}
+.stat{background:rgba(2,6,23,.6);border:1px solid #1e293b;border-radius:13px;padding:9px 10px}
+.stat b{display:block;font-size:17px;color:#fde68a;font-variant-numeric:tabular-nums}
+.stat small{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
+.tabs{display:flex;gap:6px;padding:10px 14px 0}
+.tab{flex:1;border:1px solid #334155;background:#1e293b;color:#cbd5e1;border-radius:11px;padding:10px 4px;font-size:13px;font-weight:700;min-height:44px}
+.tab.on{background:#1d4ed8;border-color:#60a5fa;color:#fff}
+.tabbody{padding:12px 14px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.tabbody h5{margin:12px 0 6px;font-size:13px;color:#fbbf24}
+.tabbody h5:first-child{margin-top:0}
+.tabbody p{margin:0 0 8px;font-size:12.5px;color:#cbd5e1;line-height:1.65}
+.tabbody ul{margin:0 0 8px;padding-left:18px;font-size:12.5px;color:#cbd5e1;line-height:1.6}
+.tabbody .card{background:rgba(2,6,23,.6);border:1px solid #1e293b;border-radius:12px;padding:10px 12px;margin:0 0 10px}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.legend .li{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#cbd5e1}
+.sw{width:20px;height:14px;border-radius:4px;flex-shrink:0}
+.lrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 2px;border-bottom:1px solid rgba(255,255,255,.06);min-height:52px}
+.lrow .ln b{display:block;font-size:13.5px;color:#e2e8f0}
+.lrow .ln small{font-size:11px;color:#94a3b8}
+/* toggle switch */
+.sw2{position:relative;width:52px;height:32px;flex-shrink:0}
+.sw2 input{opacity:0;width:100%;height:100%;margin:0;position:absolute;z-index:2;cursor:pointer}
+.sw2 i{position:absolute;inset:0;background:#334155;border-radius:99px;transition:.2s}
+.sw2 i:after{content:"";position:absolute;left:4px;top:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.sw2 input:checked+i{background:#2563eb}
+.sw2 input:checked+i:after{left:24px}
+.big{width:100%;min-height:48px;border:0;border-radius:13px;background:#1d4ed8;color:#fff;font-size:15px;font-weight:800;margin:4px 0 8px}
+.big.stop{background:#b45309}
+.big:active{transform:scale(.98)}
+.hint{font-size:11.5px;color:#94a3b8;line-height:1.5;margin:0 0 10px}
+.res{background:rgba(2,6,23,.75);border:1px solid #f59e0b;border-radius:14px;padding:4px 12px;margin:0 0 10px}
+.resline{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;color:#cbd5e1}
+.resline:last-child{border-bottom:0}
+.resline b{color:#fff;font-variant-numeric:tabular-nums}
+.resline.big b{font-size:21px;color:#facc15}
+.resline.mid b{font-size:16px;color:#6ee7b7}
+.btnrow{display:flex;gap:8px;margin:0 0 10px}
+.btnrow button{flex:1;min-height:46px;border-radius:12px;border:1px solid #334155;background:#1e293b;color:#e2e8f0;font-size:13.5px;font-weight:700}
+.presets{font-size:11.5px;color:#94a3b8;line-height:1.7}
+.presets table{width:100%;border-collapse:collapse;margin-top:6px}
+.presets td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px;color:#cbd5e1}
+.presets td:last-child{text-align:right;color:#fde68a;font-variant-numeric:tabular-nums}
+.dash-foot{padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 10px);font-size:10.5px;color:#64748b;border-top:1px solid rgba(255,255,255,.08);text-align:center}
+.searchrow{display:flex;gap:6px;margin:0 0 4px}
+.searchrow input{flex:1;min-width:0;background:#0f172a;color:#fff;border:1px solid #334155;border-radius:11px;padding:11px 10px;font-size:13.5px;font-weight:600}
+.searchrow button{border:0;border-radius:11px;background:#1d4ed8;color:#fff;font-weight:800;padding:0 16px;font-size:14px;min-height:46px}
+.mpoint{width:14px;height:14px;border-radius:50%;background:#f59e0b;border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.7)}
+.mlabel{background:rgba(15,23,42,.92);border:1px solid #f59e0b;color:#facc15;font-weight:800;font-size:12px;border-radius:8px;padding:2px 8px;white-space:nowrap}
+#dashQuick{display:flex;gap:6px;padding:0 14px 10px}
+#dashQuick button{flex:1;border:1px solid #334155;background:#1e293b;color:#e2e8f0;border-radius:11px;min-height:42px;font-size:12px;font-weight:700}
+@media print{#dash,#loader,#toast,.fab,#top,#find,#north,#panel{display:none!important}}
+
+</style>
 </head>
 <body>
 <div id="map"></div>
+<div id="loader"><div class="spin"></div><div>Naqsha load ho raha hai...</div></div>
+<div id="north" title="North">N &#8593;</div>
+
+<aside id="dash" class="glass" aria-label="Dashboard">
+  <div class="dash-head">
+    <div class="brand"><span class="logo">&#9873;</span><div><b>Chak 130/1-L</b><small>Village Map Dashboard</small></div></div>
+    <button class="xbtn" onclick="toggleDash()" aria-label="Dashboard band karein">&#10005;</button>
+  </div>
+  <div class="stats" id="dashStats"></div>
+  <div class="tabs">
+    <button class="tab on" id="tabbtn-ov" onclick="switchDashTab('ov')">Overview</button>
+    <button class="tab" id="tabbtn-ly" onclick="switchDashTab('ly')">Layers</button>
+    <button class="tab" id="tabbtn-pm" onclick="switchDashTab('pm')">Paimaish</button>
+  </div>
+
+  <div class="tabbody" id="tab-ov">
+    <h5>Chak 130/1-L &mdash; Taaruf</h5>
+    <p>Ye Chak 130/1-L ka offline digital naqsha hai &mdash; Tehsil Khanpur, Zila Rahim Yar Khan, Punjab, Pakistan. Gaon ki zameen mustatil (murabba) aur qilon mein taqseem hai. Is naqshe mein kul <b id="ovMur">...</b> mustatil aur <b id="ovQila">...</b> qile map kiye gaye hain. Har mustatil mein 5&times;5 = <b>25 qile</b> hote hain aur har qila lagbhag <b>1 acre (160 Marla)</b> ka hota hai.</p>
+    <div class="card"><b style="color:#facc15">Khaas baat:</b> <span style="font-size:12.5px;color:#cbd5e1">Ye map bina internet chalta hai. Ek baar satellite download karne ke baad GPS location, mustatil/qila ki pehchan aur paimaish &mdash; sab kuch baghair net ke kaam karta hai.</span></div>
+    <h5>Dhoondhein (Search)</h5>
+    <div class="searchrow">
+      <input id="dashSearch" list="murList" placeholder="Masalan: 447/12" autocomplete="off" onkeydown="if(event.key==='Enter')dashSearchGo()">
+      <datalist id="murList"></datalist>
+      <button onclick="dashSearchGo()">Dhoondhein</button>
+    </div>
+    <p class="hint">Mustatil ka naam likhein (masalan 447/12). Neeche Qila number likhne se seedha us qila par le jayega. Map par kisi jagah tap karne se bhi mustatil aur qila maloom ho jata hai &mdash; pehla tap mustatil, dusra tap qila select karta hai.</p>
+    <div class="searchrow">
+      <input id="dashQ" type="number" min="1" max="25" placeholder="Qila number (1-25) &mdash; ikhtiyari">
+      <button onclick="dashSearchGo()">Chalein</button>
+    </div>
+    <h5>Rangon ki pehchan (Legend)</h5>
+    <div class="legend">
+      <div class="li"><span class="sw" style="background:#ef4444"></span>Mustatil boundary</div>
+      <div class="li"><span class="sw" style="background:#38bdf8"></span>Qila lines</div>
+      <div class="li"><span class="sw" style="background:#facc15"></span>Aap ki location wala mustatil</div>
+      <div class="li"><span class="sw" style="background:#34d399"></span>Aap ka qila</div>
+      <div class="li"><span class="sw" style="background:#f59e0b"></span>Chuna hua mustatil</div>
+      <div class="li"><span class="sw" style="background:#22c55e"></span>Chuna hua qila</div>
+    </div>
+    <h5>Istemal ki guide</h5>
+    <ul>
+      <li><b>Live Location:</b> neelay button se GPS location chalein &mdash; map khud batayega aap kis mustatil aur kis qila mein kharay hain.</li>
+      <li><b>Paimaish:</b> Paimaish tab se tool on karein, map par tap karke plot ke kone chunein &mdash; area Marla, Kanal, Acre aur Square Feet mein live nazar ayega.</li>
+      <li><b>Satellite offline:</b> gear (settings) button se panel khol kar satellite tiles download kar lein, taake baghair internet ke satellite photo bhi nazar aye.</li>
+      <li><b>Grid Adjust:</b> agar asli jagah aur grid lines mein thora farq lage to settings panel se grid ko 5 meter ke qadam se theek jagah par rakha ja sakta hai.</li>
+      <li><b>Layers:</b> Layers tab se satellite, grid, qile aur labels on/off karein.</li>
+    </ul>
+  </div>
+
+  <div class="tabbody" id="tab-ly" style="display:none">
+    <h5>Layers</h5>
+    <div class="lrow"><div class="ln"><b>Satellite</b><small>ArcGIS World Imagery (offline saved bhi chalta hai)</small></div><label class="sw2"><input type="checkbox" id="lySat" checked onchange="lyToggleSat(this.checked)"><i></i></label></div>
+    <div class="lrow"><div class="ln"><b>Mustatil Grid</b><small>Lal boundary wali lines</small></div><label class="sw2"><input type="checkbox" id="lyGrid" checked onchange="lyToggleGrid(this.checked)"><i></i></label></div>
+    <div class="lrow"><div class="ln"><b>Sab Qile</b><small>Har mustatil ke 25 qile (zoom 16+ par)</small></div><label class="sw2"><input type="checkbox" id="lyQila" onchange="lyToggleQila(this.checked)"><i></i></label></div>
+    <div class="lrow"><div class="ln"><b>Labels</b><small>Mustatil aur qila numbers</small></div><label class="sw2"><input type="checkbox" id="lyLbl" checked onchange="lyToggleLbl(this.checked)"><i></i></label></div>
+    <h5>Quick Actions</h5>
+    <div id="dashQuick">
+      <button onclick="fitVillage()">Poora Gaon</button>
+      <button onclick="toggleFull()">Fullscreen</button>
+      <button onclick="shareLink()">Link Copy</button>
+    </div>
+    <p class="hint">Settings panel (gear button) mein satellite offline download aur Grid Adjust mojood hai.</p>
+    <button class="big" onclick="togglePanel()">Settings Panel Kholein</button>
+  </div>
+
+  <div class="tabbody" id="tab-pm" style="display:none">
+    <h5>Paimaish (Measurement)</h5>
+    <button class="big" id="pmBtn" onclick="toggleMeasure()">Paimaish Shuru Karein</button>
+    <p class="hint">Map par tap karke plot ke kone chunein. <b>2 points</b> hon to seedhi line ka fasla (distance) milega, <b>3 ya zyada points</b> hon to plot ka area live calculate hoga.</p>
+    <div class="res" id="pmRes" style="display:none">
+      <div class="resline mid"><span>Square Feet</span><b id="pmSqft">0</b></div>
+      <div class="resline big"><span>Marla</span><b id="pmMarla">0</b></div>
+      <div class="resline"><span>Kanal</span><b id="pmKanal">0</b></div>
+      <div class="resline"><span>Acre</span><b id="pmAcre">0</b></div>
+      <div class="resline"><span>Square Yard (Gaj)</span><b id="pmGaj">0</b></div>
+      <div class="resline"><span>Square Meter</span><b id="pmSqm">0</b></div>
+      <div class="resline mid"><span>Ghera (Perimeter)</span><b id="pmPeri">0</b></div>
+      <div class="resline"><span>Points</span><b id="pmPts">0</b></div>
+    </div>
+    <div class="btnrow">
+      <button onclick="pmUndo()">&#8617; Aakhri Point Hatao</button>
+      <button onclick="pmClear()">Saaf Karo</button>
+    </div>
+    <h5>Plot sizes &mdash; reference</h5>
+    <div class="presets"><table>
+      <tr><td>1 Marla</td><td>272.25 sq ft</td></tr>
+      <tr><td>3 Marla</td><td>816.75 sq ft</td></tr>
+      <tr><td>5 Marla</td><td>1,361.25 sq ft</td></tr>
+      <tr><td>7 Marla</td><td>1,905.75 sq ft</td></tr>
+      <tr><td>10 Marla</td><td>2,722.5 sq ft</td></tr>
+      <tr><td>1 Kanal (20 Marla)</td><td>5,445 sq ft</td></tr>
+      <tr><td>1 Qila / Acre (160 Marla)</td><td>43,560 sq ft</td></tr>
+    </table></div>
+  </div>
+
+  <div class="dash-foot">Chak 130/1-L Map &mdash; CALLMEATIF75</div>
+</aside>
+<div id="pmChip" class="glass" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:1200;border-radius:14px;padding:10px 16px;font-size:14px;font-weight:800;color:#facc15;text-align:center;cursor:pointer;max-width:86vw" onclick="toggleDash(true);switchDashTab('pm')"><span id="pmChipTxt">Points: 0</span></div>
+<div id="toast"></div>
+
 
 <header id="top" class="glass">
   <div class="row">
+    <button id="bDash" class="dashbtn" onclick="toggleDash()" aria-label="Dashboard">&#9776;</button>
     <div class="title"><span id="dot" class="dot"></span>Chak 130/1-L</div>
     <div id="acc" class="badge">GPS: dhoond raha hai...</div>
   </div>
@@ -765,6 +942,7 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
   <button id="bLayer" class="btn on" onclick="toggleSat()" aria-label="Satellite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="m2 13 10 5 10-5"/></svg></button>
   <button id="bQila" class="btn amber dim" onclick="toggleQila()" aria-label="Sab qile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M12 3v18M3 12h18"/></svg></button>
   <button id="bFollow" class="btn on" onclick="followMe()" aria-label="Meri location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg></button>
+  <button id="bMeasure" class="btn" onclick="toggleMeasure()" aria-label="Paimaish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21l-4-4Z"/><path d="M8.5 14.5 10 16M11.5 11.5 13 13M14.5 8.5 16 10"/></svg></button>
   <div class="zoom"><button onclick="map.zoomIn()">+</button><button onclick="map.zoomOut()">&minus;</button></div>
 </div>
 
@@ -908,7 +1086,7 @@ function refresh(){
   var z=map.getZoom();
   if(qilaAll && z>=16){ buildAllQila(); if(!map.hasLayer(qAllLayer)) map.addLayer(qAllLayer);} else if(map.hasLayer(qAllLayer)) map.removeLayer(qAllLayer);
   labelLayer.clearLayers();
-  if(z<14.5) return;
+  if(z<14.5||window.C130_LABELS===false) return;
   var vb=map.getBounds().pad(0.1);
   NAMES.forEach(function(k){
     var m=MUR[k], b=mBounds(m);
@@ -1114,7 +1292,199 @@ function nudge(dn,de){ shift.lat+=dn; shift.lng+=de; saveShift(); }
 function resetShift(){ shift={lat:0,lng:0}; saveShift(); }
 
 document.addEventListener('DOMContentLoaded',init);
-if('serviceWorker' in navigator && /^https?:/.test(location.protocol)){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
+/* v2: sw.js maujood nahi thi, is liye service worker registration hata di gayi (offline tiles IndexedDB se chalte hain). */
+
+</script>
+<script>
+/* ===== Chak 130/1-L Dashboard v2 + Paimaish tool (enhancement module) ===== */
+(function(){
+  /* --- Manifest fix: purana manifest.webmanifest link 404 tha, ab inline manifest --- */
+  try{
+    var icon='data:image/svg+xml,'+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='#0b1220'/><path d='M25 8v84M50 8v84M75 8v84M8 25h84M8 50h84M8 75h84' stroke='#fbbf24' stroke-width='4'/><circle cx='50' cy='50' r='10' fill='#22c55e' stroke='#fff' stroke-width='3'/></svg>");
+    var man={name:'Chak 130/1-L Map',short_name:'Chak 130 Map',start_url:location.href.split('#')[0],display:'standalone',background_color:'#0b1220',theme_color:'#0b1220',icons:[{src:icon,sizes:'any',type:'image/svg+xml',purpose:'any'}]};
+    var lk=document.createElement('link'); lk.rel='manifest';
+    lk.href=URL.createObjectURL(new Blob([JSON.stringify(man)],{type:'application/json'}));
+    document.head.appendChild(lk);
+  }catch(e){}
+
+  function dzHideLoader(){
+    var l=document.getElementById('loader'); if(!l||l._done) return; l._done=true;
+    l.classList.add('hide'); setTimeout(function(){ if(l.parentNode) l.parentNode.removeChild(l); },600);
+  }
+  setTimeout(dzHideLoader,3500);
+  window.addEventListener('load',function(){ setTimeout(dzHideLoader,300); });
+
+  /* --- Geodesic area (spherical formula, Leaflet Draw wali hi technique) --- */
+  function gzArea(latlngs){
+    var a=0, d2r=Math.PI/180, n=latlngs.length, i, p1, p2;
+    for(i=0;i<n;i++){ p1=latlngs[i]; p2=latlngs[(i+1)%n];
+      a += ((p2.lng-p1.lng)*d2r) * (2 + Math.sin(p1.lat*d2r) + Math.sin(p2.lat*d2r)); }
+    return Math.abs(a * 6378137 * 6378137 / 2);
+  }
+  function gzRect(b){ return [L.latLng(b.s,b.w), L.latLng(b.n,b.w), L.latLng(b.n,b.e), L.latLng(b.s,b.e)]; }
+  var SQFT = 0.09290304;
+  function dzFmt(n){ return Math.round(n).toLocaleString('en-US'); }
+  function dzDec(n,d){ return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+
+  /* --- Stats: tamam numbers asal GeoJSON/grid data se compute hote hain --- */
+  function dzStats(){
+    var total=0;
+    NAMES.forEach(function(k){ total += gzArea(gzRect(mBounds(MUR[k]))); });
+    var qA = gzArea(gzRect(qBounds(MUR[NAMES[0]],1)));
+    var ext = gridExtent();
+    var wKm = (ext.e-ext.w)*M_PER_DEG_LNG/1000, hKm = (ext.n-ext.s)*M_PER_DEG_LAT/1000;
+    var tSqft = total/SQFT, qSqft = qA/SQFT;
+    var cards = [
+      {v: NAMES.length, l:'Kul Mustatil (Murabba)'},
+      {v: dzFmt(NAMES.length*25), l:'Kul Qile'},
+      {v: dzDec(tSqft/43560,1), l:'Kul Area — Acre'},
+      {v: dzFmt(tSqft/272.25), l:'Kul Area — Marla'},
+      {v: dzDec(qSqft/272.25,1)+' Marla', l:'Ek Qila (Acre)'},
+      {v: dzDec(wKm,1)+' × '+dzDec(hKm,1), l:'Gaon ka Phailao — km'}
+    ];
+    document.getElementById('dashStats').innerHTML = cards.map(function(c){
+      return '<div class="stat"><b>'+c.v+'</b><small>'+c.l+'</small></div>';
+    }).join('');
+    document.getElementById('ovMur').textContent = NAMES.length;
+    document.getElementById('ovQila').textContent = dzFmt(NAMES.length*25);
+    var dl=document.getElementById('murList');
+    NAMES.forEach(function(k){ var o=document.createElement('option'); o.value=k; dl.appendChild(o); });
+  }
+
+  /* --- Dashboard kholna / tabs --- */
+  window.toggleDash = function(force){
+    var d=document.getElementById('dash');
+    var open = (typeof force==='boolean') ? force : !d.classList.contains('open');
+    d.classList.toggle('open', open);
+    if(open) dzSyncLayers();
+  };
+  window.switchDashTab = function(t){
+    ['ov','ly','pm'].forEach(function(x){
+      document.getElementById('tab-'+x).style.display = (x===t)?'block':'none';
+      document.getElementById('tabbtn-'+x).className = 'tab'+(x===t?' on':'');
+    });
+    var b=document.getElementById('tab-'+t); if(b) b.scrollTop=0;
+  };
+
+  /* --- Layers toggles --- */
+  function dzSyncLayers(){
+    try{
+      document.getElementById('lySat').checked = map.hasLayer(satLayer);
+      document.getElementById('lyGrid').checked = map.hasLayer(mLayer);
+      document.getElementById('lyQila').checked = !!qilaAll;
+      document.getElementById('lyLbl').checked = window.C130_LABELS!==false;
+    }catch(e){}
+  }
+  window.dzSyncLayers = dzSyncLayers;
+  window.lyToggleSat = function(on){ if(map.hasLayer(satLayer)!==on) toggleSat(); };
+  window.lyToggleGrid = function(on){ if(on){ if(!map.hasLayer(mLayer)) map.addLayer(mLayer); } else if(map.hasLayer(mLayer)) map.removeLayer(mLayer); };
+  window.lyToggleQila = function(on){ if(!!qilaAll!==on) toggleQila(); };
+  window.lyToggleLbl = function(on){ window.C130_LABELS=on; refresh(); };
+
+  /* --- Search --- */
+  window.dashSearchGo = function(){
+    var v=document.getElementById('dashSearch').value.trim().replace(/[\s\-]+/g,'/');
+    if(!MUR[v]){ showToast('Mustatil "'+v+'" nahi mila — neeche list se chunein'); return; }
+    onPickM(v);
+    var q=parseInt(document.getElementById('dashQ').value,10);
+    if(q>=1&&q<=25) onPickQ(String(q));
+    if(window.innerWidth<1100) toggleDash(false);
+  };
+
+  /* --- Quick actions --- */
+  window.fitVillage = function(){
+    var ext=gridExtent(); following=false; setFollowBtn();
+    map.fitBounds([[ext.s,ext.w],[ext.n,ext.e]],{padding:[30,30]});
+  };
+  window.toggleFull = function(){
+    try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }catch(e){}
+  };
+  window.shareLink = function(){
+    var u=location.href;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(u).then(function(){ showToast('Link copy ho gaya'); }, function(){ window.prompt('Link copy karein:',u); });
+    } else window.prompt('Link copy karein:', u);
+  };
+  window.showToast = function(msg){
+    var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+    clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove('show'); },2600);
+  };
+
+  /* ================= PAIMAISH (Measurement) ================= */
+  var pmOn=false, pmPts=[], pmGroup=null;
+  function pmEnsure(){ if(!pmGroup) pmGroup=L.layerGroup().addTo(map); }
+  window.toggleMeasure = function(){
+    pmOn=!pmOn;
+    var btn=document.getElementById('pmBtn');
+    document.getElementById('bMeasure').className='btn'+(pmOn?' on':'');
+    document.getElementById('map').classList.toggle('measuring',pmOn);
+    if(pmOn){
+      btn.textContent='Paimaish Band Karein'; btn.className='big stop';
+      pmEnsure();
+      map.off('click', onMapClick);
+      map.doubleClickZoom.disable();
+      map.on('click', pmClick);
+      document.getElementById('pmRes').style.display='block';
+      document.getElementById('pmChip').style.display='block';
+      showToast('Paimaish on — map par tap karke points lagayen');
+    } else pmOff();
+  };
+  function pmOff(){
+    pmOn=false;
+    var btn=document.getElementById('pmBtn');
+    btn.textContent='Paimaish Shuru Karein'; btn.className='big';
+    document.getElementById('bMeasure').className='btn';
+    document.getElementById('map').classList.remove('measuring');
+    document.getElementById('pmChip').style.display='none';
+    map.off('click', pmClick);
+    map.on('click', onMapClick);
+    map.doubleClickZoom.enable();
+  }
+  function pmClick(e){ pmPts.push(e.latlng); pmDraw(); }
+  window.pmUndo = function(){ if(pmPts.length){ pmPts.pop(); pmDraw(); } };
+  window.pmClear = function(){ pmPts=[]; pmDraw(); };
+  function pmDraw(){
+    pmEnsure(); pmGroup.clearLayers();
+    pmPts.forEach(function(p){
+      L.marker(p,{interactive:false,keyboard:false,icon:L.divIcon({className:'',html:'<div class="mpoint"></div>',iconSize:[14,14],iconAnchor:[7,7]})}).addTo(pmGroup);
+    });
+    if(pmPts.length>=2) L.polyline(pmPts,{color:'#f59e0b',weight:2.5,interactive:false}).addTo(pmGroup);
+    if(pmPts.length>=3) L.polygon(pmPts,{color:'#f59e0b',weight:2,fillColor:'#f59e0b',fillOpacity:.15,interactive:false}).addTo(pmGroup);
+    pmUpdate();
+  }
+  function pmUpdate(){
+    var n=pmPts.length, peri=0, i, areaM2=0;
+    for(i=1;i<n;i++) peri += pmPts[i-1].distanceTo(pmPts[i]);
+    if(n>=3){ peri += pmPts[n-1].distanceTo(pmPts[0]); areaM2 = gzArea(pmPts); }
+    var sqft = areaM2/SQFT, marla = sqft/272.25;
+    document.getElementById('pmPts').textContent = n;
+    document.getElementById('pmSqft').textContent = dzFmt(sqft);
+    document.getElementById('pmMarla').textContent = dzDec(marla,2);
+    document.getElementById('pmKanal').textContent = dzDec(sqft/5445, sqft/5445<10?3:2);
+    document.getElementById('pmAcre').textContent = dzDec(sqft/43560, sqft/43560<1?4:3);
+    document.getElementById('pmGaj').textContent = dzDec(sqft/9,1);
+    document.getElementById('pmSqm').textContent = dzDec(areaM2, areaM2<100?2:1);
+    var periTxt = (peri>=1000 ? dzDec(peri/1000,2)+' km' : Math.round(peri)+' m') + ' · ' + dzFmt(peri*3.28084) + ' ft';
+    document.getElementById('pmPeri').textContent = periTxt;
+    document.getElementById('pmChipTxt').textContent = n<2 ? 'Points: '+n :
+      (n===2 ? 'Fasla: '+periTxt : 'Marla: '+dzDec(marla,2)+' · '+dzFmt(sqft)+' sq ft');
+    /* map par live label */
+    if(n>=2){
+      var cLat=0, cLng=0;
+      if(n===2){ cLat=(pmPts[0].lat+pmPts[1].lat)/2; cLng=(pmPts[0].lng+pmPts[1].lng)/2; }
+      else { pmPts.forEach(function(p){ cLat+=p.lat; cLng+=p.lng; }); cLat/=n; cLng/=n; }
+      var txt = n===2 ? (Math.round(pmPts[0].distanceTo(pmPts[1]))+' m') : (dzDec(marla,2)+' Marla');
+      L.marker([cLat,cLng],{interactive:false,keyboard:false,icon:L.divIcon({className:'',html:'<span class="mlabel">'+txt+'</span>',iconAnchor:[34,10]})}).addTo(pmGroup);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(dzHideLoader, 500);
+    try{ dzStats(); }catch(e){}
+    if(window.innerWidth>=1100) toggleDash(true);
+    dzSyncLayers();
+  });
+})();
 
 </script>
 </body>
