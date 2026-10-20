@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2317bd85'/%3E%3Cstop offset='1' stop-color='%2307704c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' rx='12' fill='url(%23g)'/%3E%3Cpath d='M13 19h22M13 30h13' stroke='white' stroke-width='4.5' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='30' r='2.8' fill='white'/%3E%3C/svg%3E" />
+    <title>Numeria — Calculadora Online, Científica, Porcentajes e IVA</title>
+    <meta name="description" content="Numeria es tu calculadora online gratuita y profesional: estándar y científica, calculadoras de porcentajes y de IVA para Argentina. Rápida, precisa y sin registro." />
+    <meta name="theme-color" content="#0c8a5c" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Numeria — Calculadora Online, Científica, Porcentajes e IVA" />
+    <meta property="og:description" content="Calculadora online gratuita con modo científico, porcentajes e IVA para Argentina. Precisa, rápida y sin registro." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f3f1ec;
+        --bg-soft: #ebe8e0;
+        --surface: #ffffff;
+        --surface-2: #f7f5f0;
+        --ink: #171a21;
+        --ink-2: #4b5160;
+        --ink-3: #8a8fa0;
+        --line: #e2ded2;
+        --accent: #0c8a5c;
+        --accent-ink: #ffffff;
+        --accent-soft: #e0f3ea;
+        --device: #191d26;
+        --device-2: #222733;
+        --device-line: #2e3547;
+        --key: #262c3b;
+        --key-hover: #313a4f;
+        --key-fn: #1d222e;
+        --screen: #10131a;
+        --screen-ink: #f5f2ea;
+        --screen-dim: #9aa3b8;
+        --ok: #1d9d63;
+        --shadow: 0 24px 60px -18px rgba(23, 26, 33, 0.28), 0 4px 14px rgba(23, 26, 33, 0.08);
+        --radius: 18px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d0f13;
+          --bg-soft: #12151b;
+          --surface: #161a21;
+          --surface-2: #1b2029;
+          --ink: #f2f0e9;
+          --ink-2: #b6bccb;
+          --ink-3: #7c8398;
+          --line: #262c38;
+          --accent: #2fce8f;
+          --accent-ink: #052418;
+          --accent-soft: #12291e;
+          --device: #141821;
+          --device-2: #1a1f2b;
+          --device-line: #2a3142;
+          --key: #232a39;
+          --key-hover: #2d3649;
+          --key-fn: #191e29;
+          --screen: #0a0c10;
+          --screen-ink: #f5f2ea;
+          --screen-dim: #8b94a9;
+          --shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.7), 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: "Manrope", system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; }
+      ::selection { background: var(--accent); color: #fff; }
+
+      /* ---------- Header ---------- */
+      header {
+        position: sticky; top: 0; z-index: 50;
+        background: color-mix(in srgb, var(--bg) 86%, transparent);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--line);
+      }
+      .header-in {
+        max-width: 1180px; margin: 0 auto; padding: 14px 20px;
+        display: flex; align-items: center; gap: 28px;
+      }
+      .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; font-family: "Bricolage Grotesque", "Manrope", sans-serif; font-weight: 800; font-size: 1.24rem; letter-spacing: -0.02em; }
+      .brand-mark {
+        width: 38px; height: 38px; border-radius: 11px; flex: none;
+        background: linear-gradient(135deg, #17bd85, #07704c);
+        display: grid; place-items: center;
+        box-shadow: 0 6px 16px -6px rgba(7, 112, 76, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      }
+      .brand-mark svg { width: 23px; height: 23px; }
+      .brand-mark.small { width: 30px; height: 30px; border-radius: 9px; }
+      .brand-mark.small svg { width: 18px; height: 18px; }
+      .brand em { font-style: normal; color: var(--accent); }
+      nav.main-nav { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; }
+      nav.main-nav a {
+        text-decoration: none; font-weight: 600; font-size: 0.9rem; color: var(--ink-2);
+        padding: 8px 13px; border-radius: 999px;
+      }
+      nav.main-nav a:hover { background: var(--bg-soft); color: var(--ink); }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        position: relative;
+        max-width: 1180px; margin: 0 auto; padding: 52px 20px 30px;
+        display: grid; grid-template-columns: 1fr 480px; gap: 56px; align-items: start;
+      }
+      .hero::before {
+        content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
+        background-image: radial-gradient(color-mix(in srgb, var(--ink) 13%, transparent) 1.2px, transparent 1.4px);
+        background-size: 22px 22px;
+        -webkit-mask-image: linear-gradient(105deg, #000 0%, #000 34%, transparent 62%);
+        mask-image: linear-gradient(105deg, #000 0%, #000 34%, transparent 62%);
+      }
+      .glyph {
+        position: absolute; z-index: 0; pointer-events: none; user-select: none;
+        font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; line-height: 1;
+        color: var(--accent);
+      }
+      .glyph.g1 { top: 4px; right: 41%; font-size: 3.4rem; opacity: 0.16; transform: rotate(-8deg); }
+      .glyph.g2 { bottom: 132px; left: -12px; font-size: 2.6rem; opacity: 0.12; transform: rotate(10deg); }
+      .glyph.g3 { top: 252px; right: 44%; font-size: 2.2rem; opacity: 0.14; }
+      .hero-copy { padding-top: 26px; position: relative; z-index: 1; }
+      .hero-copy h1 {
+        font-family: "Bricolage Grotesque", "Manrope", sans-serif;
+        font-size: clamp(2.3rem, 4.6vw, 3.6rem); line-height: 1.04; letter-spacing: -0.03em;
+        margin: 0 0 18px; font-weight: 800;
+      }
+      .hero-copy h1 .hl { color: var(--accent); }
+      .hero-copy p.lead { font-size: 1.13rem; line-height: 1.65; color: var(--ink-2); margin: 0 0 26px; max-width: 52ch; }
+      .hero-points { display: grid; gap: 12px; margin: 0 0 30px; padding: 0; list-style: none; }
+      .hero-points li { display: flex; gap: 11px; align-items: flex-start; font-weight: 600; font-size: 0.98rem; }
+      .hero-points .tick {
+        flex: none; width: 22px; height: 22px; border-radius: 7px; margin-top: 1px;
+        background: var(--accent-soft); color: var(--accent); display: grid; place-items: center;
+      }
+      .hero-points .tick svg { width: 13px; height: 13px; }
+      .hero-points small { display: block; font-weight: 500; color: var(--ink-3); font-size: 0.86rem; margin-top: 2px; }
+      .stat-row { display: flex; gap: 34px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 22px; }
+      .stat b { display: block; font-size: 1.5rem; letter-spacing: -0.02em; }
+      .stat span { font-size: 0.82rem; color: var(--ink-3); font-weight: 600; }
+
+      /* ---------- Calculator device ---------- */
+      .device-wrap { position: sticky; top: 92px; z-index: 1; }
+      .device {
+        background: linear-gradient(165deg, var(--device-2), var(--device) 55%);
+        border-radius: 28px; padding: 20px 18px 18px;
+        box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.07);
+        border: 1px solid var(--device-line);
+        color: var(--screen-ink);
+      }
+      .mode-tabs {
+        display: flex; gap: 6px; background: rgba(0,0,0,0.28); border-radius: 12px; padding: 4px; margin-bottom: 14px;
+      }
+      .mode-tabs button {
+        flex: 1; border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 0.86rem;
+        padding: 9px 6px; border-radius: 9px; background: transparent; color: var(--screen-dim);
+        transition: background 0.15s, color 0.15s;
+      }
+      .mode-tabs button.active { background: var(--accent); color: #fff; }
+      .screen {
+        position: relative;
+        background: var(--screen); border-radius: 16px; padding: 18px 18px 14px;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.55);
+        min-height: 118px; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end;
+        overflow: hidden;
+      }
+      .screen-brand {
+        position: absolute; top: 12px; left: 16px;
+        font-family: "Bricolage Grotesque", sans-serif; font-size: 0.62rem; font-weight: 700;
+        letter-spacing: 0.24em; color: var(--screen-dim); opacity: 0.85;
+      }
+      .screen .expr {
+        font-family: "IBM Plex Mono", monospace; font-size: 1.02rem; color: var(--screen-dim);
+        min-height: 1.4em; text-align: right; word-break: break-all; line-height: 1.45;
+      }
+      .screen .result {
+        font-family: "IBM Plex Mono", monospace; font-weight: 600;
+        font-size: clamp(2rem, 6vw, 2.7rem); line-height: 1.15; text-align: right; word-break: break-all;
+      }
+      .screen .result.error { color: #ff7a6b; font-size: 1.3rem; }
+      .keys { margin-top: 14px; }
+      .keys-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+      .sci-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 8px; }
+      .key {
+        border: 0; cursor: pointer; font-family: "IBM Plex Mono", monospace;
+        font-size: 1.18rem; font-weight: 500; padding: 15px 4px; border-radius: 13px;
+        background: var(--key); color: var(--screen-ink);
+        box-shadow: 0 3px 0 rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+        transition: transform 0.05s, background 0.12s;
+        user-select: none; -webkit-tap-highlight-color: transparent;
+      }
+      .key:hover { background: var(--key-hover); }
+      .key:active, .key.pressed { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.35); }
+      .key.fn { background: var(--key-fn); color: var(--screen-dim); font-size: 1rem; }
+      .key.op { color: #8fe3c0; font-weight: 600; }
+      .key.eq { background: var(--accent); color: #fff; font-weight: 700; }
+      .key.eq:hover { background: color-mix(in srgb, var(--accent) 88%, #fff); }
+      .key.sci-key { font-size: 0.92rem; padding: 12px 2px; }
+
+      .history {
+        margin-top: 16px; background: var(--surface); border: 1px solid var(--line);
+        border-radius: var(--radius); padding: 16px 18px;
+      }
+      .history-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+      .history-head h3 { margin: 0; font-size: 0.92rem; letter-spacing: 0.01em; }
+      .history-head button {
+        border: 0; background: none; font: inherit; font-size: 0.82rem; font-weight: 700;
+        color: var(--accent); cursor: pointer; padding: 4px 6px;
+      }
+      .history ul { list-style: none; margin: 0; padding: 0; }
+      .history li {
+        display: flex; justify-content: space-between; gap: 14px; padding: 8px 6px;
+        border-top: 1px dashed var(--line); cursor: pointer; border-radius: 8px;
+        font-family: "IBM Plex Mono", monospace; font-size: 0.92rem;
+      }
+      .history li:hover { background: var(--surface-2); }
+      .history li .h-expr { color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .history li .h-res { font-weight: 600; flex: none; }
+      .history .empty { color: var(--ink-3); font-size: 0.9rem; padding: 6px 2px 2px; }
+
+      /* ---------- Sections ---------- */
+      section.block { max-width: 1180px; margin: 0 auto; padding: 44px 20px 8px; }
+      .block-head { max-width: 640px; margin-bottom: 26px; }
+      .block-head h2 { font-family: "Bricolage Grotesque", "Manrope", sans-serif; font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -0.025em; margin: 0 0 8px; font-weight: 800; }
+      .block-head p { margin: 0; color: var(--ink-2); line-height: 1.6; font-size: 1rem; }
+      .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+      .tool-grid.two { grid-template-columns: 1.15fr 0.85fr; }
+      .tool {
+        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 24px; display: flex; flex-direction: column; gap: 14px;
+      }
+      .tool h3 { margin: 0; font-size: 1.06rem; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+      .tool h3 .ic {
+        width: 34px; height: 34px; border-radius: 9px; flex: none;
+        background: var(--accent-soft); color: var(--accent); display: grid; place-items: center;
+      }
+      .tool h3 .ic svg { width: 18px; height: 18px; }
+      .tool p.desc { margin: 0; color: var(--ink-2); font-size: 0.92rem; line-height: 1.55; }
+      .fields { display: grid; gap: 10px; }
+      .fields .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      label.fl { display: grid; gap: 5px; font-size: 0.8rem; font-weight: 700; color: var(--ink-2); }
+      input.fi, select.fi {
+        font: inherit; font-family: "IBM Plex Mono", monospace; font-size: 1rem; font-weight: 500;
+        padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line);
+        background: var(--surface-2); color: var(--ink); width: 100%;
+      }
+      input.fi:focus, select.fi:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+      .out {
+        margin-top: auto; border-top: 1px dashed var(--line); padding-top: 14px;
+        display: grid; gap: 6px;
+      }
+      .out .line { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 0.92rem; color: var(--ink-2); }
+      .out .line b { font-family: "IBM Plex Mono", monospace; font-size: 1.02rem; color: var(--ink); font-weight: 600; text-align: right; }
+      .out .line.big b { font-size: 1.45rem; color: var(--accent); }
+      .seg { display: flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 3px; }
+      .seg button {
+        flex: 1; border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 0.84rem;
+        padding: 8px 4px; border-radius: 8px; background: transparent; color: var(--ink-2);
+      }
+      .seg button.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+
+      /* ---------- FAQ / info ---------- */
+      .faq { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+      .faq-item { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px; }
+      .faq-item h3 { margin: 0 0 8px; font-size: 1rem; }
+      .faq-item p { margin: 0; color: var(--ink-2); line-height: 1.65; font-size: 0.94rem; }
+      .faq-item code { font-family: "IBM Plex Mono", monospace; font-size: 0.86em; background: var(--surface-2); padding: 1px 6px; border-radius: 6px; border: 1px solid var(--line); }
+
+      /* ---------- Brand band ---------- */
+      .brand-band { margin-top: 56px; background: linear-gradient(120deg, #07271c, #0a5c3d 70%, #0c8a5c); color: #e9f7f0; }
+      .band-in { max-width: 1180px; margin: 0 auto; padding: 34px 20px; display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+      .band-brand { display: flex; align-items: center; gap: 14px; }
+      .band-brand .brand-mark { background: rgba(255, 255, 255, 0.14); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28); }
+      .band-brand b { display: block; font-family: "Bricolage Grotesque", "Manrope", sans-serif; font-size: 1.35rem; letter-spacing: -0.01em; line-height: 1.15; }
+      .band-brand .tag { font-size: 0.88rem; color: #bfe6d4; font-weight: 600; }
+      .band-values { list-style: none; display: flex; margin: 0 0 0 auto; padding: 0; flex-wrap: wrap; }
+      .band-values li { padding: 4px 18px; border-left: 1px solid rgba(255, 255, 255, 0.22); font-size: 0.9rem; font-weight: 600; color: #cfeee0; }
+      .band-values li:first-child { border-left: 0; padding-left: 0; }
+      .band-values b { display: block; font-size: 1.05rem; color: #fff; font-family: "Bricolage Grotesque", "Manrope", sans-serif; }
+      @media (max-width: 700px) {
+        .band-values { margin-left: 0; }
+        .band-values li { padding: 4px 14px 4px 0; border-left: 0; }
+      }
+      .foot-brand { display: flex; gap: 12px; align-items: center; }
+      .foot-brand small { color: var(--ink-3); }
+
+      footer { margin-top: 0; border-top: 1px solid var(--line); background: var(--bg-soft); }
+      .footer-in {
+        max-width: 1180px; margin: 0 auto; padding: 30px 20px 38px;
+        display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+        color: var(--ink-2); font-size: 0.88rem;
+      }
+      .footer-in nav { display: flex; gap: 18px; flex-wrap: wrap; }
+      .footer-in a { text-decoration: none; font-weight: 600; }
+      .footer-in a:hover { color: var(--accent); }
+
+      kbd {
+        font-family: "IBM Plex Mono", monospace; font-size: 0.78em;
+        background: var(--surface-2); border: 1px solid var(--line); border-bottom-width: 2px;
+        border-radius: 5px; padding: 1px 6px;
+      }
+
+      @media (max-width: 980px) {
+        .glyph { display: none; }
+        .hero { grid-template-columns: 1fr; gap: 34px; padding-top: 36px; }
+        .hero-copy { padding-top: 0; }
+        .device-wrap { position: static; max-width: 480px; width: 100%; margin: 0 auto; }
+        .tool-grid, .tool-grid.two, .faq { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 560px) {
+        nav.main-nav a { padding: 8px 9px; font-size: 0.84rem; }
+        .brand span.name { display: none; }
+        .keys-grid { gap: 6px; }
+        .sci-grid { gap: 6px; }
+        .key { padding: 14px 2px; font-size: 1.08rem; }
+        .key.sci-key { font-size: 0.8rem; padding: 11px 1px; }
+        .fields .row2 { grid-template-columns: 1fr 1fr; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        * { transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-in">
+        <a class="brand" href="#top" aria-label="Numeria — inicio">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none"><path d="M13 19h22M13 30h13" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/><circle cx="32" cy="30" r="2.8" fill="#fff"/></svg>
+          </span>
+          <span class="name">Numeria<em>.</em></span>
+        </a>
+        <nav class="main-nav" aria-label="Herramientas">
+          <a href="#calculadora">Calculadora</a>
+          <a href="#porcentajes">Porcentajes</a>
+          <a href="#iva">IVA Argentina</a>
+          <a href="#preguntas">Preguntas frecuentes</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- ============ HERO + CALCULATOR ============ -->
+      <div class="hero" id="calculadora">
+        <span class="glyph g1" aria-hidden="true">÷</span>
+        <span class="glyph g2" aria-hidden="true">%</span>
+        <span class="glyph g3" aria-hidden="true">π</span>
+        <div class="hero-copy">
+          <h1>Tu calculadora online, <span class="hl">rápida y precisa</span>, sin vueltas.</h1>
+          <p class="lead">Esto es <strong>Numeria</strong>: sumá, restá, multiplicá y dividí al instante, o pasá al modo científico para potencias, raíces, trigonometría y logaritmos. Abajo tenés además calculadoras de porcentajes y de IVA pensadas para Argentina. Todo gratis, sin registro y sin descargar nada.</p>
+          <ul class="hero-points">
+            <li>
+              <span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span>
+              <span>Modo científico completo<small>sin, cos, tan, logaritmos, potencias, raíces y constantes π y e.</small></span>
+            </li>
+            <li>
+              <span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span>
+              <span>Historial de cálculos<small>Revisá tus operaciones anteriores y reutilizá cualquier resultado con un clic.</small></span>
+            </li>
+            <li>
+              <span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span>
+              <span>Funciona con el teclado<small>Escribí con <kbd>Enter</kbd> para calcular, <kbd>Esc</kbd> para borrar y <kbd>⌫</kbd> para corregir.</small></span>
+            </li>
+          </ul>
+          <div class="stat-row">
+            <div class="stat"><b>4</b><span>herramientas en una página</span></div>
+            <div class="stat"><b>15 dígitos</b><span>de precisión por cálculo</span></div>
+            <div class="stat"><b>0</b><span>registros ni descargas</span></div>
+          </div>
+        </div>
+
+        <div class="device-wrap">
+          <div class="device" role="group" aria-label="Calculadora">
+            <div class="mode-tabs" role="tablist" aria-label="Modo de calculadora">
+              <button id="tab-basic" class="active" role="tab" aria-selected="true">Estándar</button>
+              <button id="tab-sci" role="tab" aria-selected="false">Científica</button>
+            </div>
+            <div class="screen" aria-live="polite">
+              <div class="screen-brand" aria-hidden="true">NUMERIA</div>
+              <div class="expr" id="expr">&nbsp;</div>
+              <div class="result" id="display">0</div>
+            </div>
+            <div class="keys" id="keys"><!-- keys injected by JS --></div>
+          </div>
+
+          <div class="history" aria-label="Historial de cálculos">
+            <div class="history-head">
+              <h3>Historial</h3>
+              <button id="clear-history" type="button">Limpiar</button>
+            </div>
+            <div class="empty" id="history-empty">Todavía no hiciste cálculos. Los resultados van a aparecer acá.</div>
+            <ul id="history-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PORCENTAJES ============ -->
+      <section class="block" id="porcentajes">
+        <div class="block-head">
+          <h2>Calculadora de porcentajes</h2>
+          <p>Las tres cuentas de porcentaje que se usan todos los días: cuánto es un porcentaje de un monto, qué porcentaje representa una cantidad y cuánto subió o bajó un precio. Los resultados se actualizan mientras escribís.</p>
+        </div>
+        <div class="tool-grid">
+          <div class="tool">
+            <h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span>Porcentaje de un monto</h3>
+            <p class="desc">¿Cuánto es el X% de una cantidad? Ideal para descuentos, propinas y comisiones.</p>
+            <div class="fields">
+              <div class="row2">
+                <label class="fl">Porcentaje (%)
+                  <input class="fi" id="p1-pct" type="number" inputmode="decimal" value="21" min="0" step="any" />
+                </label>
+                <label class="fl">De este monto
+                  <input class="fi" id="p1-val" type="number" inputmode="decimal" value="15000" step="any" />
+                </label>
+              </div>
+            </div>
+            <div class="out">
+              <div class="line big"><span>Resultado</span><b id="p1-out">3.150</b></div>
+              <div class="line"><span>Monto menos el porcentaje</span><b id="p1-minus">11.850</b></div>
+              <div class="line"><span>Monto más el porcentaje</span><b id="p1-plus">18.150</b></div>
+            </div>
+          </div>
+
+          <div class="tool">
+            <h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span>¿Qué porcentaje es?</h3>
+            <p class="desc">Una cantidad, ¿qué porcentaje representa de un total? Útil para notas, presupuestos y participaciones.</p>
+            <div class="fields">
+              <div class="row2">
+                <label class="fl">Cantidad
+                  <input class="fi" id="p2-part" type="number" inputmode="decimal" value="45" step="any" />
+                </label>
+                <label class="fl">Del total
+                  <input class="fi" id="p2-total" type="number" inputmode="decimal" value="180" step="any" />
+                </label>
+              </div>
+            </div>
+            <div class="out">
+              <div class="line big"><span>Representa</span><b id="p2-out">25%</b></div>
+              <div class="line"><span>El resto del total</span><b id="p2-rest">75%</b></div>
+            </div>
+          </div>
+
+          <div class="tool">
+            <h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></span>Variación porcentual</h3>
+            <p class="desc">¿Cuánto cambió un valor entre dos momentos? La cuenta clave para precios, sueldos e inflación.</p>
+            <div class="fields">
+              <div class="row2">
+                <label class="fl">Valor inicial
+                  <input class="fi" id="p3-from" type="number" inputmode="decimal" value="10000" step="any" />
+                </label>
+                <label class="fl">Valor final
+                  <input class="fi" id="p3-to" type="number" inputmode="decimal" value="12500" step="any" />
+                </label>
+              </div>
+            </div>
+            <div class="out">
+              <div class="line big"><span>Variación</span><b id="p3-out">+25%</b></div>
+              <div class="line"><span>Diferencia</span><b id="p3-diff">2.500</b></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ IVA ============ -->
+      <section class="block" id="iva">
+        <div class="block-head">
+          <h2>Calculadora de IVA — Argentina</h2>
+          <p>Sumá o restá el IVA a cualquier monto con las alícuotas vigentes en Argentina: 21% general, 10,5% reducida y 27% para servicios públicos de uso comercial. También podés ingresar una alícuota personalizada.</p>
+        </div>
+        <div class="tool-grid two">
+          <div class="tool">
+            <h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9.5 13h6M9.5 17h6"/></svg></span>Calcular IVA</h3>
+            <div class="fields">
+              <label class="fl">Monto ($)
+                <input class="fi" id="iva-amount" type="number" inputmode="decimal" value="10000" min="0" step="any" />
+              </label>
+              <div class="row2">
+                <label class="fl">Alícuota
+                  <select class="fi" id="iva-rate">
+                    <option value="21" selected>21% — General</option>
+                    <option value="10.5">10,5% — Reducida</option>
+                    <option value="27">27% — Servicios públicos</option>
+                    <option value="custom">Personalizada…</option>
+                  </select>
+                </label>
+                <label class="fl" id="iva-custom-wrap" hidden>Alícuota personalizada (%)
+                  <input class="fi" id="iva-custom" type="number" inputmode="decimal" value="21" min="0" step="any" />
+                </label>
+              </div>
+              <div class="seg" role="group" aria-label="Modo de cálculo de IVA">
+                <button type="button" id="iva-mode-add" class="active">El monto es neto (sumar IVA)</button>
+                <button type="button" id="iva-mode-remove">El monto es final (restar IVA)</button>
+              </div>
+            </div>
+            <div class="out">
+              <div class="line"><span>Precio neto (sin IVA)</span><b id="iva-net">$10.000,00</b></div>
+              <div class="line"><span>IVA (<span id="iva-rate-label">21</span>%)</span><b id="iva-tax">$2.100,00</b></div>
+              <div class="line big"><span>Precio final</span><b id="iva-total">$12.100,00</b></div>
+            </div>
+          </div>
+
+          <div class="tool">
+            <h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5h.01"/></svg></span>¿Qué alícuota te corresponde?</h3>
+            <p class="desc"><strong>21% — General.</strong> La mayoría de los bienes y servicios: electrónica, ropa, servicios profesionales, restaurantes.</p>
+            <p class="desc"><strong>10,5% — Reducida.</strong> Alimentos básicos sin procesar, medicamentos, libros, transporte de pasajeros y carnes, frutas y verduras.</p>
+            <p class="desc"><strong>27% — Incrementada.</strong> Servicios públicos (electricidad, gas, agua, telefonía e internet) cuando el usuario es comercial o industrial.</p>
+            <p class="desc"><strong>Exento.</strong> Educación, salud pública y exportaciones no llevan IVA.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ FAQ ============ -->
+      <section class="block" id="preguntas">
+        <div class="block-head">
+          <h2>Preguntas frecuentes</h2>
+          <p>Lo que más nos preguntan sobre la calculadora y cómo sacarle el máximo provecho.</p>
+        </div>
+        <div class="faq">
+          <div class="faq-item">
+            <h3>¿Para qué sirve esta herramienta?</h3>
+            <p>La calculadora online gratis te permite realizar las operaciones aritméticas básicas: sumar, restar, dividir y multiplicar. Si necesitás más funciones, podés utilizar nuestra calculadora científica, con trigonometría, logaritmos, potencias y raíces, todo en esta misma página.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Cómo se calcula el IVA de un precio?</h3>
+            <p>Si el precio es neto, el IVA es <code>monto × 0,21</code> y el total es <code>monto × 1,21</code>. Si el precio ya incluye IVA, el neto se obtiene dividiendo por <code>1,21</code>: por ejemplo, un total de $12.100 equivale a $10.000 netos más $2.100 de IVA. La calculadora de IVA de arriba hace ambas cuentas automáticamente.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Puedo usar la calculadora con el teclado?</h3>
+            <p>Sí. Escribí los números y operadores directamente (<kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd>), presioná <kbd>Enter</kbd> o <kbd>=</kbd> para ver el resultado, <kbd>Esc</kbd> para borrar todo y <kbd>⌫</kbd> para corregir el último dígito. En modo científico también acepta paréntesis y la tecla <kbd>^</kbd> para potencias.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Mis cálculos quedan guardados?</h3>
+            <p>El historial vive solo en esta pestaña mientras la tengas abierta: no enviamos ni guardamos tus operaciones en ningún servidor. Al cerrar la página, el historial desaparece.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Cómo calculo un porcentaje rápido?</h3>
+            <p>Para saber cuánto es el X% de un número, multiplicá el número por X y dividí por 100: el 20% de 250 es <code>250 × 20 ÷ 100 = 50</code>. Con la calculadora estándar también podés escribir <code>250 × 20%</code> y obtener el resultado al instante.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Funciona en el celular?</h3>
+            <p>Sí, la página está diseñada para pantallas chicas y grandes: la calculadora, los porcentajes y el IVA se adaptan al ancho de tu dispositivo y los botones tienen el tamaño justo para usarlos con el dedo.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============ MARCA ============ -->
+    <section class="brand-band" aria-label="Sobre Numeria">
+      <div class="band-in">
+        <div class="band-brand">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M13 19h22M13 30h13" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/><circle cx="32" cy="30" r="2.8" fill="#fff"/></svg></span>
+          <div>
+            <b>Numeria.</b>
+            <span class="tag">Calculadoras online para Argentina</span>
+          </div>
+        </div>
+        <ul class="band-values">
+          <li><b>15 dígitos</b>de precisión</li>
+          <li><b>Sin registro</b>ni descargas</li>
+          <li><b>100% privado</b>todo en tu navegador</li>
+          <li><b>Gratis</b>para siempre</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-in">
+        <div class="foot-brand">
+          <span class="brand-mark small" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M13 19h22M13 30h13" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/><circle cx="32" cy="30" r="2.8" fill="#fff"/></svg></span>
+          <span><strong>Numeria.</strong> Calculadoras online gratuitas, hechas para Argentina.<br /><small>© 2026 Numeria · Todos los cálculos se hacen en tu navegador.</small></span>
+        </div>
+        <nav aria-label="Pie de página">
+          <a href="#calculadora">Calculadora</a>
+          <a href="#porcentajes">Porcentajes</a>
+          <a href="#iva">IVA</a>
+          <a href="#preguntas">Preguntas frecuentes</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script>
+      "use strict";
+      /* ================= Formatting ================= */
+      var fmtNum = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 10 });
+      var fmtMoney = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      function fmtResult(n) {
+        if (typeof n !== "number" || !isFinite(n) || isNaN(n)) return "Error";
+        var r = Math.abs(n) < 1e15 ? parseFloat(n.toPrecision(15)) : n;
+        return fmtNum.format(r);
+      }
+      function num(id) {
+        var v = parseFloat(document.getElementById(id).value);
+        return isNaN(v) ? null : v;
+      }
+
+      /* ================= Expression parser =================
+         Grammar: expr -> term (('+'|'-') term)*
+                  term -> unary (('*'|'/'|'×'|'÷') unary)*
+                  unary -> '-' unary | power
+                  power -> postfix ('^' unary)?
+                  postfix -> primary ('!'|'%')*
+                  primary -> number | constant | func '(' expr ')' | '(' expr ')'     */
+      function tokenize(s) {
+        var tokens = [], i = 0;
+        while (i < s.length) {
+          var c = s[i];
+          if (c === " " ) { i++; continue; }
+          if (/[0-9.]/.test(c)) {
+            var j = i, dots = 0;
+            while (j < s.length && /[0-9.]/.test(s[j])) { if (s[j] === ".") dots++; j++; }
+            if (dots > 1) throw new Error("Número inválido");
+            tokens.push({ t: "num", v: parseFloat(s.slice(i, j)) });
+            i = j; continue;
+          }
+          if (/[a-zA-Zπ]/.test(c)) {
+            var k = i;
+            while (k < s.length && /[a-zA-Z]/.test(s[k])) k++;
+            if (k === i) { tokens.push({ t: "id", v: "π" }); i++; continue; }
+            tokens.push({ t: "id", v: s.slice(i, k).toLowerCase() });
+            i = k; continue;
+          }
+          if ("+-*/^%!(),".indexOf(c) >= 0) { tokens.push({ t: c }); i++; continue; }
+          if (c === "×") { tokens.push({ t: "*" }); i++; continue; }
+          if (c === "÷") { tokens.push({ t: "/" }); i++; continue; }
+          if (c === "√") { tokens.push({ t: "id", v: "sqrt" }); i++; continue; }
+          throw new Error("Carácter no válido: " + c);
+        }
+        return tokens;
+      }
+      var FUNCS = {
+        sin: Math.sin, cos: Math.cos, tan: Math.tan,
+        asin: Math.asin, acos: Math.acos, atan: Math.atan,
+        ln: Math.log, log: Math.log10,
+        sqrt: Math.sqrt, abs: Math.abs
+      };
+      function factorial(n) {
+        if (n < 0 || Math.floor(n) !== n) throw new Error("Factorial inválido");
+        var r = 1;
+        for (var i = 2; i <= n; i++) { r *= i; if (!isFinite(r)) throw new Error("Resultado demasiado grande"); }
+        return r;
+      }
+      function evaluate(src) {
+        var tokens = tokenize(src), pos = 0;
+        function peek() { return tokens[pos]; }
+        function next() { return tokens[pos++]; }
+        function parseExpr() {
+          var v = parseTerm();
+          while (peek() && (peek().t === "+" || peek().t === "-")) {
+            var op = next().t, rhs = parseTerm();
+            v = op === "+" ? v + rhs : v - rhs;
+          }
+          return v;
+        }
+        function parseTerm() {
+          var v = parseUnary();
+          while (peek() && (peek().t === "*" || peek().t === "/")) {
+            var op = next().t, rhs = parseUnary();
+            if (op === "/" && rhs === 0) throw new Error("No se puede dividir por cero");
+            v = op === "*" ? v * rhs : v / rhs;
+          }
+          return v;
+        }
+        function parseUnary() {
+          if (peek() && peek().t === "-") { next(); return -parseUnary(); }
+          if (peek() && peek().t === "+") { next(); return parseUnary(); }
+          return parsePower();
+        }
+        function parsePower() {
+          var base = parsePostfix();
+          if (peek() && peek().t === "^") { next(); return Math.pow(base, parseUnary()); }
+          return base;
+        }
+        function parsePostfix() {
+          var v = parsePrimary();
+          while (peek() && (peek().t === "!" || peek().t === "%")) {
+            var op = next().t;
+            v = op === "!" ? factorial(v) : v / 100;
+          }
+          return v;
+        }
+        function parsePrimary() {
+          var tk = next();
+          if (!tk) throw new Error("Expresión incompleta");
+          if (tk.t === "num") return tk.v;
+          if (tk.t === "(") {
+            var v = parseExpr();
+            if (!peek() || next().t !== ")") throw new Error("Falta cerrar paréntesis");
+            return v;
+          }
+          if (tk.t === "id") {
+            if (tk.v === "π" || tk.v === "pi") return Math.PI;
+            if (tk.v === "e") return Math.E;
+            if (tk.v === "ans") return lastAnswer;
+            if (FUNCS[tk.v]) {
+              if (!peek() || next().t !== "(") throw new Error("Falta ( después de " + tk.v);
+              var arg = parseExpr();
+              if (!peek() || next().t !== ")") throw new Error("Falta cerrar paréntesis");
+              var out = FUNCS[tk.v](arg);
+              if (typeof out !== "number" || isNaN(out)) throw new Error("Fuera de dominio");
+              return out;
+            }
+            throw new Error("Función desconocida: " + tk.v);
+          }
+          throw new Error("Expresión inválida");
+        }
+        var result = parseExpr();
+        if (pos < tokens.length) throw new Error("Expresión inválida");
+        if (typeof result !== "number" || isNaN(result)) throw new Error("Resultado inválido");
+        if (!isFinite(result)) throw new Error("Resultado demasiado grande");
+        return result;
+      }
+
+      /* ================= Calculator UI ================= */
+      var exprEl = document.getElementById("expr");
+      var displayEl = document.getElementById("display");
+      var keysEl = document.getElementById("keys");
+      var expr = "";
+      var lastAnswer = 0;
+      var justEvaluated = false;
+      var sciMode = false;
+
+      var BASIC_KEYS = [
+        { label: "C", act: "clear", cls: "fn op" },
+        { label: "( )", act: "paren", cls: "fn" },
+        { label: "%", ins: "%", cls: "fn" },
+        { label: "÷", ins: "÷", cls: "fn op" },
+        { label: "7", ins: "7" }, { label: "8", ins: "8" }, { label: "9", ins: "9" },
+        { label: "×", ins: "×", cls: "fn op" },
+        { label: "4", ins: "4" }, { label: "5", ins: "5" }, { label: "6", ins: "6" },
+        { label: "−", ins: "−", cls: "fn op" },
+        { label: "1", ins: "1" }, { label: "2", ins: "2" }, { label: "3", ins: "3" },
+        { label: "+", ins: "+", cls: "fn op" },
+        { label: "±", act: "neg", cls: "fn" },
+        { label: "0", ins: "0" },
+        { label: ".", ins: "." },
+        { label: "=", act: "equals", cls: "eq" }
+      ];
+      var SCI_KEYS = [
+        { label: "sin", ins: "sin(", cls: "sci" },
+        { label: "cos", ins: "cos(", cls: "sci" },
+        { label: "tan", ins: "tan(", cls: "sci" },
+        { label: "π", ins: "π", cls: "sci" },
+        { label: "e", ins: "e", cls: "sci" },
+        { label: "ln", ins: "ln(", cls: "sci" },
+        { label: "log", ins: "log(", cls: "sci" },
+        { label: "√", ins: "√(", cls: "sci" },
+        { label: "x²", act: "square", cls: "sci" },
+        { label: "xʸ", ins: "^", cls: "sci" },
+        { label: "(", ins: "(", cls: "sci" },
+        { label: ")", ins: ")", cls: "sci" },
+        { label: "n!", ins: "!", cls: "sci" },
+        { label: "1/x", act: "inv", cls: "sci" },
+        { label: "⌫", act: "back", cls: "sci" }
+      ];
+      var SCI_BASIC = [
+        { label: "C", act: "clear", cls: "fn op" },
+        { label: "%", ins: "%", cls: "fn" },
+        { label: "⌫", act: "back", cls: "fn" },
+        { label: "÷", ins: "÷", cls: "fn op" },
+        { label: "7", ins: "7" }, { label: "8", ins: "8" }, { label: "9", ins: "9" },
+        { label: "×", ins: "×", cls: "fn op" },
+        { label: "4", ins: "4" }, { label: "5", ins: "5" }, { label: "6", ins: "6" },
+        { label: "−", ins: "−", cls: "fn op" },
+        { label: "1", ins: "1" }, { label: "2", ins: "2" }, { label: "3", ins: "3" },
+        { label: "+", ins: "+", cls: "fn op" },
+        { label: "±", act: "neg", cls: "fn" },
+        { label: "0", ins: "0" },
+        { label: ".", ins: "." },
+        { label: "=", act: "equals", cls: "eq" }
+      ];
+
+      function makeKey(k) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "key" + (k.cls ? " " + k.cls : "") + (k.cls === "sci" ? " sci-key" : "");
+        b.textContent = k.label;
+        b.setAttribute("aria-label", k.label);
+        b.addEventListener("click", function () { handleKey(k); });
+        return b;
+      }
+      function buildKeys() {
+        keysEl.innerHTML = "";
+        if (sciMode) {
+          var sg = document.createElement("div");
+          sg.className = "sci-grid";
+          SCI_KEYS.forEach(function (k) { sg.appendChild(makeKey(k)); });
+          keysEl.appendChild(sg);
+        }
+        var bg = document.createElement("div");
+        bg.className = "keys-grid";
+        (sciMode ? SCI_BASIC : BASIC_KEYS).forEach(function (k) { bg.appendChild(makeKey(k)); });
+        keysEl.appendChild(bg);
+      }
+
+      function renderScreen() {
+        exprEl.textContent = expr === "" ? "\u00A0" : prettyExpr(expr);
+        if (expr === "") { displayEl.textContent = "0"; displayEl.classList.remove("error"); return; }
+        try {
+          var v = evaluate(toMathExpr(expr));
+          displayEl.textContent = fmtResult(v);
+          displayEl.classList.remove("error");
+        } catch (e) {
+          displayEl.textContent = justEvaluated ? "Error" : "…";
+          displayEl.classList.toggle("error", justEvaluated);
+        }
+      }
+      function prettyExpr(s) { return s; }
+      function toMathExpr(s) {
+        return s.replace(/−/g, "-").replace(/×/g, "*").replace(/÷/g, "/");
+      }
+
+      function insertText(t) {
+        if (justEvaluated) {
+          if (/^[0-9.πe(]/.test(t) || /^(sin|cos|tan|ln|log|√)/.test(t)) expr = "";
+          justEvaluated = false;
+        }
+        expr += t;
+        renderScreen();
+      }
+      function doEquals() {
+        if (expr === "") return;
+        try {
+          var v = evaluate(toMathExpr(expr));
+          addHistory(expr, v);
+          lastAnswer = v;
+          expr = String(parseFloat(v.toPrecision(15)));
+          justEvaluated = true;
+          renderScreen();
+          exprEl.textContent = prettyExpr(expr) + " =";
+          displayEl.textContent = fmtResult(v);
+        } catch (e) {
+          justEvaluated = true;
+          renderScreen();
+          displayEl.textContent = e.message;
+          displayEl.classList.add("error");
+        }
+      }
+      function doAction(act) {
+        if (act === "clear") { expr = ""; justEvaluated = false; renderScreen(); }
+        else if (act === "back") {
+          if (justEvaluated) { justEvaluated = false; }
+          expr = expr.replace(/(sin|cos|tan|asin|acos|atan|log|ln|√)\($/, "").length === expr.length
+            ? expr.slice(0, -1)
+            : expr.replace(/(sin|cos|tan|asin|acos|atan|log|ln|√)\($/, "");
+          if (expr === expr) { /* handled above */ }
+          renderScreen();
+        }
+        else if (act === "equals") { doEquals(); }
+        else if (act === "paren") {
+          var open = (expr.match(/\(/g) || []).length, close = (expr.match(/\)/g) || []).length;
+          insertText(open > close && /[0-9)%!πe]$/.test(expr) ? ")" : "(");
+        }
+        else if (act === "neg") {
+          if (expr === "") { expr = "-"; renderScreen(); return; }
+          try {
+            var v = evaluate(toMathExpr(expr));
+            expr = String(-parseFloat(v.toPrecision(15)));
+            justEvaluated = true;
+            renderScreen();
+          } catch (e) { insertText("-"); }
+        }
+        else if (act === "square") {
+          insertText("^2");
+        }
+        else if (act === "inv") {
+          if (expr === "") return;
+          expr = "1/(" + expr + ")";
+          renderScreen();
+        }
+      }
+      function handleKey(k) {
+        if (k.act) doAction(k.act);
+        else if (k.ins) insertText(k.ins);
+      }
+
+      /* backspace helper — cleaner implementation */
+      function backspace() {
+        var m = expr.match(/(sin|cos|tan|ln|log|√)\($/);
+        expr = m ? expr.slice(0, expr.length - m[0].length) : expr.slice(0, -1);
+        renderScreen();
+      }
+
+      /* Mode tabs */
+      var tabBasic = document.getElementById("tab-basic");
+      var tabSci = document.getElementById("tab-sci");
+      function setMode(sci) {
+        sciMode = sci;
+        tabBasic.classList.toggle("active", !sci);
+        tabSci.classList.toggle("active", sci);
+        tabBasic.setAttribute("aria-selected", String(!sci));
+        tabSci.setAttribute("aria-selected", String(sci));
+        buildKeys();
+      }
+      tabBasic.addEventListener("click", function () { setMode(false); });
+      tabSci.addEventListener("click", function () { setMode(true); });
+
+      /* Patch back action to use helper (keeps logic in one place) */
+      var origDoAction = doAction;
+      doAction = function (act) {
+        if (act === "back") { justEvaluated = false; backspace(); return; }
+        origDoAction(act);
+      };
+
+      /* ================= History ================= */
+      var historyList = document.getElementById("history-list");
+      var historyEmpty = document.getElementById("history-empty");
+      function addHistory(e, v) {
+        historyEmpty.style.display = "none";
+        var li = document.createElement("li");
+        var left = document.createElement("span");
+        left.className = "h-expr"; left.textContent = prettyExpr(e);
+        var right = document.createElement("span");
+        right.className = "h-res"; right.textContent = fmtResult(v);
+        li.appendChild(left); li.appendChild(right);
+        li.title = "Usar este resultado";
+        li.addEventListener("click", function () {
+          expr = String(parseFloat(v.toPrecision(15)));
+          justEvaluated = true;
+          renderScreen();
+          document.getElementById("calculadora").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        historyList.insertBefore(li, historyList.firstChild);
+        while (historyList.children.length > 12) historyList.removeChild(historyList.lastChild);
+      }
+      document.getElementById("clear-history").addEventListener("click", function () {
+        historyList.innerHTML = "";
+        historyEmpty.style.display = "";
+      });
+
+      /* ================= Keyboard ================= */
+      document.addEventListener("keydown", function (ev) {
+        var tag = (ev.target && ev.target.tagName) || "";
+        if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+        var k = ev.key;
+        if (/^[0-9.]$/.test(k)) { insertText(k); flashKey(k); ev.preventDefault(); }
+        else if (k === "+") { insertText("+"); flashKey("+"); ev.preventDefault(); }
+        else if (k === "-") { insertText("−"); flashKey("−"); ev.preventDefault(); }
+        else if (k === "*") { insertText("×"); flashKey("×"); ev.preventDefault(); }
+        else if (k === "/") { insertText("÷"); flashKey("÷"); ev.preventDefault(); }
+        else if (k === "%") { insertText("%"); flashKey("%"); ev.preventDefault(); }
+        else if (k === "(" || k === ")") { insertText(k); ev.preventDefault(); }
+        else if (k === "^") { insertText("^"); ev.preventDefault(); }
+        else if (k === "Enter" || k === "=") { doEquals(); ev.preventDefault(); }
+        else if (k === "Escape") { doAction("clear"); ev.preventDefault(); }
+        else if (k === "Backspace") { doAction("back"); ev.preventDefault(); }
+      });
+      function flashKey(label) {
+        var btns = keysEl.querySelectorAll(".key");
+        for (var i = 0; i < btns.length; i++) {
+          if (btns[i].textContent === label) {
+            btns[i].classList.add("pressed");
+            (function (b) { setTimeout(function () { b.classList.remove("pressed"); }, 120); })(btns[i]);
+            break;
+          }
+        }
+      }
+
+      /* ================= Percentages ================= */
+      function updPct1() {
+        var p = num("p1-pct"), v = num("p1-val");
+        if (p === null || v === null) { document.getElementById("p1-out").textContent = "—"; return; }
+        var r = v * p / 100;
+        document.getElementById("p1-out").textContent = fmtResult(r);
+        document.getElementById("p1-minus").textContent = fmtResult(v - r);
+        document.getElementById("p1-plus").textContent = fmtResult(v + r);
+      }
+      function updPct2() {
+        var part = num("p2-part"), total = num("p2-total");
+        if (part === null || total === null || total === 0) { document.getElementById("p2-out").textContent = "—"; return; }
+        var r = part / total * 100;
+        document.getElementById("p2-out").textContent = fmtResult(r) + "%";
+        document.getElementById("p2-rest").textContent = fmtResult(100 - r) + "%";
+      }
+      function updPct3() {
+        var a = num("p3-from"), b = num("p3-to");
+        if (a === null || b === null || a === 0) { document.getElementById("p3-out").textContent = "—"; return; }
+        var r = (b - a) / Math.abs(a) * 100;
+        document.getElementById("p3-out").textContent = (r > 0 ? "+" : "") + fmtResult(r) + "%";
+        document.getElementById("p3-diff").textContent = fmtResult(b - a);
+      }
+      ["p1-pct", "p1-val"].forEach(function (id) { document.getElementById(id).addEventListener("input", updPct1); });
+      ["p2-part", "p2-total"].forEach(function (id) { document.getElementById(id).addEventListener("input", updPct2); });
+      ["p3-from", "p3-to"].forEach(function (id) { document.getElementById(id).addEventListener("input", updPct3); });
+      updPct1(); updPct2(); updPct3();
+
+      /* ================= IVA ================= */
+      var ivaMode = "add";
+      function ivaRate() {
+        var sel = document.getElementById("iva-rate").value;
+        if (sel === "custom") {
+          var c = parseFloat(document.getElementById("iva-custom").value);
+          return isNaN(c) ? 0 : c;
+        }
+        return parseFloat(sel);
+      }
+      function updIva() {
+        var amount = num("iva-amount");
+        var rate = ivaRate();
+        document.getElementById("iva-rate-label").textContent = fmtNum.format(rate);
+        if (amount === null || amount < 0) {
+          document.getElementById("iva-net").textContent = "—";
+          document.getElementById("iva-tax").textContent = "—";
+          document.getElementById("iva-total").textContent = "—";
+          return;
+        }
+        var net, tax, total;
+        if (ivaMode === "add") {
+          net = amount; tax = amount * rate / 100; total = net + tax;
+        } else {
+          total = amount; net = amount / (1 + rate / 100); tax = total - net;
+        }
+        document.getElementById("iva-net").textContent = fmtMoney.format(net);
+        document.getElementById("iva-tax").textContent = fmtMoney.format(tax);
+        document.getElementById("iva-total").textContent = fmtMoney.format(total);
+      }
+      document.getElementById("iva-amount").addEventListener("input", updIva);
+      document.getElementById("iva-custom").addEventListener("input", updIva);
+      document.getElementById("iva-rate").addEventListener("change", function () {
+        document.getElementById("iva-custom-wrap").hidden = this.value !== "custom";
+        updIva();
+      });
+      document.getElementById("iva-mode-add").addEventListener("click", function () {
+        ivaMode = "add";
+        this.classList.add("active");
+        document.getElementById("iva-mode-remove").classList.remove("active");
+        updIva();
+      });
+      document.getElementById("iva-mode-remove").addEventListener("click", function () {
+        ivaMode = "remove";
+        this.classList.add("active");
+        document.getElementById("iva-mode-add").classList.remove("active");
+        updIva();
+      });
+      updIva();
+
+      /* Init */
+      buildKeys();
+      renderScreen();
+    </script>
+  </body>
+</html>
