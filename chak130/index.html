@@ -713,6 +713,20 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
 @keyframes pr{0%{transform:scale(.33);opacity:.8}80%,100%{transform:scale(1.8);opacity:0}}
 .lbl{display:flex;align-items:center;justify-content:center;pointer-events:none}
 .lbl-m{font-weight:800;font-size:13px;color:#fef08a;background:rgba(0,0,0,.72);border:1px solid #eab308;border-radius:5px;padding:1px 6px;white-space:nowrap}
+.lbl-corner{font-size:11px;padding:0 5px;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+/* ===== PIN gate (Zameen Records lock) ===== */
+#pinModal{display:none;position:fixed;inset:0;background:rgba(2,6,23,.72);z-index:4000;align-items:center;justify-content:center;padding:18px}
+#pinModal.open{display:flex}
+.pincard{background:#0f172a;border:1px solid #b8860b;border-radius:16px;padding:22px 20px;max-width:340px;width:100%;text-align:center;color:#e2e8f0;box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.pincard .pinlock{font-size:34px;line-height:1}
+.pincard h3{margin:8px 0 4px;color:#facc15;font-size:19px}
+.pincard p{margin:0 0 14px;font-size:13.5px;color:#cbd5e1}
+#pinInp{width:100%;box-sizing:border-box;padding:12px;font-size:18px;text-align:center;letter-spacing:4px;border-radius:10px;border:1.5px solid #475569;background:#020617;color:#fff;outline:none}
+#pinInp:focus{border-color:#f59e0b}
+#pinErr{display:none;color:#f87171;font-size:13px;margin-top:9px;font-weight:700}
+.locknote{background:rgba(245,158,11,.12);border:1px dashed #b8860b;border-radius:10px;padding:10px 12px;font-size:13.5px;color:#fde68a;margin:6px 0}
+.lockcard{text-align:center;padding:18px 12px;border:1px dashed #b8860b;border-radius:14px;background:rgba(245,158,11,.07)}
+.lockcard .lk{font-size:30px}
 .lbl-q{font-weight:700;font-size:11px;color:#7dd3fc;text-shadow:0 0 3px #000,0 0 3px #000;white-space:nowrap}
 .leaflet-control-scale-line{background:rgba(15,23,42,.8)!important;color:#cbd5e1!important;border-color:#94a3b8!important;font-size:10px}
 .leaflet-control-scale{margin-bottom:76px!important}
@@ -1027,6 +1041,19 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
   <div class="btnrow"><button id="ocPrint">&#128424; Print Nikalein</button></div>
 </div>
 
+<div id="pinModal">
+  <div class="pincard">
+    <div class="pinlock">&#128274;</div>
+    <h3>Zameen Records</h3>
+    <p>Ye records Numberdar ke liye hain — PIN darj karein</p>
+    <input id="pinInp" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN" maxlength="12" onkeydown="if(event.key==='Enter')pinSubmit()">
+    <div id="pinErr">Ghalat PIN — dobara koshish karein</div>
+    <div class="btnrow" style="margin-top:14px">
+      <button onclick="pinSubmit()">&#128275; Kholain</button>
+      <button onclick="pinCancel()">Band Karein</button>
+    </div>
+  </div>
+</div>
 <div id="printSheet"></div>
 
 <div id="err"></div>
@@ -1170,11 +1197,9 @@ function refresh(){
     var m=MUR[k], b=mBounds(m);
     if(!vb.intersects(toLB(b))) return;
     var isSel=target&&target.m===k;
-    if(z<17.5){
-      L.marker([(b.n+b.s)/2,(b.w+b.e)/2],{interactive:false,keyboard:false,icon:L.divIcon({className:'lbl',html:'<span class="lbl-m"'+(isSel?' style="background:#b45309;color:#fff"':'')+'>'+k+'</span>',iconSize:[70,22],iconAnchor:[35,11]})}).addTo(labelLayer);
-    } else {
-      L.marker([b.n-0.00022,b.w+0.00035],{interactive:false,keyboard:false,icon:L.divIcon({className:'lbl',html:'<span class="lbl-m" style="font-size:11px">'+k+'</span>',iconSize:[70,20],iconAnchor:[0,10]})}).addTo(labelLayer);
-    }
+    /* BUG FIX (v3.1): Mustatil ka label hamesha NW corner point par — center mein kabhi nahi.
+       Corner point se har qila number har zoom par door rehta hai, is liye koi number nahi dhakta. */
+    L.marker([b.n,b.w],{interactive:false,keyboard:false,icon:L.divIcon({className:'lbl',html:'<span class="lbl-m lbl-corner"'+(isSel?' style="background:#b45309;color:#fff"':'')+'>'+k+'</span>',iconSize:[64,18],iconAnchor:[32,9]})}).addTo(labelLayer);
     if(isSel && z>=16.5) addQLabels(m,vb);
     else if(qilaAll && z>=17) addQLabels(m,vb);
   });
@@ -1582,9 +1607,9 @@ document.addEventListener('DOMContentLoaded',init);
 
   /* ================= OWNERS DATA ================= */
   var FULL_KANAL = 8; /* ek full qila = 8 Kanal (160 Marla = 1 acre) */
-  /* PIN GATE NOTE: tamam owner-records ka data (OWNERS) aur us ki UI (Records tab, owner card,
-     printout, search index) isi v3 module / Records section mein hai — aindah PIN lock isi
-     section par lagega. Is build mein PIN gate nahi hai (user PIN baad mein dega). */
+  /* PIN GATE: owner-records ka data (OWNERS) aur us ki UI (Records tab, owner card, printout,
+     search ke owner-results, owners highlight layer) isi module mein hai aur PIN lock isi
+     section par laga hai. Public ko sirf map / muraba / qila numbers nazar aate hain. */
   var OWNERS = [
     { name:'Muhammad Atif', father:'Muhammad Arshad', khata:'207', muraba:'468/15', role:'Numberdar',
       cnic:'31301-0440886-3', phone:'03458145930',
@@ -1605,11 +1630,113 @@ document.addEventListener('DOMContentLoaded',init);
   OWNERS.forEach(function(o,oi){ o.plots.forEach(function(p){ OWN_BY_KEY[o.muraba+'|'+p.q] = {oi:oi, plot:p}; }); });
   window.OWNERS = OWNERS;
 
+  /* ================= PIN GATE =================
+     PIN code mein plain text NAHI hai — sirf us ka SHA-256 hash store hai.
+     Entry ko hash karke compare kiya jata hai (crypto.subtle; na mile to sync fallback). */
+  var PIN_HASH = '150ee9ca45eb445d2205b613815c975b46e0d8addfc7e6c4023ef3a666db9e25';
+  function sha256Sync(ascii){
+    function rr(v,a){ return (v>>>a)|(v<<(32-a)); }
+    var maxWord=Math.pow(2,32), i, j, result='';
+    var words=[], asciiBitLength=ascii.length*8;
+    var hash=sha256Sync.h=sha256Sync.h||[], k=sha256Sync.k=sha256Sync.k||[];
+    var primeCounter=k.length, isComposite={};
+    for(var candidate=2; primeCounter<64; candidate++){
+      if(!isComposite[candidate]){
+        for(i=0;i<313;i+=candidate) isComposite[i]=candidate;
+        hash[primeCounter]=(Math.pow(candidate,.5)*maxWord)|0;
+        k[primeCounter++]=(Math.pow(candidate,1/3)*maxWord)|0;
+      }
+    }
+    ascii+='\x80';
+    while(ascii.length%64-56) ascii+='\x00';
+    for(i=0;i<ascii.length;i++){
+      var ch=ascii.charCodeAt(i); if(ch>>8) return ''; /* PIN sirf digits hai */
+      words[i>>2]|=ch<<((3-i)%4)*8;
+    }
+    words[words.length]=((asciiBitLength/maxWord)|0);
+    words[words.length]=(asciiBitLength|0);
+    for(j=0;j<words.length;){
+      var w=words.slice(j,j+=16), oldHash=hash;
+      hash=hash.slice(0,8);
+      for(i=0;i<64;i++){
+        var w15=w[i-15], w2=w[i-2], a=hash[0], e=hash[4];
+        var temp1=hash[7]
+          +(rr(e,6)^rr(e,11)^rr(e,25))
+          +((e&hash[5])^((~e)&hash[6]))
+          +k[i]
+          +(w[i]=(i<16)? w[i] : (
+              w[i-16]
+              +(rr(w15,7)^rr(w15,18)^(w15>>>3))
+              +w[i-7]
+              +(rr(w2,17)^rr(w2,19)^(w2>>>10))
+            )|0);
+        var temp2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
+        hash=[(temp1+temp2)|0].concat(hash);
+        hash[4]=(hash[4]+temp1)|0;
+      }
+      for(i=0;i<8;i++) hash[i]=(hash[i]+oldHash[i])|0;
+    }
+    for(i=0;i<8;i++) for(j=3;j+1;j--){
+      var b=(hash[i]>>(j*8))&255;
+      result+=((b<16)?'0':'')+b.toString(16);
+    }
+    return result;
+  }
+  function hashPin(str){
+    if(window.crypto && crypto.subtle && crypto.subtle.digest){
+      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function(buf){
+        return Array.prototype.map.call(new Uint8Array(buf), function(x){ return ('0'+x.toString(16)).slice(-2); }).join('');
+      }).catch(function(){ return sha256Sync(str); });
+    }
+    return Promise.resolve(sha256Sync(str));
+  }
+  var unlocked=false, pinPending=null;
+  try{ unlocked = sessionStorage.getItem('c130pin')==='1'; }catch(e){}
+  window.pinIsUnlocked=function(){ return unlocked; };
+  window.requirePin=function(cb){
+    if(unlocked){ if(cb) cb(); return; }
+    pinPending=cb||null;
+    var m=$('pinModal'); if(!m) return;
+    $('pinErr').style.display='none'; $('pinInp').value='';
+    m.className='open';
+    setTimeout(function(){ var i=$('pinInp'); if(i) i.focus(); }, 60);
+  };
+  window.pinCancel=function(){
+    pinPending=null;
+    var m=$('pinModal'); if(m) m.className='';
+  };
+  window.pinSubmit=function(){
+    var v=($('pinInp').value||'').trim();
+    return hashPin(v).then(function(h){
+      if(h===PIN_HASH){
+        unlocked=true;
+        try{ sessionStorage.setItem('c130pin','1'); }catch(e){}
+        var cb=pinPending; pinPending=null;
+        var m=$('pinModal'); if(m) m.className='';
+        drawOwners(); renderRecords();
+        if(window.showToast) showToast('Records khul gaye');
+        if(cb) cb();
+        return true;
+      }
+      $('pinErr').style.display='block'; $('pinInp').value='';
+      return false;
+    });
+  };
+  window.lockRecords=function(){
+    unlocked=false;
+    try{ sessionStorage.removeItem('c130pin'); }catch(e){}
+    if(ownLayer){ ownLayer.clearLayers(); if(window.map && map.hasLayer(ownLayer)) map.removeLayer(ownLayer); }
+    renderRecords(); hideOwnerCard();
+    window.switchDashTab('ov');
+    if(window.showToast) showToast('Records lock ho gaye');
+  };
+
   /* ================= Owners highlight layer ================= */
   var ownLayer=null, ownOn=true;
   function drawOwners(){
     if(!ownLayer) ownLayer = L.layerGroup();
     ownLayer.clearLayers();
+    if(!unlocked){ if(map.hasLayer(ownLayer)) map.removeLayer(ownLayer); return; } /* locked: highlight bhi nahi */
     OWNERS.forEach(function(o){
       var m=MUR[o.muraba]; if(!m) return;
       o.plots.forEach(function(p){
@@ -1622,6 +1749,11 @@ document.addEventListener('DOMContentLoaded',init);
     if(ownOn && !map.hasLayer(ownLayer)) map.addLayer(ownLayer);
   }
   window.lyToggleOwn = function(on){
+    if(on && !unlocked){
+      var cbx=$('lyOwn'); if(cbx) cbx.checked=false;
+      requirePin(function(){ var c2=$('lyOwn'); if(c2) c2.checked=true; lyToggleOwn(true); });
+      return;
+    }
     ownOn=on;
     if(on){ drawOwners(); if(ownLayer && !map.hasLayer(ownLayer)) map.addLayer(ownLayer); }
     else if(ownLayer && map.hasLayer(ownLayer)) map.removeLayer(ownLayer);
@@ -1637,6 +1769,17 @@ document.addEventListener('DOMContentLoaded',init);
   function showOwnerCard(){
     var r=recOfTarget(), c=$('ownerCard'); if(!c) return;
     if(!r){ c.style.display='none'; return; }
+    if(!unlocked){
+      /* Locked: sirf itna ke record mojood hai — koi zaati maloomat nahi */
+      $('ocBody').innerHTML =
+        '<div class="ocrow"><span>Muraba No</span><b>'+r.o.muraba+'</b></div>'+
+        '<div class="ocrow"><span>Qila No</span><b>'+r.plot.q+'</b></div>'+
+        '<div class="locknote">&#128274; Is qile ka record mojood hai. Maalik ki tafseel Numberdar ke records mein hai — dekhne ke liye PIN darj karein.</div>';
+      var pb=$('ocPrint'); pb.innerHTML='&#128275; PIN se Kholain';
+      pb.onclick=function(){ requirePin(function(){ showOwnerCard(); }); };
+      c.style.display='block';
+      return;
+    }
     var o=r.o, pk=plotKanal(r.plot);
     $('ocBody').innerHTML =
       '<div class="ocrow"><span>Maalik</span><b>'+o.name+(o.role?' ('+o.role+')':'')+'</b></div>'+
@@ -1649,7 +1792,8 @@ document.addEventListener('DOMContentLoaded',init);
       '<div class="ocrow"><span>Is Qile ka Raqba</span><b>'+pk+' Kanal ('+F(pk*20)+' Marla)</b></div>'+
       (r.plot.note ? '<div class="ocnote">'+r.plot.note+'</div>' : '')+
       '<div class="ocrow tot"><span>Maalik ka Kul Raqba</span><b>'+o.totalKanal+' Kanal ('+F(o.totalKanal*20)+' Marla)</b></div>';
-    $('ocPrint').onclick=function(){ v3Print(r.oi); };
+    var pb2=$('ocPrint'); pb2.innerHTML='&#128424; Print Nikalein';
+    pb2.onclick=function(){ v3Print(r.oi); };
     c.style.display='block';
   }
   var _drawTarget = window.drawTarget, _clearTarget = window.clearTarget;
@@ -1697,6 +1841,7 @@ document.addEventListener('DOMContentLoaded',init);
 
   /* ================= Dashboard tabs (Records shamil) ================= */
   window.switchDashTab = function(t){
+    if(t==='rc' && !unlocked){ requirePin(function(){ window.switchDashTab('rc'); }); return; }
     ['ov','ly','pm','rc'].forEach(function(x){
       var el=$('tab-'+x), b=$('tabbtn-'+x);
       if(el) el.style.display = (x===t)?'block':'none';
@@ -1708,7 +1853,15 @@ document.addEventListener('DOMContentLoaded',init);
   /* ================= Records tab ================= */
   function renderRecords(){
     var box=$('ownList'); if(!box) return;
-    box.innerHTML = OWNERS.map(function(o,oi){
+    if(!unlocked){
+      box.innerHTML = '<div class="lockcard"><div class="lk">&#128274;</div>'+
+        '<p style="margin:8px 0"><b>Zameen Records lock hain</b></p>'+
+        '<p class="hint">Ye records Numberdar ke liye hain — maalik ki tafseel dekhne ke liye PIN darj karein.</p>'+
+        '<div class="btnrow"><button onclick="requirePin(function(){renderRecords();})">&#128275; PIN se Kholain</button></div></div>';
+      return;
+    }
+    box.innerHTML = '<div class="btnrow" style="margin-bottom:10px"><button onclick="lockRecords()">&#128274; Records Lock Karein</button></div>' +
+      OWNERS.map(function(o,oi){
       var qs=o.plots.map(function(p){ return p.q+(p.kanal?' ('+p.kanal+'K)':''); }).join(', ');
       return '<div class="owncard">'+
         '<div class="ownhead"><b>'+o.name+'</b>'+(o.role?'<span class="owntag">'+o.role+'</span>':'')+'</div>'+
@@ -1724,6 +1877,7 @@ document.addEventListener('DOMContentLoaded',init);
     }).join('');
   }
   window.v3ShowOwner = function(oi){
+    if(!unlocked){ requirePin(function(){ v3ShowOwner(oi); }); return; }
     var o=OWNERS[oi]; if(!o) return;
     target={m:o.muraba, q:o.plots[0].q};
     syncSelects(); drawTarget(true);
@@ -1737,6 +1891,7 @@ document.addEventListener('DOMContentLoaded',init);
     + '<path d="M50 22c-11.6 0-19 7.8-19 17.5C31 54 50 74 50 74s19-20 19-34.5C69 29.8 61.6 22 50 22z" fill="#f59e0b" stroke="#ffffff" stroke-width="2.5"/>'
     + '<circle cx="50" cy="40" r="7" fill="#166534" stroke="#ffffff" stroke-width="2"/></svg>';
   window.v3Print = function(oi){
+    if(!unlocked){ requirePin(function(){ v3Print(oi); }); return; }
     var o=OWNERS[oi], sheet=$('printSheet'); if(!o || !sheet) return;
     var rows=o.plots.map(function(p){
       var k=plotKanal(p);
@@ -1889,8 +2044,10 @@ document.addEventListener('DOMContentLoaded',init);
         sub:'Murabba — qila muntakhib karein', hay:nm+' '+nm.replace('/',' ')+' mustatil murabba muraba'});
     });
   }
+  var lastQ='', lastLockedHits=0;
   function gSearch(q){
     q=(q||'').toLowerCase().replace(/\s+/g,' ').trim();
+    lastQ=q; lastLockedHits=0;
     if(!q) return [];
     var toks=q.split(' '), out=[], qm=q.match(/qila\s*(\d+)/);
     IDX.forEach(function(e){
@@ -1910,10 +2067,17 @@ document.addEventListener('DOMContentLoaded',init);
       if (e.oi!=null){ perOi[e.oi]=(perOi[e.oi]||0)+1; if (perOi[e.oi]>4) continue; }
       capped.push(out[i]);
     }
-    return capped.map(function(r){ return r.e; });
+    var res=capped.map(function(r){ return r.e; });
+    if(!unlocked){
+      /* Locked: owner results nahi — sirf public muraba results. Owner hits gin kar rakho taake lock row dikha sakein */
+      lastLockedHits=res.filter(function(e){ return e.oi!=null; }).length;
+      res=res.filter(function(e){ return e.oi==null; });
+    }
+    return res;
   }
   function gGo(e){
     if(!e) return;
+    if(e.oi!=null && !unlocked){ requirePin(function(){ gGo(e); }); return; }
     if(e.kind==='mur'){ onPickM(e.muraba); hideOwnerCard(); }
     else { target={m:e.muraba, q:e.qila}; syncSelects(); drawTarget(true); }
     ['gsRes','rcRes'].forEach(function(id){ var d=$(id); if(d) d.style.display='none'; });
@@ -1921,13 +2085,17 @@ document.addEventListener('DOMContentLoaded',init);
   }
   function renderRes(boxId, list){
     var box=$(boxId); if(!box) return;
-    if(!list.length){ box.style.display='none'; box.innerHTML=''; return; }
+    var lockRow = (!unlocked && lastLockedHits>0)
+      ? '<button class="gsitem" id="'+boxId+'-lock"><b>&#128274; Records mein '+lastLockedHits+' result</b><small>Maalik ki tafseel Numberdar ke liye hai — PIN se dekhein</small></button>' : '';
+    if(!list.length && !lockRow){ box.style.display='none'; box.innerHTML=''; return; }
     box.innerHTML=list.map(function(e){
       return '<button class="gsitem"><b>'+e.label+'</b><small>'+e.sub+'</small></button>';
-    }).join('');
+    }).join('') + lockRow;
     box.style.display='flex';
     var btns=box.querySelectorAll('.gsitem');
-    for(var i=0;i<btns.length;i++){ (function(i){ btns[i].onclick=function(){ gGo(list[i]); }; })(i); }
+    for(var i=0;i<btns.length;i++){ (function(i){ if(list[i]) btns[i].onclick=function(){ gGo(list[i]); }; })(i); }
+    var lk=$(boxId+'-lock');
+    if(lk) lk.onclick=function(){ requirePin(function(){ renderRes(boxId, gSearch(lastQ)); }); };
   }
   function wireSearch(inputId, boxId){
     var inp=$(inputId); if(!inp) return;
@@ -1959,7 +2127,9 @@ document.addEventListener('DOMContentLoaded',init);
   /* test hooks */
   window.__v3 = { owners:OWNERS, byKey:OWN_BY_KEY, search:gSearch, go:gGo,
     pm:{ pts:function(){ return mPts; }, done:function(){ return mDone; } },
-    route:function(){ return showRoute; } };
+    route:function(){ return showRoute; },
+    pin:{ unlocked:pinIsUnlocked, submit:pinSubmit, lock:lockRecords, require:requirePin,
+          hashOf:sha256Sync, lockedHits:function(){ return lastLockedHits; } } };
 })();
 </script>
 </body>
