@@ -681,7 +681,7 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
 .dot.ok{background:#10b981}.dot.bad{background:#ef4444;animation:none}
 @keyframes pl{0%,100%{opacity:1}50%{opacity:.35}}
 .badge{font-size:11px;padding:3px 9px;border-radius:99px;background:#1e293b;border:1px solid #334155;color:#cbd5e1;white-space:nowrap}
-.badge.good{background:#022c22;border-color:#047857;color:#6ee7b7}.badge.warn{background:#451a03;border-color:#b45309;color:#fcd34d}
+.badge.good{background:#022c22;border-color:#047857;color:#6ee7b7}.badge.warn{background:#451a03;border-color:#b45309;color:#fcd34d}.badge.bad{background:#450a0a;border-color:#dc2626;color:#fca5a5}
 .off{margin-top:8px;font-size:10px;letter-spacing:.8px;color:#38bdf8;font-weight:700}
 #loc{margin-top:8px;background:rgba(2,6,23,.75);border:1px solid #1e293b;border-radius:12px;padding:8px 10px}
 #loc small{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;font-weight:700}
@@ -728,6 +728,12 @@ html,body{margin:0;height:100%;background:#0b1220;color:#e2e8f0;font-family:syst
 .lockcard{text-align:center;padding:18px 12px;border:1px dashed #b8860b;border-radius:14px;background:rgba(245,158,11,.07)}
 .lockcard .lk{font-size:30px}
 .lbl-q{font-weight:700;font-size:11px;color:#7dd3fc;text-shadow:0 0 3px #000,0 0 3px #000;white-space:nowrap}
+.lbl-q-sel{font-weight:800;font-size:12px;color:#fde047;text-shadow:0 0 3px #000,0 0 3px #000,0 1px 3px #000}
+/* ===== v5: selected mustatil ka banner — header ke andar rehta hai, map ke center ko nahi dhakta ===== */
+#selBanner{display:none;align-items:center;gap:9px;margin-top:8px;padding:6px 8px 6px 12px;border-radius:11px;background:rgba(180,83,9,.16);border:1px solid #b45309}
+#selBanner .sbName{font-size:17px;font-weight:800;color:#fcd34d;white-space:nowrap;letter-spacing:.2px}
+#selBanner .sbSub{flex:1;min-width:0;font-size:12px;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#selBanner button{flex-shrink:0;width:26px;height:26px;border-radius:8px;border:1px solid #92400e;background:#451a03;color:#fcd34d;font-size:13px;line-height:1;cursor:pointer}
 .leaflet-control-scale-line{background:rgba(15,23,42,.8)!important;color:#cbd5e1!important;border-color:#94a3b8!important;font-size:10px}
 .leaflet-control-scale{margin-bottom:76px!important}
 .leaflet-control-attribution{background:rgba(15,23,42,.7)!important;color:#94a3b8!important;font-size:9px!important;margin-bottom:62px!important;margin-right:64px!important}
@@ -1068,6 +1074,7 @@ body.cleanview .leaflet-control-scale{margin-bottom:12px!important}
       <div id="coord"></div>
     </div>
   </div>
+  <div id="selBanner"><span class="sbName" id="sbName"></span><span class="sbSub" id="sbSub"></span><button onclick="clearTarget()" aria-label="Selection band karein">&#10005;</button></div>
 </header>
 
 <div id="panel" class="glass">
@@ -1253,20 +1260,23 @@ function buildAllQila(){
 function drawSelQila(){
   qSelLayer.clearLayers(); if(!target) return;
   var m=MUR[target.m];
-  for(var q=1;q<=25;q++) L.rectangle(toLB(qBounds(m,q)),{renderer:canvas,color:'#38bdf8',weight:1.3,dashArray:'4 3',fill:false,interactive:false}).addTo(qSelLayer);
+  /* v5 (video rawaiya): selected mustatil ke qile PEELI dashed lines se — video ke selected murabba jaisi wazeh pehchan */
+  for(var q=1;q<=25;q++) L.rectangle(toLB(qBounds(m,q)),{renderer:canvas,color:'#facc15',weight:1.6,dashArray:'5 4',fill:false,interactive:false}).addTo(qSelLayer);
 }
 
-function addQLabels(m,vb){
+function addQLabels(m,vb,sel){
   for(var q=1;q<=25;q++){
     var qb=qBounds(m,q); if(!vb.intersects(toLB(qb))) continue;
-    L.marker([(qb.n+qb.s)/2,(qb.w+qb.e)/2],{interactive:false,keyboard:false,icon:L.divIcon({className:'lbl',html:'<span class="lbl-q">'+q+'</span>',iconSize:[30,16],iconAnchor:[15,8]})}).addTo(labelLayer);
+    /* v5: selected mustatil ke numbers peeli/bold (video style) — aam numbers sky-blue rehte hain */
+    L.marker([(qb.n+qb.s)/2,(qb.w+qb.e)/2],{interactive:false,keyboard:false,icon:L.divIcon({className:'lbl',html:'<span class="'+(sel?'lbl-q lbl-q-sel':'lbl-q')+'">'+q+'</span>',iconSize:[30,16],iconAnchor:[15,8]})}).addTo(labelLayer);
   }
 }
 function refresh(){
   var z=map.getZoom();
   if(qilaAll && z>=16){ buildAllQila(); if(!map.hasLayer(qAllLayer)) map.addLayer(qAllLayer);} else if(map.hasLayer(qAllLayer)) map.removeLayer(qAllLayer);
   labelLayer.clearLayers();
-  if(z<14.5||window.C130_LABELS===false) return;
+  selLblShown=false;
+  if(z<14.5||window.C130_LABELS===false){ updateSelBanner(); return; }
   var vb=map.getBounds().pad(0.1);
   NAMES.forEach(function(k){
     var m=MUR[k], b=mBounds(m);
@@ -1275,9 +1285,17 @@ function refresh(){
     /* BUG FIX (v3.1): Mustatil ka label hamesha NW corner point par — center mein kabhi nahi.
        Corner point se har qila number har zoom par door rehta hai, is liye koi number nahi dhakta. */
     L.marker([b.n,b.w],{interactive:false,keyboard:false,icon:L.divIcon({className:'lbl',html:'<span class="lbl-m lbl-corner"'+(isSel?' style="background:#b45309;color:#fff"':'')+'>'+k+'</span>',iconSize:[64,18],iconAnchor:[32,9]})}).addTo(labelLayer);
-    if(isSel && z>=16.5) addQLabels(m,vb);
+    if(isSel){
+      /* v5 (video rawaiya): selected mustatil ke 25 qila numbers FORAN — lekin clutter se bachne ke liye
+         zoom number ki bajaye on-screen size shart hai: murabba screen par ~110px+ chorha ho (takreeban zoom 15.6+)
+         to har qila cell ~22px+ banta hai aur numbers saaf parhe jate hain. Pehle ye hadd zoom 16.5 thi. */
+      var pw=0; try{ var pa=map.latLngToContainerPoint([b.n,b.w]), pb=map.latLngToContainerPoint([b.n,b.e]); pw=Math.abs(pb.x-pa.x); }catch(e){}
+      if(pw>=110){ addQLabels(m,vb,true); selLblShown=true; }
+      else if(qilaAll && z>=17) addQLabels(m,vb);
+    }
     else if(qilaAll && z>=17) addQLabels(m,vb);
   });
+  updateSelBanner();
 }
 
 /* ===== Tap select: 1st tap = murabba (its qilas only), 2nd tap = qila ===== */
@@ -1330,6 +1348,19 @@ function clearTarget(){
   target=null; qSelLayer.clearLayers(); repaintHi(); if(navLine){map.removeLayer(navLine);navLine=null}
   document.getElementById('selM').value=''; var q=document.getElementById('selQ'); q.value=''; q.disabled=true;
   document.getElementById('nav').style.display='none'; refresh();
+}
+
+/* ===== v5: Selected mustatil ka banner — header ke andar bara naam.
+   Map ke center par badge NAHI lagta (user ki shikayat thi ke label qila numbers ko dhakta hai);
+   NW-corner wala chhota label pehle ki tarah rehta hai, ye banner sirf selection par header mein aata hai. ===== */
+var selLblShown=false;
+function updateSelBanner(){
+  var b=document.getElementById('selBanner'); if(!b) return;
+  if(!target){ b.style.display='none'; return; }
+  document.getElementById('sbName').textContent='Mustatil '+target.m;
+  document.getElementById('sbSub').textContent = target.q ? ('Qila '+target.q+' select hai')
+    : (selLblShown ? '25 qile — kisi qile par tap karein' : 'Qila numbers ke liye thora zoom karein');
+  b.style.display='flex';
 }
 function targetCenter(){
   var m=MUR[target.m], b=target.q?qBounds(m,target.q):mBounds(m);
@@ -1401,7 +1432,7 @@ function startGPS(){
 }
 function setStatus(cls,badge,msg){
   document.getElementById('dot').className='dot '+(cls==='ok'?'ok':cls==='bad'?'bad':'');
-  var b=document.getElementById('acc'); b.textContent=badge; b.className='badge'+(cls==='ok'?' good':cls==='warn'?' warn':'');
+  var b=document.getElementById('acc'); b.textContent=badge; b.className='badge'+(cls==='ok'?' good':cls==='warn'?' warn':cls==='bad'?' bad':'');
   if(msg) document.getElementById('pos').textContent=msg;
 }
 function onErr(e){
@@ -1415,7 +1446,10 @@ function onFix(p){
     userMarker=L.marker(userLL,{interactive:false,zIndexOffset:1000,icon:L.divIcon({className:'',html:'<div class="userpulse"></div><div class="userdot"></div>',iconSize:[18,18],iconAnchor:[9,9]})}).addTo(map);
     userCircle=L.circle(userLL,{radius:acc,color:'#3b82f6',weight:1,fillColor:'#3b82f6',fillOpacity:.15,interactive:false}).addTo(map);
   } else { userMarker.setLatLng(userLL); userCircle.setLatLng(userLL); userCircle.setRadius(acc); }
-  setStatus(acc<=15?'ok':'warn','Accuracy: '+acc+' m');
+  /* v5: GPS accuracy chip — reference video jaisi rang-daar: <=5m sabz Strong, 6-20m amber Medium, >20m surkh Weak */
+  if(acc<=5) setStatus('ok',acc+' m · Strong GPS');
+  else if(acc<=20) setStatus('warn',acc+' m · Medium GPS');
+  else setStatus('bad',acc+' m · Weak GPS');
   document.getElementById('coord').textContent=lat.toFixed(5)+', '+lng.toFixed(5);
   detect(lat,lng);
   updateNav();
@@ -2304,6 +2338,11 @@ document.addEventListener('DOMContentLoaded',init);
   window.__v4 = { clean:function(){ return document.body.classList.contains('cleanview'); },
     locOpen:function(){ var l=$('loc'); return !!(l && l.classList.contains('open')); },
     pmCoordsRender:renderPmCoords, syncNdBtn:syncNdBtn };
+  /* v5 hooks: qila-number visibility + banner + GPS chip */
+  window.__v5 = { version:'v5',
+    selLblShown:function(){ return !!window.selLblShown; },
+    banner:function(){ var b=document.getElementById('selBanner'); return b ? {disp:b.style.display, name:(document.getElementById('sbName')||{}).textContent||'', sub:(document.getElementById('sbSub')||{}).textContent||''} : null; },
+    chip:function(){ var a=document.getElementById('acc'); return a ? {txt:a.textContent, cls:a.className} : null; } };
 })();
 </script>
 </body>
