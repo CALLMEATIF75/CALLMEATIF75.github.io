@@ -28,9 +28,10 @@ header .logo{width:40px;height:40px;border-radius:10px;background:rgba(255,255,2
 header h1{font-size:18px;margin:0;line-height:1.15}
 header .sub{font-size:11.5px;opacity:.85;margin-top:1px}
 header select{margin-left:auto;background:#fff;color:var(--em3);border:none;border-radius:9px;padding:8px 6px;font-size:13.5px;font-weight:600;max-width:42vw}
-.seasonsel{display:flex;gap:9px;margin-top:11px}
-.seasonsel button{flex:1;padding:11px 6px;border-radius:12px;border:2px solid var(--gold2);background:rgba(255,255,255,.10);color:#fff;font-weight:800;font-size:16px;line-height:1.2}
-.seasonsel button small{display:block;font-weight:400;font-size:12.5px;opacity:.9;margin-top:1px}
+.seasonsel{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.seasonsel::-webkit-scrollbar{display:none}
+.seasonsel button{flex:0 0 auto;padding:6px 14px;border-radius:99px;border:1.5px solid rgba(255,255,255,.55);background:rgba(255,255,255,.08);color:#fff;font-weight:800;font-size:15px;line-height:1.15;white-space:nowrap;text-align:left}
+.seasonsel button small{display:block;font-weight:500;font-size:11px;opacity:.85}
 .seasonsel button.on{background:var(--gold);color:#231a02;border-color:var(--gold)}
 
 /* ---------- Layout ---------- */
@@ -74,6 +75,9 @@ h2.sec{font-size:16px;margin:16px 2px 10px;color:var(--em3)}
 .farmer .amts{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;margin-top:5px}
 .farmer .amts span b{font-size:13.5px}
 .pill{flex:0 0 auto;font-size:11px;font-weight:800;padding:4px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.3px}
+.kindtag{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:99px;letter-spacing:.3px;text-transform:uppercase;vertical-align:middle;margin-left:6px}
+.kindtag.paid{background:var(--greenbg);color:var(--green)}
+.kindtag.collected{background:var(--amberbg);color:var(--amber)}
 .pill.Paid{background:var(--greenbg);color:var(--green)}
 .pill.Partial{background:var(--amberbg);color:var(--amber)}
 .pill.Unpaid{background:var(--redbg);color:var(--red)}
@@ -144,25 +148,41 @@ nav button.on .ic{filter:none}
   header,main,nav,.overlay,#lockScreen,.fab{display:none !important}
   #printArea{display:block !important}
   @page{size:A4;margin:12mm}
+  thead{display:table-header-group}
+  tr{break-inside:avoid}
 }
 #printArea{font-family:"Segoe UI",Arial,sans-serif;color:#000;font-size:12.5px}
-#printArea .lh{text-align:center;border-bottom:3px double #000;padding-bottom:8px;margin-bottom:6px}
-#printArea .lh .n1{font-size:19px;font-weight:800;color:#000;letter-spacing:1.5px}
-#printArea .lh .n2{font-size:12.5px;margin-top:2px}
-#printArea .lh .n3{font-size:14.5px;font-weight:700;margin-top:3px}
-#printArea .lh .n4{font-size:12px;margin-top:2px}
-#printArea .rt{text-align:center;font-size:16px;font-weight:800;margin:10px 0 2px;text-decoration:underline}
-#printArea .meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;margin:6px 0 10px}
+#printArea [dir="rtl"]{font-size:13.5px}
+#printArea .urdu{font-family:"Noto Nastaliq Urdu","Segoe UI",serif;line-height:1.9}
+#printArea .docframe{border:2.5px solid #000;padding:5px}
+#printArea .docframe-in{border:1px solid #000;padding:16px 18px 12px}
+#printArea .emblem{text-align:center;margin-bottom:2px}
+#printArea .lh{text-align:center;border-bottom:4px double #000;padding-bottom:9px;margin-bottom:10px}
+#printArea .lh .n1{font-size:17px;font-weight:800;color:#000;font-family:Georgia,"Times New Roman",serif;text-transform:uppercase;letter-spacing:1px}
+#printArea .lh .n1.urdu{font-family:"Noto Nastaliq Urdu",serif;text-transform:none;letter-spacing:0;font-size:20px;line-height:2}
+#printArea .lh .n2{font-size:12.5px;margin-top:3px}
+#printArea .rt{text-align:center;font-size:15.5px;font-weight:800;margin:0 0 10px;background:#e8e8e8;border:1px solid #000;padding:8px 10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#printArea .rt .caps{letter-spacing:2px;text-transform:uppercase}
+#printArea .rt .urdu{font-size:18px;line-height:2}
+#printArea .rt2{text-align:center;font-size:15px;font-weight:700;margin:2px 0}
+#printArea table.meta{width:100%;border-collapse:collapse;margin:0 0 12px}
+#printArea table.meta td{border:1px solid #000;padding:5px 9px;vertical-align:top}
+#printArea table.meta .ml{display:block;font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#444}
+#printArea table.meta .mv{display:block;font-weight:800;font-size:12.5px;margin-top:1px}
 #printArea table{width:100%;border-collapse:collapse}
-#printArea th,#printArea td{border:1px solid #555;padding:5px 6px;text-align:left;vertical-align:top}
-#printArea th{background:#ececec;font-size:12px}
+#printArea th,#printArea td{border:1px solid #555;padding:6px 7px;text-align:left;vertical-align:top}
+#printArea th{background:#1f1f1f;color:#fff;font-size:12px;font-weight:800;border-color:#1f1f1f;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 #printArea td.num,#printArea th.num{text-align:right}
 #printArea td.bold{font-weight:800}
-#printArea tr.tot td{font-weight:800;background:#f2f2f2}
-#printArea .sigfoot{margin-top:42px;display:flex;justify-content:space-between;align-items:flex-end;direction:ltr;page-break-inside:avoid}
-#printArea .sigfoot .sigbox{font-size:12.5px}
-#printArea .sigfoot .line{border-top:1.5px solid #000;width:240px;margin-bottom:5px}
-#printArea .stampbox{border:1.5px solid #000;width:55mm;height:35mm;text-align:center;padding-top:5px;font-size:12px;color:#444;flex:0 0 auto}
+#printArea tr.tot td{font-weight:800;background:#e9e9e9;border-top:3px double #000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#printArea .sigfoot{margin-top:46px;display:flex;justify-content:flex-end;align-items:flex-end;direction:ltr;page-break-inside:avoid}
+#printArea .sigfoot.sig-rtl{direction:rtl}
+#printArea .sigfoot .sigbox{font-size:12.5px;text-align:center}
+#printArea .sigfoot .line{border-top:2px dotted #000;width:250px;margin-bottom:6px}
+#printArea .sigfoot .sname{font-weight:800;font-size:13.5px}
+#printArea .sigfoot .stitle{font-size:11.5px;color:#333}
+#printArea .docfoot{border-top:1px solid #000;margin-top:16px;padding-top:5px;text-align:center;font-size:10.5px;color:#333}
+#printArea .cornerlabel{float:right;border:2px solid #000;padding:4px 12px;font-weight:800;font-size:13.5px;margin:0 0 6px 10px;background:#fff}
 #printArea .chowinst{text-align:center;font-size:15px;line-height:2;margin:10px 0 2px}
 #printArea .chowline{text-align:center;font-weight:800;font-size:13.5px;margin:2px 0}
 #printArea [dir="rtl"] table{direction:rtl}
@@ -204,8 +224,8 @@ nav button.on .ic{filter:none}
     </div>
   </div>
   <div class="seasonsel" id="seasonSel" role="group" aria-label="Season">
-    <button type="button" data-season="kharif2025">Kharif 2025<small>خریف 2025 · Last Date: 15/06/2026</small></button>
-    <button type="button" data-season="rabi2026">Rabi 2026<small>ربیع 2026 · Last Date: 27/10/2026</small></button>
+    <button type="button" data-season="kharif2025">Kharif 2025<small>Last Date: 15/06/2026</small></button>
+    <button type="button" data-season="rabi2026">Rabi 2026<small>Last Date: 27/10/2026</small></button>
   </div>
 </header>
 
@@ -214,8 +234,9 @@ nav button.on .ic{filter:none}
   <section class="view active" id="view-dashboard">
     <div class="cards">
       <div class="card"><div class="lbl">Total Billed</div><div class="val" id="dTotal">—</div></div>
-      <div class="card"><div class="lbl">Collected</div><div class="val" id="dColl">—</div></div>
-      <div class="card gold"><div class="lbl">Remaining</div><div class="val" id="dRem">—</div></div>
+      <div class="card"><div class="lbl">Paid — Jama</div><div class="val" id="dJama">—</div></div>
+      <div class="card"><div class="lbl">Collected — Mere Paas</div><div class="val" id="dPaas">—</div></div>
+      <div class="card gold"><div class="lbl">Baqaya</div><div class="val" id="dRem">—</div></div>
       <div class="card"><div class="lbl">Farmers / Bills</div><div class="val" id="dCount">—</div></div>
       <div class="card wide">
         <div class="lbl">Collection Progress — <span id="dPct">0%</span></div>
@@ -263,7 +284,7 @@ nav button.on .ic{filter:none}
         <label>Report Type</label>
         <select id="pType">
           <option value="paid">Paid List</option>
-          <option value="unpaid">Unpaid &amp; Partial List (with remaining)</option>
+          <option value="unpaid">Outstanding Abiana List (unpaid &amp; partial)</option>
           <option value="complete">Complete List</option>
           <option value="summary">Season Summary</option>
         </select>
@@ -429,12 +450,27 @@ function paidCapped(bill){ return Math.min(paidRaw(bill), effAmt(bill)); }
 function remaining(bill){ return Math.max(0, effAmt(bill) - paidRaw(bill)); }
 function statusOf(bill){ var p = paidRaw(bill); if(p >= effAmt(bill)) return "Paid"; if(p > 0) return "Partial"; return "Unpaid"; }
 function savePayments(){ lsSet(LS_PAY, payments); }
-function addPayment(bill, amount, date, note){
+function addPayment(bill, amount, date, note, kind){
   if(!payments[bill.season_id]) payments[bill.season_id] = {};
   var pk = payKey(bill);
   if(!payments[bill.season_id][pk]) payments[bill.season_id][pk] = [];
-  payments[bill.season_id][pk].push({ amount:Number(amount), date:date, note:note||"", ts:Date.now() });
+  payments[bill.season_id][pk].push({ amount:Number(amount), date:date, note:note||"", kind:(kind==="paid" ? "paid" : "collected"), ts:Date.now() });
   savePayments();
+}
+/* Money split per bill: 'paid' = Jama (already deposited/submitted onward);
+   'collected' = Mere Paas (received from the farmer, still held by the Numberdar).
+   Payments without a kind (pre-kind records) count as collected. Capped at the bill
+   amount so Paid(Jama) + Collected(Paas) always equals paidCapped. */
+function kindSums(bill){
+  var jp=0, cp=0;
+  getPays(bill).forEach(function(p){ if(p.kind==="paid") jp += Number(p.amount||0); else cp += Number(p.amount||0); });
+  return { jama:jp, paas:cp };
+}
+function billSplit(bill){
+  var s = kindSums(bill), cap = effAmt(bill);
+  var j = Math.min(s.jama, cap);
+  var c = Math.min(s.paas, Math.max(0, cap - j));
+  return { jama:j, paas:c };
 }
 
 var ONES=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
@@ -498,7 +534,7 @@ function seedVideoStatuses(){
     var un = SEED_UNPAID[b.season_id] || [];
     if(un.indexOf(b.khata) !== -1){
       var part = (SEED_PARTIAL[b.season_id] || {})[b.khata];
-      if(part) addPayment(b, part.amount, "2026-10-22", part.note);  // partial share paid — rest remains
+      if(part) addPayment(b, part.amount, "2026-10-22", part.note, "collected");  // Nasir handed cash to the Numberdar — partial share, rest remains
       return;  // still owed (fully or partly) — no full payment
     }
     var coll = (SEED_COLLECTED[b.season_id] || []).indexOf(b.khata) !== -1;
@@ -508,7 +544,7 @@ function seedVideoStatuses(){
       : coll
       ? "Collected — official eAbiana app (video 22 Oct 2026). Paisay Numberdar ke paas, jama baqi."
       : "Paid — official eAbiana app video mein show nahi (22 Oct 2026)";
-    addPayment(b, effAmt(b), "2026-10-22", note);
+    addPayment(b, effAmt(b), "2026-10-22", note, coll ? "collected" : "paid");
   });
   seedCustomBaqayaBills();
   lsSetRaw(LS_SEEDED, "1");
@@ -539,6 +575,34 @@ function fix264Correction(){
     }
   }catch(e){}
   lsSetRaw(LS_FIX264, "1");
+}
+
+/* One-time migration: give every existing payment a `kind` ('paid' = Jama /
+   deposited onward, 'collected' = Mere Paas / still held by the Numberdar).
+   Assigned from the seed notes; anything else (the Numberdar's own entries)
+   defaults to 'collected' — cash in his hand until he marks it Jama.
+   Idempotent; never overwrites an existing kind. */
+var LS_KIND = "abiana_kind_v1";
+function kindMigration(){
+  if(lsGetRaw(LS_KIND)) return;
+  try{
+    for(var sid in payments){
+      var byK = payments[sid] || {};
+      for(var k in byK){
+        var arr = byK[k] || [];
+        for(var i=0;i<arr.length;i++){
+          var p = arr[i];
+          if(!p || p.kind) continue;
+          var n = p.note || "";
+          if(n.indexOf("Collected —")===0 || n.indexOf("Nasir ne diye")===0) p.kind = "collected";
+          else if(n.indexOf("Paid —")===0) p.kind = "paid";
+          else p.kind = "collected";
+        }
+      }
+    }
+    savePayments();
+  }catch(e){}
+  lsSetRaw(LS_KIND, "1");
 }
 
 /* ==================== PIN (screen lock only) ==================== */
@@ -605,14 +669,15 @@ for(var sbi=0; sbi<seasonBtns.length; sbi++){ (function(btn){ btn.addEventListen
 
 /* ==================== DASHBOARD ==================== */
 function seasonStats(season){
-  var bs = billsFor(season), tot=0, coll=0, np=0, npa=0, nu=0;
-  bs.forEach(function(b){ tot += effAmt(b); coll += paidCapped(b); var s = statusOf(b); if(s==="Paid") np++; else if(s==="Partial") npa++; else nu++; });
-  return { bills:bs, total:tot, coll:coll, rem:tot-coll, paid:np, partial:npa, unpaid:nu, pct: tot? Math.round(coll/tot*1000)/10 : 0 };
+  var bs = billsFor(season), tot=0, coll=0, jama=0, paas=0, np=0, npa=0, nu=0;
+  bs.forEach(function(b){ tot += effAmt(b); var sp = billSplit(b); jama += sp.jama; paas += sp.paas; coll += sp.jama + sp.paas; var s = statusOf(b); if(s==="Paid") np++; else if(s==="Partial") npa++; else nu++; });
+  return { bills:bs, total:tot, coll:coll, jama:jama, paas:paas, rem:tot-coll, paid:np, partial:npa, unpaid:nu, pct: tot? Math.round(coll/tot*1000)/10 : 0 };
 }
 function renderDashboard(){
   var st = seasonStats(seasonFilter);
   $("dTotal").textContent = fmt(st.total);
-  $("dColl").textContent = fmt(st.coll);
+  $("dJama").textContent = fmt(st.jama);
+  $("dPaas").textContent = fmt(st.paas);
   $("dRem").textContent = fmt(st.rem);
   $("dCount").textContent = fmtN(st.bills.length);
   $("dPct").textContent = st.pct + "%";
@@ -623,7 +688,7 @@ function renderDashboard(){
     var s = seasonStats(sid);
     sc += '<div class="seasoncard"><h3>' + esc(SEASONS[sid].label) + ' <span class="urdu mut" style="font-weight:400">' + esc(SEASONS[sid].ur) + '</span></h3>'
       + '<div class="grid"><div>Bills<b>' + fmtN(s.bills.length) + '</b></div><div>Total<b>' + fmt(s.total) + '</b></div>'
-      + '<div>Collected<b>' + fmt(s.coll) + '</b></div><div>Remaining<b>' + fmt(s.rem) + '</b></div><div>Last Date<b>' + seasonLastDate(sid) + '</b></div><div>Done<b>' + s.pct + '%</b></div></div></div>';
+      + '<div>Paid — Jama<b>' + fmt(s.jama) + '</b></div><div>Collected — Paas<b>' + fmt(s.paas) + '</b></div><div>Baqaya<b>' + fmt(s.rem) + '</b></div><div>Last Date<b>' + seasonLastDate(sid) + '</b></div><div>Done<b>' + s.pct + '%</b></div></div></div>';
   });
   $("seasonCards").innerHTML = sc;
   var all = [];
@@ -707,6 +772,8 @@ function renderDetail(){
      + (b.season_id==="kharif2025" ? '<div class="kv"><span>Amount Detail</span><span>Due-date amount ' + fmt(b.amt) + ' · With late fees ' + fmt(effAmt(b)) + '</span></div>' : '')
      + '<div class="kv"><span>Payable After Due Date</span><span>' + fmt(b.payable_late!=null ? b.payable_late : b.amt) + '</span></div>'
      + '<div class="kv"><span>Total Paid</span><span style="color:var(--em2)">' + fmt(paid) + (raw>paid ? ' (actual ' + fmt(raw) + ')' : '') + '</span></div>'
+     + (function(){ var sp = billSplit(b); return '<div class="kv"><span>Jama (Paid)</span><span style="color:var(--green)">' + fmt(sp.jama) + '</span></div>'
+     + '<div class="kv"><span>Mere Paas (Collected)</span><span style="color:var(--amber)">' + fmt(sp.paas) + '</span></div>'; })()
      + '<div class="kv"><span>Remaining</span><span style="color:' + (rem>0 ? 'var(--red)' : 'var(--green)') + '">' + fmt(rem) + '</span></div>'
      + '<div class="kv" style="border-bottom:none"><span>Status</span><span><span class="pill ' + st + '">' + st + '</span></span></div>'
      + (rem>0 ? '<button class="btn block gold" id="markFullBtn">✓ Mark Full Paid (' + fmt(rem) + ')</button>' : '')
@@ -715,7 +782,8 @@ function renderDetail(){
   h += '<div class="panel"><h3>Payment History</h3>';
   if(!pays.length) h += '<p class="mut small" style="margin:0">No payments recorded yet.</p>';
   pays.forEach(function(p, i){
-    h += '<div class="payrow"><div><span class="pa">' + fmt(p.amount) + '</span><br><span class="mut small">' + esc(ddmmyyyy(p.date)) + (p.note ? ' · ' + esc(p.note) : '') + '</span></div>'
+    var kd = p.kind==="paid" ? "paid" : "collected";
+    h += '<div class="payrow"><div><span class="pa">' + fmt(p.amount) + '</span><span class="kindtag ' + kd + '">' + (kd==="paid" ? "Paid" : "Collected") + '</span><br><span class="mut small">' + esc(ddmmyyyy(p.date)) + (p.note ? ' · ' + esc(p.note) : '') + '</span></div>'
        + '<div class="acts"><button class="iconbtn" data-edit="' + i + '">Edit</button><button class="iconbtn" data-del="' + i + '">Delete</button></div></div>';
   });
   h += '</div>';
@@ -724,6 +792,7 @@ function renderDetail(){
      + '<div class="fld"><label>Amount (Rs) *</label><input id="payAmt" type="number" inputmode="numeric" placeholder="Amount received"></div>'
      + '<div class="fld"><label>Date</label><input id="payDate" type="date" value="' + todayStr() + '"></div>'
      + '<div class="fld"><label>Note (optional)</label><input id="payNote" type="text" placeholder="Cash / bank / remarks"></div>'
+     + '<div class="fld"><label>Payment Type — paisay kahan hain?</label><select id="payKind"><option value="collected">Collected — paisay mere paas hain</option><option value="paid">Paid — jama karwa diye</option></select></div>'
      + '<button class="btn block" id="paySave">' + (editPayIdx>=0 ? 'Save Changes' : 'Add Payment') + '</button>'
      + (editPayIdx>=0 ? '<button class="btn block ghost" id="payCancelEdit">Cancel Edit</button>' : '')
      + '</div>';
@@ -759,19 +828,21 @@ function renderDetail(){
   for(var e=0; e<edBtns.length; e++){ (function(btn){ btn.addEventListener("click", function(){
     var i = Number(btn.getAttribute("data-edit")); editPayIdx = i; renderDetail();
     $("payAmt").value = pays[i].amount; $("payDate").value = pays[i].date || todayStr(); $("payNote").value = pays[i].note || "";
+    $("payKind").value = pays[i].kind==="paid" ? "paid" : "collected";
     $("payAmt").focus(); window.scrollTo(0, document.body.scrollHeight);
   }); })(edBtns[e]); }
   var ce = $("payCancelEdit"); if(ce) ce.addEventListener("click", function(){ editPayIdx = -1; renderDetail(); });
   $("paySave").addEventListener("click", function(){
     var amt = Number($("payAmt").value), date = $("payDate").value || todayStr(), note = $("payNote").value.trim();
+    var kind = $("payKind").value==="paid" ? "paid" : "collected";
     if(!amt || amt <= 0){ alert("Please enter a valid amount."); return; }
     if(editPayIdx >= 0){
-      payments[b.season_id][payKey(b)][editPayIdx] = { amount:amt, date:date, note:note, ts:payments[b.season_id][payKey(b)][editPayIdx].ts || Date.now() };
+      payments[b.season_id][payKey(b)][editPayIdx] = { amount:amt, date:date, note:note, kind:kind, ts:payments[b.season_id][payKey(b)][editPayIdx].ts || Date.now() };
       savePayments(); editPayIdx = -1; renderDetail(); return;
     }
     var remNow = remaining(b);
     if(amt > remNow && !confirm("Warning: This payment (" + fmt(amt) + ") is more than the remaining amount (" + fmt(remNow) + "). The extra will be recorded but the bill will simply show as Paid. Continue?")) return;
-    addPayment(b, amt, date, note); renderDetail();
+    addPayment(b, amt, date, note, kind); renderDetail();
   });
   $("rcLang").addEventListener("change", function(){ printLang = this.value; lsSetRaw(LS_LANG, printLang); $("pLang").value = printLang; });
   $("printReceiptBtn").addEventListener("click", function(){ printReceipt(b, printLang); });
@@ -846,7 +917,8 @@ $("lockBtn").addEventListener("click", function(){ showLock(); });
 /* ==================== PRINTING ==================== */
 var LBL = {
   en:{ sr:"Sr", khata:"Khata", farmer:"Farmer", father:"Father", area:"Area (K-M)", bill:"Bill (Rs)", paid:"Paid (Rs)", rem:"Remaining (Rs)", status:"Status",
-       paidT:"Paid List", unpaidT:"Unpaid & Partial List", completeT:"Complete List", summaryT:"Season Summary",
+       paidT:"Paid List", unpaidT:"Outstanding Abiana List", completeT:"Complete List", summaryT:"Season Summary",
+       jama:"Paid — Jama (Rs)", paas:"Collected — Mere Paas (Rs)", baq:"Baqaya (Rs)", farmers:"Total Farmers",
        Paid:"Paid", Partial:"Partial", Unpaid:"Unpaid", receipt:"Payment Receipt", season:"Season", date:"Print Date",
        total:"TOTAL", bills:"Bills", collected:"Collected", remainingL:"Remaining", pct:"Collection %",
        cons:"Consumer No.", ref:"Bill Reference", issue:"Issue Date", due:"Due Date", afterdue:"Payable After Due Date",
@@ -854,7 +926,8 @@ var LBL = {
        metric:"Detail", value:"Value", received:"Received", balance:"Balance",
        lastdate:"Last Date", kharifB:"Kharif 2025 Baqaya (Rs)", rabiB:"Rabi 2026 Baqaya (Rs)", totB:"TOTAL Baqaya (Rs)" },
   ur:{ sr:"نمبر", khata:"کھاتہ", farmer:"کسان", father:"والد", area:"رقبہ (کنال-مرلہ)", bill:"بل (روپے)", paid:"ادا شدہ (روپے)", rem:"بقایا (روپے)", status:"حالت",
-       paidT:"ادا شدہ فہرست", unpaidT:"بقایا و جزوی فہرست", completeT:"مکمل فہرست", summaryT:"سیزن خلاصہ",
+       paidT:"ادا شدہ فہرست", unpaidT:"بقایا آبیانہ کی فہرست", completeT:"مکمل فہرست", summaryT:"سیزن خلاصہ",
+       jama:"جمع شدہ (روپے)", paas:"میرے پاس (روپے)", baq:"بقایا (روپے)", farmers:"کل کسان",
        Paid:"ادا شدہ", Partial:"جزوی ادا", Unpaid:"غیر ادا", receipt:"ادائیگی رسید", season:"سیزن", date:"تاریخ اشاعت",
        total:"کل", bills:"بلوں کی تعداد", collected:"وصول شدہ", remainingL:"بقایا", pct:"وصولی فیصد",
        cons:"صارف نمبر", ref:"بل حوالہ نمبر", issue:"تاریخ اجرا", due:"آخری تاریخ", afterdue:"آخری تاریخ کے بعد قابل ادا",
@@ -862,7 +935,8 @@ var LBL = {
        metric:"تفصیل", value:"قدر", received:"موصول", balance:"بقایا",
        lastdate:"آخری تاریخ", kharifB:"خریف 2025 بقایا (روپے)", rabiB:"ربیع 2026 بقایا (روپے)", totB:"کل بقایا (روپے)" },
   bi:{ sr:"Sr / نمبر", khata:"Khata / کھاتہ", farmer:"Farmer / کسان", father:"Father / والد", area:"Area / رقبہ (K-M)", bill:"Bill / بل (Rs)", paid:"Paid / ادا (Rs)", rem:"Remaining / بقایا (Rs)", status:"Status / حالت",
-       paidT:"Paid List / ادا شدہ فہرست", unpaidT:"Unpaid & Partial List / بقایا فہرست", completeT:"Complete List / مکمل فہرست", summaryT:"Season Summary / سیزن خلاصہ",
+       paidT:"Paid List / ادا شدہ فہرست", unpaidT:"Outstanding Abiana List / بقایا آبیانہ کی فہرست", completeT:"Complete List / مکمل فہرست", summaryT:"Season Summary / سیزن خلاصہ",
+       jama:"Paid — Jama / جمع شدہ (Rs)", paas:"Collected — Paas / میرے پاس (Rs)", baq:"Baqaya / بقایا (Rs)", farmers:"Total Farmers / کل کسان",
        Paid:"Paid / ادا شدہ", Partial:"Partial / جزوی", Unpaid:"Unpaid / غیر ادا", receipt:"Payment Receipt / ادائیگی رسید", season:"Season / سیزن", date:"Print Date / تاریخ",
        total:"TOTAL / کل", bills:"Bills / بل", collected:"Collected / وصول", remainingL:"Remaining / بقایا", pct:"Collection % / وصولی فیصد",
        cons:"Consumer No. / صارف نمبر", ref:"Bill Reference / حوالہ نمبر", issue:"Issue Date / تاریخ اجرا", due:"Due Date / آخری تاریخ", afterdue:"After Due Date / بعد از تاریخ قابل ادا",
@@ -870,22 +944,43 @@ var LBL = {
        metric:"Detail / تفصیل", value:"Value / قدر", received:"Received / موصول", balance:"Balance / بقایا",
        lastdate:"Last Date / آخری تاریخ", kharifB:"Kharif 2025 Baqaya / خریف بقایا (Rs)", rabiB:"Rabi 2026 Baqaya / ربیع بقایا (Rs)", totB:"TOTAL Baqaya / کل بقایا (Rs)" }
 };
-function letterhead(lang, title, seasonLabel, seasonId){
+var EMBLEM_SVG = '<svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#000" stroke-width="2"/><circle cx="24" cy="24" r="18.5" fill="none" stroke="#000" stroke-width="1"/><path d="M24 12 C24 12 15.5 21.5 15.5 28.5 a8.5 8.5 0 0 0 17 0 C32.5 21.5 24 12 24 12 Z" fill="none" stroke="#000" stroke-width="1.8"/></svg>';
+function titleHtml(lang, title){
+  if(lang==="ur") return '<span class="urdu">' + esc(title) + '</span>';
+  if(lang==="bi"){
+    var p = String(title).split(" / ");
+    if(p.length===2) return '<span class="caps">' + esc(p[0]) + '</span> · <span class="urdu">' + esc(p[1]) + '</span>';
+  }
+  return '<span class="caps">' + esc(title) + '</span>';
+}
+function letterhead(lang, title, seasonLabel, seasonId, count){
   var L = LBL[lang];
-  var h = '<div class="lh"><div class="n1">OFFICE OF THE NUMBERDAR</div>'
-    + '<div class="n2">Chak No. 130/1-L · Tehsil Khanpur · District Rahim Yar Khan</div>'
-    + '<div class="n2 urdu">چک نمبر 130/1-L · تحصیل خانپور، ضلع رحیم یار خان</div>'
-    + '<div class="n3">Abiana (Water Tax) Collection Record</div>'
-    + '<div class="n4">Outlet / Moga 12925 · Revenue Circle 92 1-L</div></div>'
-    + '<div class="rt">' + esc(title) + '</div>'
-    + '<div class="meta"><span><b>' + esc(L.season) + ':</b> ' + esc(seasonLabel) + '</span>'
-    + (seasonId ? '<span><b>' + esc(L.lastdate) + ':</b> ' + seasonLastDate(seasonId) + '</span>' : '')
-    + '<span><b>' + esc(L.date) + ':</b> ' + nowDmy() + '</span></div>';
+  var head = lang==="ur"
+    ? '<div class="n1 urdu">محمد عاطف — نمبردار، چک نمبر 130/1-L</div>'
+      + '<div class="n2 urdu">تحصیل خانپور، ضلع رحیم یار خان</div>'
+    : '<div class="n1">Muhammad Atif — Numberdar, Chak No. 130/1-L</div>'
+      + '<div class="n2">Tehsil Khanpur · District Rahim Yar Khan</div>';
+  var cells = [[L.season, seasonLabel]];
+  if(seasonId) cells.push([L.lastdate, seasonLastDate(seasonId)]);
+  cells.push([L.date, nowDmy()]);
+  if(count != null) cells.push([L.farmers, fmtN(count)]);
+  var meta = '<table class="meta"><tr>' + cells.map(function(c){
+    return '<td><span class="ml">' + esc(c[0]) + '</span><span class="mv">' + esc(c[1]) + '</span></td>';
+  }).join("") + '</tr></table>';
+  var h = '<div class="emblem">' + EMBLEM_SVG + '</div>'
+    + '<div class="lh">' + head + '</div>'
+    + '<div class="rt">' + titleHtml(lang, title) + '</div>'
+    + meta;
   return h;
 }
+function docFoot(title){
+  return '<div class="docfoot">' + esc(title) + ' · Chak No. 130/1-L</div>';
+}
 function sigBlock(lang){
-  return '<div class="sigfoot"><div class="sigbox"><div class="line"></div><div>Muhammad Atif — Numberdar, Chak 130/1-L</div></div>'
-    + '<div class="stampbox">Stamp / <span class="urdu">مہر</span></div></div>';
+  var inner = lang==="ur"
+    ? '<div class="sname urdu">محمد عاطف</div><div class="stitle urdu">نمبردار، چک نمبر 130/1-L</div>'
+    : '<div class="sname">Muhammad Atif</div><div class="stitle">Numberdar, Chak No. 130/1-L</div>';
+  return '<div class="sigfoot' + (lang==="ur" ? ' sig-rtl' : '') + '"><div class="sigbox"><div class="line"></div>' + inner + '</div></div>';
 }
 function nameCell(b, lang, father){
   var rn = father ? (b.father||"") : b.name, un = father ? (b.ur_father||"") : (b.ur_name||"");
@@ -893,8 +988,23 @@ function nameCell(b, lang, father){
   if(lang==="bi") return (un ? '<span class="urdu">' + esc(un) + '</span><br>' : '') + esc(rn);
   return esc(rn);
 }
+/* Chowkidar farmer cell — max 2 lines in every language.
+   ur: Urdu name / Urdu father.  en: English name / s/o English father.
+   bi: line 1 Urdu name + Urdu father, line 2 small grey English name + father. */
+function chowNameCell(b, lang){
+  var un = b.ur_name || b.name, uf = b.ur_father || b.father || "";
+  if(lang==="ur") return '<span class="urdu">' + esc(un) + '</span><br><span class="urdu" style="font-size:11px;color:#444">والد: ' + esc(uf) + '</span>';
+  if(lang==="bi") return '<span class="urdu">' + esc(un) + '</span> <span class="urdu" style="font-size:11.5px;color:#333">· والد ' + esc(uf) + '</span>'
+    + '<br><span style="font-size:11px;color:#555">' + esc(b.name) + ' s/o ' + esc(b.father||"") + '</span>';
+  return esc(b.name) + '<br><span style="font-size:11px;color:#444">s/o ' + esc(b.father||"") + '</span>';
+}
 function doPrint(html, lang){
-  $("printArea").innerHTML = '<div' + (lang==="ur" ? ' dir="rtl"' : '') + '>' + html + '</div>';
+  $("printArea").innerHTML = '<div class="docframe"' + (lang==="ur" ? ' dir="rtl"' : '') + '><div class="docframe-in">' + html + '</div></div>';
+  if(lang==="ur"){
+    document.documentElement.setAttribute("dir", "rtl");
+    var restoreDir = function(){ document.documentElement.removeAttribute("dir"); window.removeEventListener("afterprint", restoreDir); };
+    window.addEventListener("afterprint", restoreDir);
+  }
   setTimeout(function(){ window.print(); }, 60);
 }
 function printReport(){
@@ -902,17 +1012,11 @@ function printReport(){
   var seasonLabel = SEASONS[season].label;
   var title = type==="paid" ? L.paidT : type==="unpaid" ? L.unpaidT : type==="complete" ? L.completeT : L.summaryT;
   if(type==="summary"){
-    var rows = "";
-    var seasons = [season];
-    var gT=0,gC=0,gN=0;
-    seasons.forEach(function(sid){
-      var s = seasonStats(sid); gT+=s.total; gC+=s.coll; gN+=s.bills.length;
-      rows += '<tr><td>' + esc(SEASONS[sid].label) + '</td><td class="num">' + fmtN(s.bills.length) + '</td><td class="num">' + fmtN(s.total) + '</td><td class="num">' + fmtN(s.coll) + '</td><td class="num">' + fmtN(s.rem) + '</td><td class="num">' + s.pct + '%</td><td class="num">' + s.paid + ' / ' + s.partial + ' / ' + s.unpaid + '</td></tr>';
-    });
-    if(seasons.length>1) rows += '<tr class="tot"><td>' + esc(L.total) + '</td><td class="num">' + fmtN(gN) + '</td><td class="num">' + fmtN(gT) + '</td><td class="num">' + fmtN(gC) + '</td><td class="num">' + fmtN(gT-gC) + '</td><td class="num">' + (gT? Math.round(gC/gT*1000)/10 : 0) + '%</td><td></td></tr>';
-    var h = letterhead(lang, title, seasonLabel, season)
-      + '<table><tr><th>' + esc(L.season) + '</th><th class="num">' + esc(L.bills) + '</th><th class="num">' + esc(L.bill) + '</th><th class="num">' + esc(L.collected) + '</th><th class="num">' + esc(L.remainingL) + '</th><th class="num">' + esc(L.pct) + '</th><th class="num">' + esc(L.Paid) + ' / ' + esc(L.Partial) + ' / ' + esc(L.Unpaid) + '</th></tr>'
-      + rows + '</table>' + sigBlock(lang);
+    var s = seasonStats(season);
+    var rows = '<tr><td>' + esc(SEASONS[season].label) + '</td><td class="num">' + fmtN(s.bills.length) + '</td><td class="num">' + fmtN(s.total) + '</td><td class="num">' + fmtN(s.jama) + '</td><td class="num">' + fmtN(s.paas) + '</td><td class="num">' + fmtN(s.rem) + '</td><td class="num">' + s.pct + '%</td></tr>';
+    var h = letterhead(lang, title, seasonLabel, season, s.bills.length)
+      + '<table><thead><tr><th>' + esc(L.season) + '</th><th class="num">' + esc(L.bills) + '</th><th class="num">' + esc(L.bill) + '</th><th class="num">' + esc(L.jama) + '</th><th class="num">' + esc(L.paas) + '</th><th class="num">' + esc(L.baq) + '</th><th class="num">' + esc(L.pct) + '</th></tr></thead>'
+      + '<tbody>' + rows + '</tbody></table>' + sigBlock(lang) + docFoot(title);
     doPrint(h, lang); return;
   }
   var bs = billsFor(season);
@@ -922,16 +1026,32 @@ function printReport(){
   bs.forEach(function(b, i){
     var paid = paidCapped(b), rem = remaining(b), st = statusOf(b);
     tB+=effAmt(b); tP+=paid; tR+=rem;
-    rowsHtml += '<tr><td>' + (i+1) + '</td><td>' + b.khata + '</td><td>' + nameCell(b, lang, false) + '</td><td>' + nameCell(b, lang, true) + '</td><td>' + areaStr(b) + '</td>'
-      + '<td class="num">' + fmtN(effAmt(b)) + '</td><td class="num">' + fmtN(paid) + '</td><td class="num">' + fmtN(rem) + '</td><td>' + esc(L[st]) + '</td></tr>';
+    var base = '<tr><td>' + (i+1) + '</td><td>' + b.khata + '</td><td>' + nameCell(b, lang, false) + '</td><td>' + nameCell(b, lang, true) + '</td><td>' + areaStr(b) + '</td>'
+      + '<td class="num">' + fmtN(effAmt(b)) + '</td>';
+    if(type==="paid") rowsHtml += base + '<td class="num">' + fmtN(paid) + '</td></tr>';
+    else if(type==="unpaid") rowsHtml += base + '<td class="num">' + fmtN(rem) + '</td></tr>';
+    else rowsHtml += base + '<td class="num">' + fmtN(paid) + '</td><td class="num">' + fmtN(rem) + '</td><td>' + esc(L[st]) + '</td></tr>';
   });
-  if(!bs.length) rowsHtml = '<tr><td colspan="9" style="text-align:center">—</td></tr>';
-  var html = letterhead(lang, title, seasonLabel, season)
-    + '<table><tr><th>' + esc(L.sr) + '</th><th>' + esc(L.khata) + '</th><th>' + esc(L.farmer) + '</th><th>' + esc(L.father) + '</th><th>' + esc(L.area) + '</th>'
-    + '<th class="num">' + esc(L.bill) + '</th><th class="num">' + esc(L.paid) + '</th><th class="num">' + esc(L.rem) + '</th><th>' + esc(L.status) + '</th></tr>'
+  var ncols = type==="complete" ? 9 : 7;
+  if(!bs.length) rowsHtml = '<tr><td colspan="' + ncols + '" style="text-align:center">—</td></tr>';
+  var headRow = '<tr><th>' + esc(L.sr) + '</th><th>' + esc(L.khata) + '</th><th>' + esc(L.farmer) + '</th><th>' + esc(L.father) + '</th><th>' + esc(L.area) + '</th>'
+    + '<th class="num">' + esc(L.bill) + '</th>';
+  var totRow;
+  if(type==="paid"){
+    headRow += '<th class="num">' + esc(L.paid) + '</th></tr>';
+    totRow = '<tr class="tot"><td colspan="5">' + esc(L.total) + ' (' + bs.length + ')</td><td class="num">' + fmtN(tB) + '</td><td class="num">' + fmtN(tP) + '</td></tr>';
+  } else if(type==="unpaid"){
+    headRow += '<th class="num">' + esc(L.baq) + '</th></tr>';
+    totRow = '<tr class="tot"><td colspan="5">' + esc(L.total) + ' (' + bs.length + ')</td><td class="num">' + fmtN(tB) + '</td><td class="num">' + fmtN(tR) + '</td></tr>';
+  } else {
+    headRow += '<th class="num">' + esc(L.paid) + '</th><th class="num">' + esc(L.rem) + '</th><th>' + esc(L.status) + '</th></tr>';
+    totRow = '<tr class="tot"><td colspan="5">' + esc(L.total) + ' (' + bs.length + ')</td><td class="num">' + fmtN(tB) + '</td><td class="num">' + fmtN(tP) + '</td><td class="num">' + fmtN(tR) + '</td><td></td></tr>';
+  }
+  var html = letterhead(lang, title, seasonLabel, season, bs.length)
+    + '<table><thead>' + headRow + '</thead><tbody>'
     + rowsHtml
-    + '<tr class="tot"><td colspan="5">' + esc(L.total) + ' (' + bs.length + ')</td><td class="num">' + fmtN(tB) + '</td><td class="num">' + fmtN(tP) + '</td><td class="num">' + fmtN(tR) + '</td><td></td></tr></table>'
-    + sigBlock(lang);
+    + totRow + '</tbody></table>'
+    + sigBlock(lang) + docFoot(title);
   doPrint(html, lang);
 }
 $("pGo").addEventListener("click", printReport);
@@ -955,22 +1075,26 @@ function printChowkidar(){
     if(tot <= 0) return;
     n++; gKh += g.kh; gRa += g.ra;
     var nb = g.rb || g.kb;
-    var fa = nameCell(nb, lang, true);
-    var nameHtml = nameCell(nb, lang, false) + (fa ? '<br><span style="font-size:11px;color:#444">' + (lang==="en" ? "s/o " : "") + fa + '</span>' : '');
-    rowsHtml += '<tr><td>' + n + '</td><td>' + k + '</td><td>' + nameHtml + '</td>'
+    rowsHtml += '<tr><td>' + n + '</td><td>' + k + '</td><td>' + chowNameCell(nb, lang) + '</td>'
       + '<td class="num">' + (g.kh ? fmtN(g.kh) : '—') + '</td><td class="num">' + (g.ra ? fmtN(g.ra) : '—') + '</td>'
       + '<td class="num bold">' + fmtN(tot) + '</td></tr>';
   });
   if(!n) rowsHtml = '<tr><td colspan="6" style="text-align:center">—</td></tr>';
-  var h = letterhead(lang, "COPY FOR CHOWKIDAR / نقل برائے چوکیدار", "Kharif 2025 + Rabi 2026")
+  var corner = lang==="ur"
+    ? '<div class="cornerlabel urdu">نقل برائے چوکیدار</div>'
+    : lang==="bi"
+    ? '<div class="cornerlabel"><span class="urdu" dir="rtl">نقل برائے چوکیدار</span> — COPY FOR CHOWKIDAR</div>'
+    : '<div class="cornerlabel">COPY FOR CHOWKIDAR</div>';
+  var h = corner + '<div style="clear:both"></div>'
+    + letterhead(lang, L.unpaidT, "Kharif 2025 + Rabi 2026", null, n)
     + '<div class="chowinst urdu" dir="rtl">درج ذیل کاشتکاروں کو مطلع کریں کہ ان کے ذمے آبیانہ کی درج شدہ رقم باقی ہے۔</div>'
     + '<div class="chowline">Last date for payment: 27 October 2026</div>'
-    + '<div class="chowline urdu">آخری تاریخ: 27 اکتوبر 2026</div>'
-    + '<table><tr><th>' + esc(L.sr) + '</th><th>' + esc(L.khata) + '</th><th>' + esc(L.farmer) + '</th>'
-    + '<th class="num">' + esc(L.kharifB) + '</th><th class="num">' + esc(L.rabiB) + '</th><th class="num">' + esc(L.totB) + '</th></tr>'
+    + '<div class="chowline urdu" dir="rtl">آخری تاریخ: 27 اکتوبر 2026</div>'
+    + '<table><thead><tr><th>' + esc(L.sr) + '</th><th>' + esc(L.khata) + '</th><th>' + esc(L.farmer) + '</th>'
+    + '<th class="num">' + esc(L.kharifB) + '</th><th class="num">' + esc(L.rabiB) + '</th><th class="num">' + esc(L.totB) + '</th></tr></thead><tbody>'
     + rowsHtml
-    + '<tr class="tot"><td colspan="3">' + esc(L.total) + ' (' + n + ')</td><td class="num">' + fmtN(gKh) + '</td><td class="num">' + fmtN(gRa) + '</td><td class="num">' + fmtN(gKh + gRa) + '</td></tr></table>'
-    + sigBlock(lang);
+    + '<tr class="tot"><td colspan="3">' + esc(L.total) + ' (' + n + ')</td><td class="num">' + fmtN(gKh) + '</td><td class="num">' + fmtN(gRa) + '</td><td class="num">' + fmtN(gKh + gRa) + '</td></tr></tbody></table>'
+    + sigBlock(lang) + docFoot(lang==="ur" ? "نقل برائے چوکیدار — بقایا آبیانہ کی فہرست" : "COPY FOR CHOWKIDAR — Outstanding Abiana List");
   doPrint(h, lang);
 }
 $("pChowk").addEventListener("click", printChowkidar);
@@ -991,17 +1115,18 @@ function printReceipt(b, lang){
     + '<tr><th>' + esc(L.issue) + '</th><td>' + esc(b.issue||"—") + '</td><th>' + esc(b.season_id==="rabi2026" ? L.lastdate : L.due) + '</th><td>' + esc(lastDateOf(b)) + '</td></tr>'
     + '<tr><th>' + esc(L.bill) + '</th><td class="num">' + fmtN(effAmt(b)) + '</td><th>' + esc(L.afterdue) + '</th><td class="num">' + fmtN(b.payable_late!=null ? b.payable_late : b.amt) + '</td></tr></table>'
     + '<div style="font-weight:800;margin:14px 0 6px">' + esc(L.payhist) + '</div>'
-    + '<table><tr><th>' + esc(L.sr) + '</th><th>' + esc(L.pdate) + '</th><th class="num">' + esc(L.pamt) + '</th><th>' + esc(L.pnote) + '</th></tr>' + rows
-    + '<tr class="tot"><td colspan="2">' + esc(L.total) + ' ' + esc(L.received) + '</td><td class="num">' + fmtN(paid) + '</td><td></td></tr></table>'
-    + '<table style="margin-top:10px"><tr><th>' + esc(L.bill) + '</th><th class="num">' + esc(L.paid) + '</th><th class="num">' + esc(L.rem) + '</th><th>' + esc(L.status) + '</th></tr>'
-    + '<tr><td class="num">' + fmtN(effAmt(b)) + '</td><td class="num">' + fmtN(paid) + '</td><td class="num">' + fmtN(rem) + '</td><td>' + esc(L[st]) + '</td></tr></table>'
+    + '<table><thead><tr><th>' + esc(L.sr) + '</th><th>' + esc(L.pdate) + '</th><th class="num">' + esc(L.pamt) + '</th><th>' + esc(L.pnote) + '</th></tr></thead><tbody>' + rows
+    + '<tr class="tot"><td colspan="2">' + esc(L.total) + ' ' + esc(L.received) + '</td><td class="num">' + fmtN(paid) + '</td><td></td></tr></tbody></table>'
+    + '<table style="margin-top:10px"><thead><tr><th>' + esc(L.bill) + '</th><th class="num">' + esc(L.paid) + '</th><th class="num">' + esc(L.rem) + '</th><th>' + esc(L.status) + '</th></tr></thead>'
+    + '<tbody><tr><td class="num">' + fmtN(effAmt(b)) + '</td><td class="num">' + fmtN(paid) + '</td><td class="num">' + fmtN(rem) + '</td><td>' + esc(L[st]) + '</td></tr></tbody></table>'
     + '<p style="margin-top:12px"><b>' + esc(L.words) + ':</b> Rupees ' + amountWords(paid) + ' Only</p>'
-    + sigBlock(lang);
+    + sigBlock(lang) + docFoot(L.receipt);
   doPrint(h, lang);
 }
 
 /* ==================== INIT ==================== */
 fix264Correction();
+kindMigration();
 seedVideoStatuses();
 setSeason(seasonFilter);
 showLock();
