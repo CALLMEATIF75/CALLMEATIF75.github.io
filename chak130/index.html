@@ -1165,7 +1165,7 @@ body.theme-streets .lbl-q-sel,body.theme-plain .lbl-q-sel{color:#b45309;text-sha
     <div id="ownList"></div>
   </div>
 
-  <div class="dash-foot"><div class="owner-name">Muhammad Atif</div><div class="owner-role">Numberdar &middot; Chak 130/1-L</div><div class="owner-ver">ZameenMap &middot; v7.4</div></div>
+  <div class="dash-foot"><div class="owner-name">Muhammad Atif</div><div class="owner-role">Numberdar &middot; Chak 130/1-L</div><div class="owner-ver">ZameenMap &middot; v7.5</div></div>
 </aside>
 <div id="pmChip" class="glass" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:1200;border-radius:14px;padding:10px 16px;font-size:14px;font-weight:800;color:#facc15;text-align:center;max-width:86vw"><span id="pmChipTxt">Points: 0</span></div>
 <button id="cleanExit" onclick="toggleCleanView()" aria-label="Close clean view">&#10005;</button>
@@ -1383,9 +1383,15 @@ function qRC(num){ var row=Math.floor((num-1)/5), p=(num-1)%5; return {row:row,c
 function qBounds(m,num){ return bboxOf(qCorners(m,num)); }
 function toLB(b){ return [[b.s,b.w],[b.n,b.e]]; }
 
-/* ===== Satellite tiles (Esri World Imagery) with offline cache in IndexedDB ===== */
-var TILE_URL='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-var SAT_MIN=14, SAT_MAX=18, idb=null, satWarned=false, dlBusy=false;
+/* ===== Satellite tiles (Google Hybrid — the Geo Map app's own basemap) with offline cache in IndexedDB =====
+   v7.5: the survey coordinates are the app's, digitized on Google imagery; on
+   Esri imagery the same lines visibly cut across compounds because Esri's
+   rural imagery here is registered several metres off Google's. Same source
+   as the app = lines sit on the lanes/bunds the app shows. Google serves
+   REAL z19 imagery here (verified: adjacent z19 tiles over 468/9 are
+   distinct ~12-13 KB JPEGs, not placeholders), so SAT_MAX=19. */
+var TILE_URL='https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}';
+var SAT_MIN=14, SAT_MAX=19, idb=null, satWarned=false, dlBusy=false;
 function openDB(){ return new Promise(function(res){ try{ var r=indexedDB.open('c130tiles',1); r.onupgradeneeded=function(){r.result.createObjectStore('t')}; r.onsuccess=function(){idb=r.result;res(idb)}; r.onerror=function(){res(null)}; }catch(e){res(null)} }); }
 function dbGet(k){ return new Promise(function(res){ if(!idb) return res(null); try{ var q=idb.transaction('t').objectStore('t').get(k); q.onsuccess=function(){res(q.result||null)}; q.onerror=function(){res(null)} }catch(e){res(null)} }); }
 function dbHas(k){ return new Promise(function(res){ if(!idb) return res(false); try{ var q=idb.transaction('t').objectStore('t').count(k); q.onsuccess=function(){res(q.result>0)}; q.onerror=function(){res(false)} }catch(e){res(false)} }); }
@@ -1431,7 +1437,7 @@ function init(){
     maxBounds:[[ext.s-0.02,ext.w-0.02],[ext.n+0.02,ext.e+0.02]],maxBoundsViscosity:0.9});
   map.attributionControl.setPrefix(false);
   L.control.scale({imperial:false,position:'bottomleft'}).addTo(map);
-  satLayer=new SatLayer({minZoom:13,maxZoom:21,maxNativeZoom:SAT_MAX,attribution:'Satellite &copy; Esri, Maxar, Earthstar Geographics'});
+  satLayer=new SatLayer({minZoom:13,maxZoom:21,maxNativeZoom:SAT_MAX,attribution:'Satellite &copy; Google'});
   satLayer.on('tileunload',function(e){ if(e.tile&&e.tile._u) URL.revokeObjectURL(e.tile._u); });
   canvas=L.canvas({padding:0.5});
   mLayer=L.layerGroup().addTo(map); qAllLayer=L.layerGroup(); qSelLayer=L.layerGroup().addTo(map);
@@ -2816,7 +2822,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 /* test hooks */
-window.__v6 = { version:'v7.4',
+window.__v6 = { version:'v7.5',
   theme:function(){ return theme; },
   units:function(){ return window.V6_UNITS; },
   gotoCount:function(){ return gotoPts.length; },
