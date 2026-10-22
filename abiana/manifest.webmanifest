@@ -1,1 +1,39 @@
-{"background_color":"#064e3b","description":"Abiana (water-rate) bill collection manager for Chak No. 130/1-L — Muhammad Atif, Numberdar.","dir":"ltr","display":"standalone","icons":[{"purpose":"any","sizes":"any","src":"icon.svg","type":"image/svg+xml"},{"purpose":"maskable","sizes":"any","src":"icon.svg","type":"image/svg+xml"}],"lang":"en","name":"Abiana Manager","orientation":"portrait","scope":"./","short_name":"Abiana","start_url":"./","theme_color":"#065f46"}
+{
+ "background_color": "#064e3b",
+ "description": "Abiana (water-rate) bill collection manager for Chak No. 130/1-L \u2014 Muhammad Atif, Numberdar.",
+ "dir": "ltr",
+ "display": "standalone",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  },
+  {
+   "src": "icon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml",
+   "purpose": "any"
+  }
+ ],
+ "lang": "en",
+ "name": "Abiana Manager",
+ "orientation": "portrait",
+ "scope": "./",
+ "short_name": "Abiana",
+ "start_url": "./",
+ "theme_color": "#065f46"
+}
