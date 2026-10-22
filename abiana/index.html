@@ -329,6 +329,14 @@ nav button.on .ic{filter:none}
       <p class="small mut" style="margin-top:8px">Backup contains all payments and manually added bills. Keep a copy safe — app data lives only on this phone.</p>
     </div>
     <div class="panel">
+      <h3>📲 App — Download &amp; Update</h3>
+      <button class="btn block" id="installBtn">⬇️ Download / Install App</button>
+      <p class="small mut" id="installHint" style="margin-top:8px">Agar install prompt na aye: Chrome menu (⋮) → <b>Install app / Add to Home screen</b> dabao. · If no prompt appears, use Chrome menu (⋮) → <b>Install app / Add to Home screen</b>.</p>
+      <button class="btn block gold" id="updateBtn" style="margin-top:12px">🔄 Reload — Naya Version Lagao (Update)</button>
+      <p class="small mut" style="margin-top:8px">Naya version check karke lagata hai aur app dobara kholta hai. Tumhari entries (payments, bills) mehfooz rehti hain — update mein kuch delete nahi hota.</p>
+      <p class="small" id="updStatus" style="margin-top:6px"><b>Abiana Manager — Version v15</b></p>
+    </div>
+    <div class="panel">
       <h3>🔒 Security</h3>
       <button class="btn block ghost" id="lockBtn">Lock App Now</button>
     </div>
@@ -654,6 +662,35 @@ function kindMigration(){
     savePayments();
   }catch(e){}
   lsSetRaw(LS_KIND, "1");
+}
+
+/* One-time refresh (22 Oct 2026, stale-names fix): display names of SEEDED
+   custom bills live in a localStorage copy, so spelling fixes baked into this
+   file never reached existing installs. Refresh ONLY the display fields
+   (name/father + Urdu, kanal/marla) of seeded custom bills from
+   SEED_CUSTOM_BILLS, matched by season + khata. The Numberdar's own custom
+   bills (no seeded flag) and ALL payments are untouched — no amounts,
+   statuses or seed lists change. Runs once (flag); idempotent. */
+var LS_FIXNAMES = "abiana_fix_names_v1";
+function fixSeededCustomNames(){
+  if(lsGetRaw(LS_FIXNAMES)) return;
+  try{
+    var changed = false;
+    customBills.forEach(function(cb){
+      if(!cb || !cb.seeded) return;
+      for(var i=0;i<SEED_CUSTOM_BILLS.length;i++){
+        var sc = SEED_CUSTOM_BILLS[i];
+        if(sc.season_id===cb.season_id && sc.khata===cb.khata){
+          ["name","father","ur_name","ur_father","kanal","marla"].forEach(function(f){
+            if(cb[f] !== sc[f]){ cb[f] = sc[f]; changed = true; }
+          });
+          break;
+        }
+      }
+    });
+    if(changed) lsSet(LS_CUSTOM, customBills);
+  }catch(e){}
+  lsSetRaw(LS_FIXNAMES, "1");
 }
 
 /* ==================== PIN (screen lock only) ==================== */
@@ -1005,6 +1042,69 @@ $("resetBtn").addEventListener("click", function(){
 });
 $("lockBtn").addEventListener("click", function(){ showLock(); });
 
+/* ==================== APP INSTALL & UPDATE (Settings) ==================== */
+var APP_VERSION = "v15";
+(function(){ var el = $("updStatus"); if(el) el.innerHTML = "<b>Abiana Manager — Version " + APP_VERSION + "</b>"; })();
+var bipEvent = null;   // captured beforeinstallprompt (Chrome install offer)
+window.addEventListener("beforeinstallprompt", function(e){
+  e.preventDefault(); bipEvent = e;
+  var h = $("installHint"); if(h) h.innerHTML = "Install ke liye tayyar hai — upar wala <b>Download / Install App</b> button dabao, Chrome ka install prompt khud khul jayega.";
+});
+window.addEventListener("appinstalled", function(){
+  bipEvent = null;
+  var h = $("installHint"); if(h) h.textContent = "App install ho gayi ✓ — home screen par Abiana ka icon aa gaya hoga.";
+});
+function doInstallApp(){
+  if(bipEvent){
+    bipEvent.prompt();
+    if(bipEvent.userChoice && bipEvent.userChoice.then) bipEvent.userChoice.then(function(){ bipEvent = null; }).catch(function(){});
+  } else {
+    alert("Is waqt install prompt dastiyab nahi hai.\n\nChrome menu (⋮) → \"Install app\" ya \"Add to Home screen\" dabao.\n(Agar app pehle se installed hai to dobara install nahi hoti.)");
+  }
+}
+$("installBtn").addEventListener("click", doInstallApp);
+
+function setUpdStatus(t){ var el = $("updStatus"); if(el) el.textContent = t; }
+/* Force-update: check for a new service worker, hand control to it if one is
+   waiting, clear ONLY the Cache Storage app shell (never localStorage /
+   IndexedDB — payments and bills live there and stay 100% intact), then
+   reload so the fresh document (bill data is baked into index.html) shows. */
+function forceAppUpdate(){
+  if(!confirm("Update lag jayega — naya version check karke app dobara khulegi.\nTumhari entries mehfooz rahengi — payments aur bills kuch bhi delete nahi hoga.\n\nThe app will update and reopen. All your entries stay safe.")) return;
+  setUpdStatus("Update check ho raha hai… / Checking for update…");
+  var reloaded = false;
+  function reloadOnce(){
+    if(reloaded) return; reloaded = true;
+    try{ sessionStorage.removeItem("abiana_sw_reloaded"); }catch(e){}
+    location.reload();
+  }
+  function wipeShellAndReload(){
+    if(typeof navigator !== "undefined" && navigator.onLine === false){ reloadOnce(); return; }  // offline: keep the shell, plain reload
+    setUpdStatus("Purana cache saaf karke naya version la rahe hain…");
+    if(!("caches" in window)){ reloadOnce(); return; }
+    caches.keys().then(function(keys){
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).then(function(){ setTimeout(reloadOnce, 60); }).catch(function(){ reloadOnce(); });
+  }
+  if(!("serviceWorker" in navigator)){ wipeShellAndReload(); return; }
+  navigator.serviceWorker.getRegistration().then(function(reg){
+    if(!reg){ wipeShellAndReload(); return; }
+    var upd = null;
+    try{ upd = reg.update ? reg.update() : null; }catch(e){}
+    Promise.resolve(upd).then(function(){
+      if(reg.waiting){
+        setUpdStatus("Naya version mil gaya — lag raha hai…");
+        try{ reg.waiting.postMessage({ type:"SKIP_WAITING" }); }catch(e){}
+        /* the global controllerchange handler reloads; this is the fallback */
+        setTimeout(wipeShellAndReload, 1800);
+      } else {
+        wipeShellAndReload();
+      }
+    }).catch(function(){ wipeShellAndReload(); });
+  }).catch(function(){ wipeShellAndReload(); });
+}
+$("updateBtn").addEventListener("click", forceAppUpdate);
+
 /* ==================== PRINTING ==================== */
 var LBL = {
   en:{ sr:"Sr", khata:"Khata", farmer:"Farmer", father:"Father", area:"Area (K-M)", bill:"Bill (Rs)", paid:"Paid (Rs)", rem:"Remaining (Rs)", status:"Status",
@@ -1261,10 +1361,27 @@ fix264Correction();
 kindMigration();
 seedVideoStatuses();
 fixOwner22Oct();
+fixSeededCustomNames();
 setSeason(seasonFilter);
 showLock();
 if("serviceWorker" in navigator && (location.protocol==="http:" || location.protocol==="https:")){
-  window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+  /* Prompt updates (stale-names fix, 22 Oct 2026): bill data is baked into
+     this document, and the service worker used to serve its cached copy
+     first, so a published fix only appeared on some later open — the page on
+     screen never refreshed itself. Now: check for a new worker on every
+     load, and when a NEW worker takes control (a real update, not the first
+     install), reload exactly once so the fresh document shows immediately.
+     The sessionStorage guard makes a reload loop impossible. */
+  var hadController = !!navigator.serviceWorker.controller;
+  if(hadController){
+    navigator.serviceWorker.addEventListener("controllerchange", function(){
+      try{ if(sessionStorage.getItem("abiana_sw_reloaded")) return; sessionStorage.setItem("abiana_sw_reloaded", "1"); }catch(e){}
+      location.reload();
+    });
+  }
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").then(function(reg){ if(reg && reg.update) reg.update(); }).catch(function(){});
+  });
 }
 </script>
 </body>
