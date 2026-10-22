@@ -456,11 +456,11 @@ function amountWords(num){
 var LS_SEEDED = "abiana_seeded_v3";
 var SEED_UNPAID = {
   kharif2025: [6,14,35,37,43,45,49,50,57,102,160,177,181,182,188,202,205,208,209,211,226,231,241,251,264,266,276,277,280,282,283],
-  rabi2026: [6,14,18,22,24,27,30,34,35,37,43,47,49,50,52,54,57,59,61,82,85,143,160,161,166,167,170,171,173,175,176,181,182,185,186,188,190,191,192,193,195,200,201,202,204,205,208,209,213,214,217,220,222,224,226,227,228,229,230,231,233,234,236,240,242,243,244,245,246,249,251,252,256,258,260,261,266,272,276,277,278,279,280,282,283,284]
+  rabi2026: [6,14,18,22,24,27,30,34,35,37,43,47,49,50,52,54,57,59,61,82,85,143,160,161,166,167,170,171,173,175,176,181,182,185,186,188,190,191,192,193,195,200,201,202,204,205,208,209,213,214,217,220,222,224,226,227,228,229,230,231,233,234,236,240,242,243,244,245,246,249,251,252,256,258,260,261,264,266,272,276,277,278,279,280,282,283,284]
 };
 var SEED_COLLECTED = {
   kharif2025: [34,36,38,64,178,180,232,247,256,259],
-  rabi2026: [8,225,264]
+  rabi2026: [8,225]
 };
 /* Adjustments by the Numberdar, 22 Oct 2026:
    - Khata 206 (both seasons) and Khata 248 (Kharif): bills are PAID (settled in the
@@ -512,6 +512,33 @@ function seedVideoStatuses(){
   });
   seedCustomBaqayaBills();
   lsSetRaw(LS_SEEDED, "1");
+}
+
+/* One-time correction (Numberdar, 22 Oct 2026): Rabi Khata 264 (Muhammad Shareef s/o
+   Sohrab Korai, Rs 5,607) was originally seeded as Collected, but the "Collected" tap
+   in the official app was a MIS-TAP — the bill is actually UNPAID. The seed lists above
+   are already corrected, so fresh installs never create that payment; this only repairs
+   installs that already ran the old seed. It removes exactly the old seed Collected
+   payment (Rs 5,607 carrying the seed note) from Rabi Khata 264 and leaves any other
+   payment on that bill untouched. Runs once (flag); idempotent. */
+var LS_FIX264 = "abiana_fix_264_v1";
+function fix264Correction(){
+  if(lsGetRaw(LS_FIX264)) return;
+  try{
+    var arr = (payments.rabi2026 && payments.rabi2026[264]) || null;
+    if(arr){
+      var seedNote = "Collected — official eAbiana app (video 22 Oct 2026). Paisay Numberdar ke paas, jama baqi.";
+      for(var i=0;i<arr.length;i++){
+        if(arr[i] && Number(arr[i].amount)===5607 && arr[i].note===seedNote){
+          arr.splice(i,1);
+          if(!arr.length) delete payments.rabi2026[264];
+          savePayments();
+          break;
+        }
+      }
+    }
+  }catch(e){}
+  lsSetRaw(LS_FIX264, "1");
 }
 
 /* ==================== PIN (screen lock only) ==================== */
@@ -974,6 +1001,7 @@ function printReceipt(b, lang){
 }
 
 /* ==================== INIT ==================== */
+fix264Correction();
 seedVideoStatuses();
 setSeason(seasonFilter);
 showLock();
