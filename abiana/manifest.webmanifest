@@ -29,11 +29,12 @@
    "purpose": "any"
   }
  ],
+ "id": "https://callmeatif75.github.io/abiana/",
  "lang": "en",
  "name": "Abiana Manager",
  "orientation": "portrait",
- "scope": "./",
+ "scope": "https://callmeatif75.github.io/abiana/",
  "short_name": "Abiana",
- "start_url": "./",
+ "start_url": "https://callmeatif75.github.io/abiana/",
  "theme_color": "#065f46"
 }
