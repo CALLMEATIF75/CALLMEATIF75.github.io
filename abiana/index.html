@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Abiana Manager — Chak No. 130/1-L</title>
+<meta name="theme-color" content="#065f46">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+:root{
+  --em:#065f46; --em2:#047857; --em3:#064e3b; --gold:#c9a227; --gold2:#d4af37;
+  --bg:#f2f5f3; --card:#ffffff; --ink:#14231c; --mut:#5d6f66; --line:#dde5e0;
+  --green:#15803d; --greenbg:#dcfce7; --amber:#b45309; --amberbg:#fef3c7;
+  --red:#b91c1c; --redbg:#fee2e2; --rad:14px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans",Arial,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:86px}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:16px}
+.urdu{font-family:"Noto Nastaliq Urdu","Segoe UI",serif}
+
+/* ---------- Header ---------- */
+header{position:sticky;top:0;z-index:40;background:linear-gradient(135deg,var(--em2),var(--em3));color:#fff;padding:12px 14px 12px;box-shadow:0 2px 10px rgba(0,0,0,.25);border-bottom:3px solid var(--gold)}
+header .row{display:flex;align-items:center;gap:10px}
+header .logo{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:22px;border:1.5px solid var(--gold2);flex:0 0 auto}
+header h1{font-size:18px;margin:0;line-height:1.15}
+header .sub{font-size:11.5px;opacity:.85;margin-top:1px}
+header select{margin-left:auto;background:#fff;color:var(--em3);border:none;border-radius:9px;padding:8px 6px;font-size:13.5px;font-weight:600;max-width:42vw}
+.seasonsel{display:flex;gap:9px;margin-top:11px}
+.seasonsel button{flex:1;padding:11px 6px;border-radius:12px;border:2px solid var(--gold2);background:rgba(255,255,255,.10);color:#fff;font-weight:800;font-size:16px;line-height:1.2}
+.seasonsel button small{display:block;font-weight:400;font-size:12.5px;opacity:.9;margin-top:1px}
+.seasonsel button.on{background:var(--gold);color:#231a02;border-color:var(--gold)}
+
+/* ---------- Layout ---------- */
+main{max-width:760px;margin:0 auto;padding:14px 12px}
+.view{display:none}
+.view.active{display:block}
+h2.sec{font-size:16px;margin:16px 2px 10px;color:var(--em3)}
+.mut{color:var(--mut)} .small{font-size:12.5px}
+
+/* ---------- Cards ---------- */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:14px 14px 12px;box-shadow:0 1px 3px rgba(6,78,59,.06)}
+.card .lbl{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.card .val{font-size:21px;font-weight:800;margin-top:4px;color:var(--em3)}
+.card.gold .val{color:#8a6d14}
+.card.wide{grid-column:1/-1}
+.progress{height:12px;background:#e6ece8;border-radius:99px;overflow:hidden;margin-top:9px}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--em2),var(--gold2));border-radius:99px;transition:width .3s}
+.counts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+.countbox{border-radius:var(--rad);padding:12px 8px;text-align:center;border:1px solid var(--line)}
+.countbox .n{font-size:22px;font-weight:800}
+.countbox .t{font-size:12px;font-weight:700;margin-top:2px}
+.cb-paid{background:var(--greenbg)} .cb-paid .n{color:var(--green)}
+.cb-part{background:var(--amberbg)} .cb-part .n{color:var(--amber)}
+.cb-unpaid{background:var(--redbg)} .cb-unpaid .n{color:var(--red)}
+.seasoncard{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:var(--rad);padding:12px 14px;margin-bottom:10px}
+.seasoncard h3{margin:0 0 6px;font-size:15px;color:var(--em3)}
+.seasoncard .grid{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}
+.seasoncard .grid b{display:block;font-size:15.5px}
+
+/* ---------- Lists ---------- */
+.farmer{display:flex;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:11px 12px;margin-bottom:9px;align-items:flex-start;cursor:pointer}
+.farmer:active{transform:scale(.995)}
+.khata{flex:0 0 auto;background:var(--em);color:#fff;border-radius:10px;min-width:46px;text-align:center;padding:7px 4px}
+.khata .k{font-size:9.5px;letter-spacing:.6px;opacity:.85;font-weight:700}
+.khata .n{font-size:16.5px;font-weight:800;line-height:1.1}
+.farmer .info{flex:1;min-width:0}
+.farmer .nm{font-weight:700;font-size:15px}
+.farmer .urnm{font-size:15.5px;color:var(--em3);line-height:1.9;margin-top:1px}
+.farmer .fa{font-size:12.5px;color:var(--mut)}
+.farmer .amts{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;margin-top:5px}
+.farmer .amts span b{font-size:13.5px}
+.pill{flex:0 0 auto;font-size:11px;font-weight:800;padding:4px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.3px}
+.pill.Paid{background:var(--greenbg);color:var(--green)}
+.pill.Partial{background:var(--amberbg);color:var(--amber)}
+.pill.Unpaid{background:var(--redbg);color:var(--red)}
+.seasonhead{font-weight:800;color:var(--em3);margin:16px 2px 9px;font-size:14.5px;border-bottom:2px solid var(--gold);padding-bottom:5px}
+.recent{display:flex;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:13.5px}
+.recent .amt{font-weight:800;color:var(--em2);white-space:nowrap}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:var(--rad);padding:22px;text-align:center;color:var(--mut)}
+
+/* ---------- Search & chips ---------- */
+.searchwrap{position:sticky;top:74px;z-index:30;background:var(--bg);padding:2px 0 8px}
+.searchwrap input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;outline:none}
+.searchwrap input:focus{border-color:var(--em2)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 4px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;font-size:13px;font-weight:700;color:var(--mut)}
+.chip.on{background:var(--em);color:#fff;border-color:var(--em)}
+
+/* ---------- Buttons & forms ---------- */
+.btn{display:inline-block;border:none;border-radius:11px;padding:12px 18px;font-size:14.5px;font-weight:700;background:var(--em);color:#fff}
+.btn.gold{background:var(--gold);color:#231a02}
+.btn.ghost{background:#fff;color:var(--em3);border:1.5px solid var(--line)}
+.btn.red{background:var(--red)}
+.btn.sm{padding:8px 12px;font-size:13px;border-radius:9px}
+.btn.block{display:block;width:100%;text-align:center;margin-top:10px}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:12.5px;font-weight:700;color:var(--mut);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.fld input,.fld select,.fld textarea{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:11px;background:#fff;outline:none}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--em2)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:16px 14px;margin-bottom:12px}
+.panel h3{margin:0 0 10px;font-size:15px;color:var(--em3)}
+
+/* ---------- Bottom nav ---------- */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-top:1px solid var(--line);display:flex;box-shadow:0 -2px 12px rgba(0,0,0,.07);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:none;padding:9px 2px 8px;font-size:11px;font-weight:700;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button .ic{font-size:20px;line-height:1}
+nav button.on{color:var(--em2)}
+nav button.on .ic{filter:none}
+
+/* ---------- Overlays (detail / add bill / lock) ---------- */
+.overlay{position:fixed;inset:0;z-index:80;background:var(--bg);overflow-y:auto;display:none}
+.overlay.open{display:block}
+.overlay .topbar{position:sticky;top:0;background:linear-gradient(135deg,var(--em2),var(--em3));color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:3px solid var(--gold);z-index:5}
+.overlay .topbar .ttl{font-weight:800;font-size:16px}
+.overlay .body{max-width:760px;margin:0 auto;padding:14px 12px 40px}
+.backbtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:9px;padding:7px 12px;font-weight:700}
+.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.kv span:first-child{color:var(--mut)}
+.kv span:last-child{font-weight:700;text-align:right}
+.payrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.payrow .pa{font-weight:800;color:var(--em2)}
+.payrow .acts{display:flex;gap:6px}
+.iconbtn{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:12.5px;font-weight:700}
+#lockScreen{position:fixed;inset:0;z-index:200;background:linear-gradient(160deg,var(--em2),var(--em3));display:none;align-items:center;justify-content:center;padding:20px}
+#lockScreen.open{display:flex}
+.lockbox{background:#fff;border-radius:20px;padding:26px 22px;width:100%;max-width:360px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.35);border-top:5px solid var(--gold)}
+.lockbox .drop{font-size:44px}
+.lockbox h2{margin:8px 0 2px;color:var(--em3);font-size:20px}
+.lockbox p{color:var(--mut);font-size:13px;margin:4px 0 16px}
+.lockbox input{width:100%;text-align:center;font-size:22px;letter-spacing:8px;padding:12px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:10px;outline:none}
+.lockbox input:focus{border-color:var(--em2)}
+.lockmsg{color:var(--red);font-size:13px;min-height:18px;font-weight:600}
+.fab{position:fixed;right:16px;bottom:96px;z-index:60;width:56px;height:56px;border-radius:50%;background:var(--gold);color:#231a02;border:none;font-size:28px;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.28);display:none}
+.fab.show{display:block}
+
+/* ---------- Print ---------- */
+#printArea{display:none}
+@media print{
+  body{padding:0;background:#fff}
+  header,main,nav,.overlay,#lockScreen,.fab{display:none !important}
+  #printArea{display:block !important}
+  @page{size:A4;margin:12mm}
+}
+#printArea{font-family:"Segoe UI",Arial,sans-serif;color:#000;font-size:12.5px}
+#printArea .lh{text-align:center;border-bottom:3px double #000;padding-bottom:8px;margin-bottom:6px}
+#printArea .lh .n1{font-size:19px;font-weight:800;color:#000;letter-spacing:1.5px}
+#printArea .lh .n2{font-size:12.5px;margin-top:2px}
+#printArea .lh .n3{font-size:14.5px;font-weight:700;margin-top:3px}
+#printArea .lh .n4{font-size:12px;margin-top:2px}
+#printArea .rt{text-align:center;font-size:16px;font-weight:800;margin:10px 0 2px;text-decoration:underline}
+#printArea .meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;margin:6px 0 10px}
+#printArea table{width:100%;border-collapse:collapse}
+#printArea th,#printArea td{border:1px solid #555;padding:5px 6px;text-align:left;vertical-align:top}
+#printArea th{background:#ececec;font-size:12px}
+#printArea td.num,#printArea th.num{text-align:right}
+#printArea td.bold{font-weight:800}
+#printArea tr.tot td{font-weight:800;background:#f2f2f2}
+#printArea .sigfoot{margin-top:42px;display:flex;justify-content:space-between;align-items:flex-end;direction:ltr;page-break-inside:avoid}
+#printArea .sigfoot .sigbox{font-size:12.5px}
+#printArea .sigfoot .line{border-top:1.5px solid #000;width:240px;margin-bottom:5px}
+#printArea .stampbox{border:1.5px solid #000;width:55mm;height:35mm;text-align:center;padding-top:5px;font-size:12px;color:#444;flex:0 0 auto}
+#printArea .chowinst{text-align:center;font-size:15px;line-height:2;margin:10px 0 2px}
+#printArea .chowline{text-align:center;font-weight:800;font-size:13.5px;margin:2px 0}
+#printArea [dir="rtl"] table{direction:rtl}
+#printArea [dir="rtl"] th,#printArea [dir="rtl"] td{text-align:right}
+#printArea [dir="rtl"] td.num,#printArea [dir="rtl"] th.num{text-align:left}
+</style>
+</head>
+<body>
+
+<!-- ================= LOCK SCREEN ================= -->
+<div id="lockScreen">
+  <div class="lockbox">
+    <div class="drop">💧</div>
+    <h2>Abiana Manager</h2>
+    <p>Muhammad Atif — Numberdar<br>Chak No. 130/1-L · آبیانہ مینیجر</p>
+    <div id="pinSetupWrap" style="display:none">
+      <p><b>Create your PIN</b> (4–6 digits). This locks the app screen on this phone.</p>
+      <input id="pinNew" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="New PIN" autocomplete="new-password">
+      <input id="pinConfirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Confirm PIN" autocomplete="new-password">
+      <div class="lockmsg" id="pinSetupMsg"></div>
+      <button class="btn block" id="pinSetBtn">Set PIN &amp; Open App</button>
+    </div>
+    <div id="pinUnlockWrap" style="display:none">
+      <p><b>Enter PIN</b> to open the app.</p>
+      <input id="pinEnter" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="PIN" autocomplete="current-password">
+      <div class="lockmsg" id="pinUnlockMsg"></div>
+      <button class="btn block" id="pinUnlockBtn">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP SHELL ================= -->
+<header>
+  <div class="row">
+    <div class="logo">💧</div>
+    <div>
+      <h1>Abiana Manager</h1>
+      <div class="sub">Muhammad Atif · Numberdar · Chak 130/1-L</div>
+    </div>
+  </div>
+  <div class="seasonsel" id="seasonSel" role="group" aria-label="Season">
+    <button type="button" data-season="kharif2025">Kharif 2025<small>خریف 2025 · Last Date: 15/06/2026</small></button>
+    <button type="button" data-season="rabi2026">Rabi 2026<small>ربیع 2026 · Last Date: 27/10/2026</small></button>
+  </div>
+</header>
+
+<main>
+  <!-- ======== DASHBOARD ======== -->
+  <section class="view active" id="view-dashboard">
+    <div class="cards">
+      <div class="card"><div class="lbl">Total Billed</div><div class="val" id="dTotal">—</div></div>
+      <div class="card"><div class="lbl">Collected</div><div class="val" id="dColl">—</div></div>
+      <div class="card gold"><div class="lbl">Remaining</div><div class="val" id="dRem">—</div></div>
+      <div class="card"><div class="lbl">Farmers / Bills</div><div class="val" id="dCount">—</div></div>
+      <div class="card wide">
+        <div class="lbl">Collection Progress — <span id="dPct">0%</span></div>
+        <div class="progress"><div id="dProg" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="counts">
+      <div class="countbox cb-paid"><div class="n" id="dPaid">0</div><div class="t">✓ Paid</div></div>
+      <div class="countbox cb-part"><div class="n" id="dPartial">0</div><div class="t">◐ Partial</div></div>
+      <div class="countbox cb-unpaid"><div class="n" id="dUnpaid">0</div><div class="t">✗ Unpaid</div></div>
+    </div>
+    <h2 class="sec">Season Summary</h2>
+    <div id="seasonCards"></div>
+    <h2 class="sec">Recent Payments</h2>
+    <div id="recentList"></div>
+  </section>
+
+  <!-- ======== FARMERS ======== -->
+  <section class="view" id="view-farmers">
+    <div class="searchwrap">
+      <input id="searchInput" type="search" placeholder="Search name, Urdu name, khata, consumer no, father…">
+      <div class="chips" id="filterChips">
+        <button class="chip on" data-f="All">All</button>
+        <button class="chip" data-f="Paid">Paid</button>
+        <button class="chip" data-f="Partial">Partial</button>
+        <button class="chip" data-f="Unpaid">Unpaid</button>
+      </div>
+      <div class="small mut" id="farmersCount"></div>
+    </div>
+    <div id="farmersList"></div>
+  </section>
+
+  <!-- ======== PRINT CENTRE ======== -->
+  <section class="view" id="view-print">
+    <div class="panel">
+      <h3>🖨 Print Centre — پرنٹ سینٹر</h3>
+      <div class="fld">
+        <label>Season</label>
+        <select id="pSeason">
+          <option value="kharif2025">Kharif 2025</option>
+          <option value="rabi2026">Rabi 2026</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Report Type</label>
+        <select id="pType">
+          <option value="paid">Paid List</option>
+          <option value="unpaid">Unpaid &amp; Partial List (with remaining)</option>
+          <option value="complete">Complete List</option>
+          <option value="summary">Season Summary</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Language — زبان</label>
+        <select id="pLang">
+          <option value="bi">Bilingual — English + اردو</option>
+          <option value="en">English</option>
+          <option value="ur">Urdu — اردو</option>
+        </select>
+      </div>
+      <button class="btn block" id="pGo">Print / Save PDF</button>
+      <p class="small mut" style="margin-top:10px">The selected language also applies to farmer receipts. In the print dialog you can print on paper or “Save as PDF”.</p>
+      <button class="btn block gold" id="pChowk">🖨 Chowkidar Copy — نقل برائے چوکیدار</button>
+      <p class="small mut" style="margin-top:8px">Chowkidar Copy covers <b>both seasons together</b>: only farmers who still owe something, with Kharif 2025 baqaya, Rabi 2026 baqaya and the combined TOTAL for each farmer.</p>
+    </div>
+  </section>
+
+  <!-- ======== SETTINGS ======== -->
+  <section class="view" id="view-settings">
+    <div class="panel">
+      <h3>➕ Missing Bill</h3>
+      <p class="small mut">If a bill is missing from the list (for example one dropped from a later bill set), add it here. It will be included in every total, list and printout.</p>
+      <button class="btn block" id="addBillBtn2">Add Missing Bill</button>
+    </div>
+    <div class="panel">
+      <h3>💾 Backup</h3>
+      <button class="btn block ghost" id="exportBtn">⬇ Export Backup (JSON)</button>
+      <label class="btn block ghost" for="importFile" style="margin-top:10px">⬆ Import Backup (JSON)</label>
+      <input id="importFile" type="file" accept=".json,application/json" style="display:none">
+      <p class="small mut" style="margin-top:8px">Backup contains all payments and manually added bills. Keep a copy safe — app data lives only on this phone.</p>
+    </div>
+    <div class="panel">
+      <h3>🔒 Security</h3>
+      <button class="btn block ghost" id="lockBtn">Lock App Now</button>
+    </div>
+    <div class="panel">
+      <h3>⚠ Danger Zone</h3>
+      <button class="btn block red" id="resetBtn">Reset All Payments</button>
+      <p class="small mut" style="margin-top:8px">Deletes every recorded payment (all seasons). Bills themselves are not deleted. This cannot be undone — export a backup first.</p>
+    </div>
+    <div class="panel">
+      <h3>ℹ About</h3>
+      <p class="small" style="line-height:1.65;margin:0">
+        <b>Abiana Manager</b> — Abiana (water-rate) collection record for <b>Chak No. 130/1-L</b>, Tehsil Khanpur, District Rahim Yar Khan.<br>
+        Numberdar: <b>Muhammad Atif</b> · Outlet No. <b>12925</b><br>
+        Data source: Punjab Irrigation Department e-bills (Outlet / Moga 12925).<br>
+        Kharif 2025: 163 bills — Rs 1,211,903 · Rabi 2026: 160 bills — Rs 483,786.<br>
+        Payments are stored only on this device (offline app). PIN is a screen lock only.
+      </p>
+    </div>
+  </section>
+</main>
+
+<button class="fab" id="addBillBtn" title="Add missing bill">+</button>
+
+<!-- ================= FARMER DETAIL ================= -->
+<div class="overlay" id="detailOverlay">
+  <div class="topbar">
+    <button class="backbtn" id="detailBack">← Back</button>
+    <div class="ttl" id="detailTitle">Farmer</div>
+  </div>
+  <div class="body" id="detailBody"></div>
+</div>
+
+<!-- ================= ADD BILL ================= -->
+<div class="overlay" id="addOverlay">
+  <div class="topbar">
+    <button class="backbtn" id="addBack">← Back</button>
+    <div class="ttl">Add Missing Bill</div>
+  </div>
+  <div class="body">
+    <div class="panel">
+      <div class="fld"><label>Season</label>
+        <select id="abSeason"><option value="kharif2025">Kharif 2025</option><option value="rabi2026">Rabi 2026</option></select></div>
+      <div class="fld"><label>Khata No. *</label><input id="abKhata" type="number" inputmode="numeric" placeholder="e.g. 211"></div>
+      <div class="fld"><label>Farmer Name (Roman) *</label><input id="abName" type="text" placeholder="e.g. Imran Sohail Arain"></div>
+      <div class="fld"><label>Father Name (Roman)</label><input id="abFather" type="text"></div>
+      <div class="fld"><label>Farmer Name (Urdu, optional)</label><input id="abUrName" type="text" dir="rtl"></div>
+      <div class="fld"><label>Father Name (Urdu, optional)</label><input id="abUrFather" type="text" dir="rtl"></div>
+      <div style="display:flex;gap:10px">
+        <div class="fld" style="flex:1"><label>Kanal</label><input id="abKanal" type="number" inputmode="numeric" value="0"></div>
+        <div class="fld" style="flex:1"><label>Marla</label><input id="abMarla" type="number" inputmode="numeric" value="0"></div>
+      </div>
+      <div class="fld"><label>Bill Amount (Rs) *</label><input id="abAmt" type="number" inputmode="numeric" placeholder="e.g. 5007"></div>
+      <div class="fld"><label>Consumer No. (optional)</label><input id="abCons" type="text" inputmode="numeric" placeholder="Auto if left blank"></div>
+      <button class="btn block" id="abSave">Save Bill</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= BOTTOM NAV ================= -->
+<nav>
+  <button data-view="dashboard" class="on"><span class="ic">🏠</span>Dashboard</button>
+  <button data-view="farmers"><span class="ic">👨‍🌾</span>Farmers</button>
+  <button data-view="print"><span class="ic">🖨</span>Print</button>
+  <button data-view="settings"><span class="ic">⚙️</span>Settings</button>
+</nav>
+
+<div id="printArea"></div>
+
+<script>
+"use strict";
+/* ==================== DATA (embedded from verified data.json) ==================== */
+var BILLS = [{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512319994097","cons":"3000012925","khata":3,"name":"Muhammad Boota Jut","father":"Nawab Din","kanal":70,"marla":0,"amt":8755,"payable_due":8755,"payable_late":9631,"ur_name":"محمد بوٹا جٹ","ur_father":"نواب دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512318099812","cons":"6000012925","khata":6,"name":"Raheem Bakhsh","father":"Hassu Pirhar","kanal":18,"marla":0,"amt":2252,"payable_due":2252,"payable_late":2478,"ur_name":"رحیم بخش","ur_father":"حسو پیرہڑ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512310854757","cons":"8000012925","khata":8,"name":"Irshad Hussain Jutt","father":"Gulam Hussain Jutt","kanal":168,"marla":0,"amt":19211,"payable_due":19211,"payable_late":21133,"ur_name":"ارشاد حسین جٹ","ur_father":"غلام حسین جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512317501099","cons":"12000012925","khata":12,"name":"Muhammad Younas Arai","father":"GHULAM MUHAMMAD ARAI","kanal":25,"marla":0,"amt":3052,"payable_due":3052,"payable_late":3358,"ur_name":"محمد یونس آرائیں","ur_father":"غلام محمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512319220653","cons":"14000012925","khata":14,"name":"Muhammad Yousaf Arai","father":"GHULAM MUHAMMAD ARAI","kanal":25,"marla":0,"amt":3127,"payable_due":3127,"payable_late":3440,"ur_name":"محمد یوسف آرائیں","ur_father":"غلام محمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512317003802","cons":"16000012925","khata":16,"name":"Muhammad Shareef","father":"CHARAGH DEEN","kanal":20,"marla":0,"amt":2352,"payable_due":2352,"payable_late":2588,"ur_name":"محمد شریف","ur_father":"چراغ دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512310185392","cons":"18000012925","khata":18,"name":"Sadiq Ali Arain","father":"CHARAGH DEEN","kanal":20,"marla":0,"amt":2502,"payable_due":2502,"payable_late":2753,"ur_name":"صادق علی آرائیں","ur_father":"چراغ دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512312040647","cons":"22000012925","khata":22,"name":"Arshad Ali","father":"Muhammad shareef","kanal":96,"marla":0,"amt":11406,"payable_due":11406,"payable_late":12547,"ur_name":"ارشاد علی","ur_father":"محمد شریف"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512318355425","cons":"24000012925","khata":24,"name":"Muhammad Muneer Arai","father":"JAMAL DEEN","kanal":48,"marla":0,"amt":4803,"payable_due":4803,"payable_late":5284,"ur_name":"محمد منیر آرائیں","ur_father":"جمال دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512318361247","cons":"25000012925","khata":25,"name":"Irfan Ali Arain","father":"NAWAB DEEN","kanal":74,"marla":13,"amt":9138,"payable_due":9138,"payable_late":10052,"ur_name":"عرفان علی آرائیں","ur_father":"نواب دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512310966777","cons":"27000012925","khata":27,"name":"Shokat Ali Arain","father":"NAZEER AHMAD","kanal":16,"marla":0,"amt":1851,"payable_due":1851,"payable_late":2037,"ur_name":"شوکت علی آرائیں","ur_father":"نذیر احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512319383101","cons":"29000012925","khata":29,"name":"Waris Ali Arain","father":"Nazeer Ahmad","kanal":16,"marla":0,"amt":1851,"payable_due":1851,"payable_late":2037,"ur_name":"وارث علی آرائیں","ur_father":"نذیر احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512319572936","cons":"30000012925","khata":30,"name":"Muhammad Ilyas Arain","father":"Nazeer Ahmed","kanal":16,"marla":0,"amt":1851,"payable_due":1851,"payable_late":2037,"ur_name":"محمد الیاس آرائیں","ur_father":"نذیر احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512319682507","cons":"31000012925","khata":31,"name":"Ramzan Ali Mughal","father":"WALI MUHAMMAD","kanal":48,"marla":0,"amt":6003,"payable_due":6003,"payable_late":6604,"ur_name":"رمضان علی مغل","ur_father":"ولی محمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512317482091","cons":"34000012925","khata":34,"name":"Irshad Ahmed Maril","father":"Fazal ul Haq","kanal":28,"marla":0,"amt":3502,"payable_due":3502,"payable_late":3853,"ur_name":"ارشاد احمد مرل","ur_father":"فضل ال حق"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512318045601","cons":"35000012925","khata":35,"name":"Ejaz Ahmed Maril","father":"Fazal Ul Haq","kanal":28,"marla":0,"amt":3502,"payable_due":3502,"payable_late":3853,"ur_name":"اعجاز احمد مرل","ur_father":"فضل ال حق"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512310326864","cons":"36000012925","khata":36,"name":"Naseer Ahmed Chak Ek","father":"Bashir Ahmed","kanal":24,"marla":0,"amt":3002,"payable_due":3002,"payable_late":3303,"ur_name":"نصیر احمد چک ایک","ur_father":"بشیر احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512313277863","cons":"37000012925","khata":37,"name":"Fazal Hussain","father":"Sardar Muhammad Jutt","kanal":34,"marla":0,"amt":4253,"payable_due":4253,"payable_late":4679,"ur_name":"فضل حسین","ur_father":"سردار محمد جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512316397651","cons":"38000012925","khata":38,"name":"Abdul Majeed Jutt","father":"Sardar Muhammad","kanal":34,"marla":0,"amt":4253,"payable_due":4253,"payable_late":4679,"ur_name":"عبد ال مجید جٹ","ur_father":"سردار محمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512319743504","cons":"42000012925","khata":42,"name":"Muhammad Hanif Jutt","father":"Abdul Ghani JUTT","kanal":18,"marla":0,"amt":2252,"payable_due":2252,"payable_late":2478,"ur_name":"محمد حنیف جٹ","ur_father":"عبد ال غنی جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512312116239","cons":"43000012925","khata":43,"name":"Muhammad Azim","father":"Abdul Ghani","kanal":18,"marla":0,"amt":2102,"payable_due":2102,"payable_late":2313,"ur_name":"محمد عظیم","ur_father":"عبد ال غنی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512319577639","cons":"44000012925","khata":44,"name":"Muhammad Shahbaz Jut","father":"Muhammad Saleem Jutt","kanal":16,"marla":0,"amt":1851,"payable_due":1851,"payable_late":2037,"ur_name":"محمد شہباز جٹ","ur_father":"محمد سلیم جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512318682971","cons":"45000012925","khata":45,"name":"Arif Ali","father":"Munshi Khan Jutt","kanal":32,"marla":0,"amt":4002,"payable_due":4002,"payable_late":4403,"ur_name":"عارف علی","ur_father":"منشی خان جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512311441596","cons":"47000012925","khata":47,"name":"Niaz Ali Junaid And","father":"MUHAMMAD MUNEER","kanal":378,"marla":0,"amt":44874,"payable_due":44874,"payable_late":49362,"ur_name":"نیاز علی جنید اینڈ","ur_father":"محمد منیر"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512318461098","cons":"49000012925","khata":49,"name":"Niaz Ali Arain","father":"KHAIR UD DEEN","kanal":34,"marla":0,"amt":4103,"payable_due":4103,"payable_late":4514,"ur_name":"نیاز علی آرائیں","ur_father":"خیر الد دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512318461942","cons":"50000012925","khata":50,"name":"Muhammad Iqbal Arain","father":"ABDUL AZIZ","kanal":53,"marla":0,"amt":6254,"payable_due":6254,"payable_late":6880,"ur_name":"محمد اقبال آرائیں","ur_father":"عبد ال عزیز"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512317153202","cons":"52000012925","khata":52,"name":"Muhammad Akram","father":"Abdul Aziz ARAIN","kanal":18,"marla":10,"amt":2127,"payable_due":2127,"payable_late":2340,"ur_name":"محمد اکرم","ur_father":"عبد ال عزیز آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512319617361","cons":"54000012925","khata":54,"name":"Muhammad Qasim","father":"HAZOOR BAKHSH","kanal":11,"marla":0,"amt":1376,"payable_due":1376,"payable_late":1514,"ur_name":"محمد قاسم","ur_father":"حضور بخش"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512316268160","cons":"57000012925","khata":57,"name":"Abudl Ghani Arain","father":"Rahmet Ullah","kanal":20,"marla":0,"amt":3502,"payable_due":3502,"payable_late":3853,"ur_name":"عبد ال غنی آرائیں","ur_father":"رحمت اللہ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512318832166","cons":"59000012925","khata":59,"name":"Muhammad Anwar Ameen","father":"Anayat Ali Arain","kanal":16,"marla":0,"amt":2001,"payable_due":2001,"payable_late":2202,"ur_name":"محمد انور امین","ur_father":"عنایت علی آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512310313754","cons":"61000012925","khata":61,"name":"Muhammad Saleem Arai","father":"ANAYAT ALI","kanal":47,"marla":0,"amt":5878,"payable_due":5878,"payable_late":6466,"ur_name":"محمد سلیم آرائیں","ur_father":"عنایت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512310292328","cons":"62000012925","khata":62,"name":"Shafqat Mehmood","father":"SARFARAZ AHMAD JUT","kanal":102,"marla":0,"amt":12757,"payable_due":12757,"payable_late":14033,"ur_name":"شفقت محمود","ur_father":"سرفراز احمد جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512310978060","cons":"64000012925","khata":64,"name":"Nasir Ali","father":"SHOUKAT ALI JUT","kanal":98,"marla":0,"amt":11807,"payable_due":11807,"payable_late":12988,"ur_name":"ناصر علی","ur_father":"شوکت علی جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512310408965","cons":"65000012925","khata":65,"name":"Qadeer Sultan","father":"SULTAN AHMAD JUT","kanal":50,"marla":0,"amt":6104,"payable_due":6104,"payable_late":6715,"ur_name":"قدیر سلطان","ur_father":"سلطان احمد جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512311063613","cons":"66000012925","khata":66,"name":"Muhammad Asim Rajpoo","father":"SHOUKAT ALI","kanal":100,"marla":0,"amt":12507,"payable_due":12507,"payable_late":13758,"ur_name":"محمد عاصم راجپوت","ur_father":"شوکت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512317058508","cons":"71000012925","khata":71,"name":"Asghar Ali","father":"Sadiq Ali JUT","kanal":42,"marla":0,"amt":5103,"payable_due":5103,"payable_late":5614,"ur_name":"اصغر علی","ur_father":"صادق علی جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512313083473","cons":"82000012925","khata":82,"name":"Javed Iqbal Jutt","father":"Munshi Khan Jutt","kanal":8,"marla":0,"amt":1001,"payable_due":1001,"payable_late":1102,"ur_name":"جاوید اقبال جٹ","ur_father":"منشی خان جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512310655932","cons":"102000012925","khata":102,"name":"M Ashafaq","father":"Khan","kanal":160,"marla":0,"amt":40020,"payable_due":40020,"payable_late":44022,"ur_name":"ایم اشفاق","ur_father":"خان"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512312929408","cons":"143000012925","khata":143,"name":"Iran Ali Arain","father":"Muhammad Akram","kanal":56,"marla":0,"amt":6104,"payable_due":6104,"payable_late":6715,"ur_name":"ایران علی آرائیں","ur_father":"محمد اکرم"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512313834006","cons":"158000012925","khata":158,"name":"Abudl Ghani Arain","father":"Rahmet Ullah","kanal":26,"marla":0,"amt":3252,"payable_due":3252,"payable_late":3578,"ur_name":"عبد ال غنی آرائیں","ur_father":"رحمت اللہ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314984706","cons":"159000012925","khata":159,"name":"Ghulam Ahmad","father":"Muhammad Nawaz","kanal":62,"marla":0,"amt":7454,"payable_due":7454,"payable_late":8200,"ur_name":"غلام احمد","ur_father":"محمد نواز"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512311357160","cons":"160000012925","khata":160,"name":"Kareem Bakhsh","father":"Hassu Pirhar","kanal":18,"marla":0,"amt":2252,"payable_due":2252,"payable_late":2478,"ur_name":"کریم بخش","ur_father":"حسو پیرہڑ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512311376291","cons":"161000012925","khata":161,"name":"Muhammad Lateef","father":"HASSU PIRHAR","kanal":17,"marla":0,"amt":2127,"payable_due":2127,"payable_late":2340,"ur_name":"محمد لطیف","ur_father":"حسو پیرہڑ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512313315329","cons":"162000012925","khata":162,"name":"Muhammad Ismail Pirhar","father":"PALIYA PIRHAR","kanal":34,"marla":13,"amt":4334,"payable_due":4334,"payable_late":4768,"ur_name":"محمد اسماعیل پیرہڑ","ur_father":"پالیا پیرہڑ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314322687","cons":"164000012925","khata":164,"name":"M Arshad Arain","father":"M Munir","kanal":34,"marla":14,"amt":4340,"payable_due":4340,"payable_late":4774,"ur_name":"ایم ارشاد آرائیں","ur_father":"ایم منیر"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314324725","cons":"165000012925","khata":165,"name":"Abdul Ghafoor Arain","father":"GHULAM MUHAMMAD ARIN","kanal":25,"marla":0,"amt":3127,"payable_due":3127,"payable_late":3440,"ur_name":"عبد ال غفور آرائیں","ur_father":"غلام محمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512315586356","cons":"166000012925","khata":166,"name":"Muhammad Yasin Arain","father":"GHULAM MUHAMMAD ARN","kanal":25,"marla":0,"amt":3127,"payable_due":3127,"payable_late":3440,"ur_name":"محمد یٰسین آرائیں","ur_father":"غلام محمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512313573888","cons":"167000012925","khata":167,"name":"Faisal Mehmood","father":"ANAYAT ALI","kanal":20,"marla":0,"amt":2502,"payable_due":2502,"payable_late":2753,"ur_name":"فیصل محمود","ur_father":"عنایت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512313574238","cons":"168000012925","khata":168,"name":"Ashiq Hussain","father":"CHARAGH DEEN","kanal":37,"marla":6,"amt":4665,"payable_due":4665,"payable_late":5132,"ur_name":"عاشق حسین","ur_father":"چراغ دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512313960054","cons":"169000012925","khata":169,"name":"Muhammad Sardar","father":"CHARAGH DEEN","kanal":37,"marla":7,"amt":4672,"payable_due":4672,"payable_late":5140,"ur_name":"محمد سردار","ur_father":"چراغ دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314920099","cons":"170000012925","khata":170,"name":"Muhammad Rafiq Arain","father":"Barkat Ali Arain","kanal":24,"marla":0,"amt":2702,"payable_due":2702,"payable_late":2973,"ur_name":"محمد رفیق آرائیں","ur_father":"برکت علی آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314832404","cons":"171000012925","khata":171,"name":"Jam Ghulam Fareed Maril","father":"MUHAMMAD UD DEEN","kanal":200,"marla":0,"amt":29015,"payable_due":29015,"payable_late":31917,"ur_name":"جام غلام فرید مرل","ur_father":"محمد الد دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601016471758","cons":"172000012925","khata":172,"name":"Ahmad Noor Arain","father":"NOOR MUHAMMAD ARAIN","kanal":40,"marla":0,"amt":4403,"payable_due":4403,"payable_late":4844,"ur_name":"احمد نور آرائیں","ur_father":"نور محمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601016495685","cons":"173000012925","khata":173,"name":"Liaquat Ali Arain","father":"NAZEER AHMAD","kanal":16,"marla":14,"amt":1789,"payable_due":1789,"payable_late":1968,"ur_name":"لیاقت علی آرائیں","ur_father":"نذیر احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314164412","cons":"175000012925","khata":175,"name":"Shoukat Ali Arain","father":"MUHAMMAD SHAFEE","kanal":52,"marla":0,"amt":6504,"payable_due":6504,"payable_late":7155,"ur_name":"شوکت علی آرائیں","ur_father":"محمد شفیع"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314164869","cons":"176000012925","khata":176,"name":"Naeem Ali And Babar","father":"Abdul Ghafoor Awan","kanal":192,"marla":0,"amt":24012,"payable_due":24012,"payable_late":26414,"ur_name":"نعیم علی اینڈ بابر","ur_father":"عبد ال غفور اعوان"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314266344","cons":"177000012925","khata":177,"name":"Sajjad Hussain Jutt","father":"SARDAR MUHAMMAD JUTT","kanal":68,"marla":0,"amt":8505,"payable_due":8505,"payable_late":9356,"ur_name":"سجاد حسین جٹ","ur_father":"سردار محمد جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512315470916","cons":"178000012925","khata":178,"name":"Muhammad Afzal","father":"RASHEED AHMAD ARAIN","kanal":32,"marla":0,"amt":3402,"payable_due":3402,"payable_late":3743,"ur_name":"محمد افضل","ur_father":"رشید احمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601015294970","cons":"179000012925","khata":179,"name":"Muhammad Siddiq Jutt","father":"ABDUL GHANI JUTT","kanal":18,"marla":0,"amt":2102,"payable_due":2102,"payable_late":2313,"ur_name":"محمد صدیق جٹ","ur_father":"عبد ال غنی جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601015295549","cons":"180000012925","khata":180,"name":"Muhammad Azeem Jutt","father":"ABDUL GHANI JUTT","kanal":16,"marla":0,"amt":2001,"payable_due":2001,"payable_late":2202,"ur_name":"محمد عظیم جٹ","ur_father":"عبد ال غنی جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601017270551","cons":"181000012925","khata":181,"name":"Allah Ditta Arain","father":"ABDUL HAMEED ARAIN","kanal":154,"marla":0,"amt":18660,"payable_due":18660,"payable_late":20526,"ur_name":"اللہ دتہ آرائیں","ur_father":"عبد ال حمید آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512316325068","cons":"182000012925","khata":182,"name":"Muhammad Irshad Arai","father":"KHAIR UD DEEN","kanal":34,"marla":0,"amt":4103,"payable_due":4103,"payable_late":4514,"ur_name":"محمد ارشاد آرائیں","ur_father":"خیر الد دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512316325421","cons":"183000012925","khata":183,"name":"Allah Ditta Arain","father":"BAHIR AHMAD","kanal":104,"marla":0,"amt":12407,"payable_due":12407,"payable_late":13648,"ur_name":"اللہ دتہ آرائیں","ur_father":"باہر احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512315937011","cons":"184000012925","khata":184,"name":"Muhammad Arshad Arai","father":"MUHAMMAD MUNEER","kanal":18,"marla":0,"amt":1652,"payable_due":1652,"payable_late":1818,"ur_name":"محمد ارشاد آرائیں","ur_father":"محمد منیر"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512316005718","cons":"185000012925","khata":185,"name":"Muhammad Deen","father":"ANAYAT ALI ARAIN","kanal":21,"marla":0,"amt":3627,"payable_due":3627,"payable_late":3990,"ur_name":"محمد دین","ur_father":"عنایت علی آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601015894623","cons":"186000012925","khata":186,"name":"Siraj Deen","father":"ANAYAT ALI","kanal":20,"marla":0,"amt":2502,"payable_due":2502,"payable_late":2753,"ur_name":"سراج دین","ur_father":"عنایت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601018797725","cons":"187000012925","khata":187,"name":"Yasir Nasir And Rash","father":"BASHARAT ALI","kanal":16,"marla":0,"amt":2001,"payable_due":2001,"payable_late":2202,"ur_name":"یاسر ناصر اینڈ راش","ur_father":"بشارت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601018798712","cons":"188000012925","khata":188,"name":"Rasheed Ahmad","father":"ANAYAT ALI ARAIN","kanal":19,"marla":0,"amt":2377,"payable_due":2377,"payable_late":2615,"ur_name":"رشید احمد","ur_father":"عنایت علی آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314445852","cons":"189000012925","khata":189,"name":"Asmat Ullah","father":"LIAQAT ALI","kanal":89,"marla":10,"amt":10781,"payable_due":10781,"payable_late":11860,"ur_name":"عصمت اللہ","ur_father":"لیاقت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314449344","cons":"190000012925","khata":190,"name":"Parvaiz Ahmad","father":"MUHAMMAD YAQOOB ARAI","kanal":28,"marla":0,"amt":3202,"payable_due":3202,"payable_late":3523,"ur_name":"پرویز احمد","ur_father":"محمد یعقوب آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512315294960","cons":"191000012925","khata":191,"name":"Arshad Ali","father":"BARKAT ALI ARAIN","kanal":12,"marla":0,"amt":1501,"payable_due":1501,"payable_late":1652,"ur_name":"ارشاد علی","ur_father":"برکت علی آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512315300275","cons":"192000012925","khata":192,"name":"Abdul Ghafoor Arain","father":"Barkat Ali","kanal":12,"marla":0,"amt":1501,"payable_due":1501,"payable_late":1652,"ur_name":"عبد ال غفور آرائیں","ur_father":"برکت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512315296477","cons":"193000012925","khata":193,"name":"Balqees Bibi","father":"ZOJA LIAQUAT ALI","kanal":6,"marla":0,"amt":301,"payable_due":301,"payable_late":332,"ur_name":"بلقیس بی بی","ur_father":"زوجہ لیاقت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601016056978","cons":"194000012925","khata":194,"name":"Mohsin Akram Mughal","father":"MUHAMMAD AKRAM","kanal":220,"marla":0,"amt":22714,"payable_due":22714,"payable_late":24986,"ur_name":"محسن اکرم مغل","ur_father":"محمد اکرم"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601018247065","cons":"195000012925","khata":195,"name":"Ghulam Shabbir Jutt","father":"ALI AHMAD","kanal":88,"marla":0,"amt":9206,"payable_due":9206,"payable_late":10127,"ur_name":"غلام شبیر جٹ","ur_father":"علی احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601018257269","cons":"196000012925","khata":196,"name":"Muhammad Malik Jut","father":"ALI AHMAD JUT","kanal":32,"marla":0,"amt":3702,"payable_due":3702,"payable_late":4073,"ur_name":"محمد ملک جٹ","ur_father":"علی احمد جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512315069424","cons":"197000012925","khata":197,"name":"Ghulam Shabir Jut","father":"MUHAMMAD ALI JUTT","kanal":72,"marla":0,"amt":7505,"payable_due":7505,"payable_late":8256,"ur_name":"غلام شبیر جٹ","ur_father":"محمد علی جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601018847811","cons":"198000012925","khata":198,"name":"Zulfiqar Ali Jut","father":"AKBAR ALI","kanal":51,"marla":0,"amt":6379,"payable_due":6379,"payable_late":7017,"ur_name":"ذوالفقار علی جٹ","ur_father":"اکبر علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601018847942","cons":"199000012925","khata":199,"name":"Muhammad Nawaz Pirha","father":"UNKNOWN","kanal":24,"marla":0,"amt":3002,"payable_due":3002,"payable_late":3303,"ur_name":"محمد نواز پیرہڑ","ur_father":"نامعلوم"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019208936","cons":"200000012925","khata":200,"name":"Muhammad Ashraf","father":"MUHAMMAD MUNIR ARAIN","kanal":24,"marla":0,"amt":3002,"payable_due":3002,"payable_late":3303,"ur_name":"محمد اشرف","ur_father":"محمد منیر آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011121128","cons":"201000012925","khata":201,"name":"Ghulam Rasool Jut","father":"MUHAMMAD ASLAM JUTT","kanal":24,"marla":0,"amt":3002,"payable_due":3002,"payable_late":3303,"ur_name":"غلام رسول جٹ","ur_father":"محمد اسلم جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011121232","cons":"202000012925","khata":202,"name":"Muhammad Mukhtar","father":"MUHAMMAD IQBAL ARAIN","kanal":81,"marla":0,"amt":10131,"payable_due":10131,"payable_late":11145,"ur_name":"محمد مختار","ur_father":"محمد اقبال آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013073273","cons":"204000012925","khata":204,"name":"Javed Iqbal","father":"Jutt","kanal":8,"marla":0,"amt":3002,"payable_due":3002,"payable_late":3303,"ur_name":"جاوید اقبال","ur_father":"جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512314998983","cons":"205000012925","khata":205,"name":"Muhammad Ramzan Mugh","father":"WALI MUGHAL","kanal":16,"marla":0,"amt":2001,"payable_due":2001,"payable_late":2202,"ur_name":"محمد رمضان مغل","ur_father":"ولی مغل"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512316047973","cons":"206000012925","khata":206,"name":"Jafar Ali Arain","father":"MUHAMMAD SHAREEF","kanal":48,"marla":0,"amt":6003,"payable_due":6003,"payable_late":6604,"ur_name":"جعفر علی آرائیں","ur_father":"محمد شریف"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512316048344","cons":"207000012925","khata":207,"name":"Muhammad Arshad Arai","father":"NAZEER AHMAD ARAIN","kanal":124,"marla":0,"amt":14908,"payable_due":14908,"payable_late":16399,"ur_name":"محمد ارشاد آرائیں","ur_father":"نذیر احمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512316080157","cons":"208000012925","khata":208,"name":"Muhammad Iqbal Arain","father":"ABDUL AZIZ","kanal":26,"marla":0,"amt":3252,"payable_due":3252,"payable_late":3578,"ur_name":"محمد اقبال آرائیں","ur_father":"عبد ال عزیز"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601017656565","cons":"209000012925","khata":209,"name":"Muhammad Siddiq Arai","father":"REHMAT ULLAH","kanal":34,"marla":0,"amt":3953,"payable_due":3953,"payable_late":4349,"ur_name":"محمد صدیق آرائیں","ur_father":"رحمت اللہ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601017656874","cons":"210000012925","khata":210,"name":"Abdul Hameed Abdul R","father":"REHMAT ULLAH ARAIN","kanal":26,"marla":2,"amt":3265,"payable_due":3265,"payable_late":3592,"ur_name":"عبد ال حمید عبد ال آر","ur_father":"رحمت اللہ آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019319017","cons":"211000012925","khata":211,"name":"Imran Sohail Arain","father":"MUSHTAQ AHMAD","kanal":100,"marla":0,"amt":12507,"payable_due":12507,"payable_late":13758,"ur_name":"عمران سہیل آرائیں","ur_father":"مشتاق احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019319107","cons":"212000012925","khata":212,"name":"Muhammad Shareef","father":"CHARAGH DEEN","kanal":19,"marla":0,"amt":2152,"payable_due":2152,"payable_late":2368,"ur_name":"محمد شریف","ur_father":"چراغ دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512315586477","cons":"213000012925","khata":213,"name":"Faisal Mehmood","father":"ANAYAT ALI ARAIN","kanal":19,"marla":0,"amt":2377,"payable_due":2377,"payable_late":2615,"ur_name":"فیصل محمود","ur_father":"عنایت علی آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412512315586874","cons":"214000012925","khata":214,"name":"Sadiq Ali Arain","father":"CHARAGH DEEN ARAIN","kanal":19,"marla":0,"amt":2227,"payable_due":2227,"payable_late":2450,"ur_name":"صادق علی آرائیں","ur_father":"چراغ دین آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601016519189","cons":"215000012925","khata":215,"name":"Ashiq Hussain","father":"CHARAGH DEEN ARAIN","kanal":19,"marla":0,"amt":2227,"payable_due":2227,"payable_late":2450,"ur_name":"عاشق حسین","ur_father":"چراغ دین آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601017527818","cons":"216000012925","khata":216,"name":"Muhammad Sardar Arai","father":"CHARAGH DEEN ARAIN","kanal":19,"marla":0,"amt":2227,"payable_due":2227,"payable_late":2450,"ur_name":"محمد سردار آرائیں","ur_father":"چراغ دین آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601018216064","cons":"217000012925","khata":217,"name":"Muhammad Akram","father":"WALI MUHAMMAD ARAIN","kanal":10,"marla":16,"amt":1351,"payable_due":1351,"payable_late":1487,"ur_name":"محمد اکرم","ur_father":"ولی محمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019821866","cons":"218000012925","khata":218,"name":"Muhammad Aslam Arain","father":"WALI MUHAMMAD","kanal":24,"marla":0,"amt":2402,"payable_due":2402,"payable_late":2643,"ur_name":"محمد اسلم آرائیں","ur_father":"ولی محمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019822019","cons":"219000012925","khata":219,"name":"Muhammad Amjad","father":"WALI MUHAMMAD ARAIN","kanal":21,"marla":17,"amt":2534,"payable_due":2534,"payable_late":2788,"ur_name":"محمد امجد","ur_father":"ولی محمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010288343","cons":"220000012925","khata":220,"name":"Zahid Mehmood Brothe","father":"ALI MUHAMMAD ARAIN","kanal":42,"marla":6,"amt":4818,"payable_due":4818,"payable_late":5300,"ur_name":"زاہد محمود برادرز","ur_father":"علی محمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010288214","cons":"221000012925","khata":221,"name":"Alamdar Hussain Shah","father":"TALIB HUSSAIN SHAH","kanal":200,"marla":0,"amt":22013,"payable_due":22013,"payable_late":24215,"ur_name":"عالمدار حسین شاہ","ur_father":"طالب حسین شاہ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601016745247","cons":"222000012925","khata":222,"name":"General Muhammad Naw","father":"MUHAMMAD HABIB KHAN","kanal":400,"marla":0,"amt":48825,"payable_due":48825,"payable_late":53708,"ur_name":"جنرل محمد نو","ur_father":"محمد حبیب خان"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601018301428","cons":"223000012925","khata":223,"name":"Master Arif Ali Jutt","father":"UNKNOWN","kanal":248,"marla":0,"amt":28916,"payable_due":28916,"payable_late":31808,"ur_name":"ماسٹر عارف علی جٹ","ur_father":"نامعلوم"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010798016","cons":"224000012925","khata":224,"name":"Muhammad Ishfaq","father":"Wilayat Khan Gujjar","kanal":112,"marla":0,"amt":14007,"payable_due":14007,"payable_late":15408,"ur_name":"محمد اشفاق","ur_father":"ولایت خان گوجر"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601018301726","cons":"225000012925","khata":225,"name":"Muhammad Yousaf Jutt","father":"MUHAMMAD DEEN","kanal":314,"marla":0,"amt":38220,"payable_due":38220,"payable_late":42042,"ur_name":"محمد یوسف جٹ","ur_father":"محمد دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019171949","cons":"226000012925","khata":226,"name":"Hafeez Ullah Arain","father":"AHMAD LATEEF","kanal":300,"marla":0,"amt":56328,"payable_due":56328,"payable_late":61961,"ur_name":"حفیظ اللہ آرائیں","ur_father":"احمد لطیف"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010677665","cons":"227000012925","khata":227,"name":"Muhammad Rafiq","father":"MUHAMMAD RAMZAN","kanal":50,"marla":0,"amt":6104,"payable_due":6104,"payable_late":6715,"ur_name":"محمد رفیق","ur_father":"محمد رمضان"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010677962","cons":"228000012925","khata":228,"name":"Abdul Rasheed Arain","father":"MUHAMMAD RAMZAN","kanal":50,"marla":0,"amt":6104,"payable_due":6104,"payable_late":6715,"ur_name":"عبد ال رشید آرائیں","ur_father":"محمد رمضان"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012925752","cons":"229000012925","khata":229,"name":"Shahid Rasool","father":"AMANULLAH","kanal":33,"marla":0,"amt":4128,"payable_due":4128,"payable_late":4541,"ur_name":"شاہد رسول","ur_father":"امان اللہ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012925960","cons":"230000012925","khata":230,"name":"Asif Rasool Rajpoot","father":"AMANULLAH","kanal":34,"marla":0,"amt":3953,"payable_due":3953,"payable_late":4349,"ur_name":"آصف رسول راجپوت","ur_father":"امان اللہ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012926175","cons":"231000012925","khata":231,"name":"Irshad Ahmad Shahbaz","father":"MUHAMMAD NAZIR JUTT","kanal":33,"marla":0,"amt":3753,"payable_due":3753,"payable_late":4129,"ur_name":"ارشاد احمد شہباز","ur_father":"محمد نذیر جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019681436","cons":"232000012925","khata":232,"name":"Arif Ali Arain","father":"ASGHAR ALI","kanal":40,"marla":0,"amt":4703,"payable_due":4703,"payable_late":5174,"ur_name":"عارف علی آرائیں","ur_father":"اصغر علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019681524","cons":"233000012925","khata":233,"name":"Shafaqat Ali Arain","father":"Asghar Ali","kanal":32,"marla":0,"amt":3702,"payable_due":3702,"payable_late":4073,"ur_name":"شفاعت علی آرائیں","ur_father":"اصغر علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019681884","cons":"234000012925","khata":234,"name":"Jiwana","father":"QAIM DEEN","kanal":24,"marla":0,"amt":3002,"payable_due":3002,"payable_late":3303,"ur_name":"جیوانا","ur_father":"قائم دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011127798","cons":"235000012925","khata":235,"name":"Bakht Buland Arain","father":"MUHAMMAD HANEEF","kanal":100,"marla":0,"amt":12507,"payable_due":12507,"payable_late":13758,"ur_name":"بخت بلند آرائیں","ur_father":"محمد حنیف"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011128191","cons":"236000012925","khata":236,"name":"Waris Ali Arain","father":"Akbar Ali","kanal":291,"marla":0,"amt":35344,"payable_due":35344,"payable_late":38879,"ur_name":"وارث علی آرائیں","ur_father":"اکبر علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012305119","cons":"237000012925","khata":237,"name":"Muhammad Nawaz Jut","father":"MUHAMMAD ASLAM","kanal":24,"marla":0,"amt":3002,"payable_due":3002,"payable_late":3303,"ur_name":"محمد نواز جٹ","ur_father":"محمد اسلم"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012305767","cons":"238000012925","khata":238,"name":"Muhammad Saeed Jutt","father":"MUHAMMAD ASLAM","kanal":24,"marla":0,"amt":3002,"payable_due":3002,"payable_late":3303,"ur_name":"محمد سعید جٹ","ur_father":"محمد اسلم"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013203033","cons":"239000012925","khata":239,"name":"Basharat Ali Jutt","father":"TALIB HUSSAIN","kanal":18,"marla":0,"amt":2252,"payable_due":2252,"payable_late":2478,"ur_name":"بشارت علی جٹ","ur_father":"طالب حسین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013210721","cons":"240000012925","khata":240,"name":"Shoukat Ali","father":"MUHAMMAD HUSSAIN","kanal":8,"marla":5,"amt":1032,"payable_due":1032,"payable_late":1136,"ur_name":"شوکت علی","ur_father":"محمد حسین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013299850","cons":"241000012925","khata":241,"name":"Imran Ali","father":"Muhammad Saleem","kanal":7,"marla":15,"amt":970,"payable_due":970,"payable_late":1067,"ur_name":"عمران علی","ur_father":"محمد سلیم"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601015168920","cons":"242000012925","khata":242,"name":"Rashid Ali","father":"GHULAM SARWAR JUTT","kanal":86,"marla":0,"amt":10306,"payable_due":10306,"payable_late":11337,"ur_name":"راشد علی","ur_father":"غلام سرور جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019859927","cons":"243000012925","khata":243,"name":"Abdul Majid","father":"GHULAM SARWAR JUTT","kanal":64,"marla":0,"amt":7704,"payable_due":7704,"payable_late":8475,"ur_name":"عبد ال ماجد","ur_father":"غلام سرور جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019860068","cons":"244000012925","khata":244,"name":"Muhammad Amjad Ali","father":"GHULAM SARWAR JUTT","kanal":64,"marla":0,"amt":7404,"payable_due":7404,"payable_late":8145,"ur_name":"محمد امجد علی","ur_father":"غلام سرور جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010364328","cons":"245000012925","khata":245,"name":"Ghulam Rasool Rajpoo","father":"AMANULLAH","kanal":50,"marla":0,"amt":5954,"payable_due":5954,"payable_late":6550,"ur_name":"غلام رسول راجپوت","ur_father":"امان اللہ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010364252","cons":"246000012925","khata":246,"name":"Anwar Ul Haq Rajpoot","father":"ABDUL SHAKOOR","kanal":50,"marla":0,"amt":6254,"payable_due":6254,"payable_late":6880,"ur_name":"انور ال حق راجپوت","ur_father":"عبد ال شکور"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010364498","cons":"247000012925","khata":247,"name":"Muhammad Ishfaq Arain","father":"Abdul Rehman","kanal":66,"marla":0,"amt":7805,"payable_due":7805,"payable_late":8586,"ur_name":"محمد اشفاق آرائیں","ur_father":"عبد ال رحمان"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011991969","cons":"248000012925","khata":248,"name":"Shakeel Ahmad","father":"SARDAR ALI","kanal":20,"marla":0,"amt":2202,"payable_due":2202,"payable_late":2423,"ur_name":"شکیل احمد","ur_father":"سردار علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011991867","cons":"249000012925","khata":249,"name":"Zulfiqar Ali","father":"AKBAR ALI JUTT","kanal":12,"marla":0,"amt":1501,"payable_due":1501,"payable_late":1652,"ur_name":"ذوالفقار علی","ur_father":"اکبر علی جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011992089","cons":"250000012925","khata":250,"name":"Waqar Ahmad Arain","father":"MUSHTAQ AHMAD","kanal":18,"marla":0,"amt":2252,"payable_due":2252,"payable_late":2478,"ur_name":"وقار احمد آرائیں","ur_father":"مشتاق احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013366685","cons":"251000012925","khata":251,"name":"Muhammad Mohsin","father":"MUHAMMAD ASLAM ARAIN","kanal":56,"marla":0,"amt":6704,"payable_due":6704,"payable_late":7375,"ur_name":"محمد محسن","ur_father":"محمد اسلم آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013367016","cons":"252000012925","khata":252,"name":"Muhammad Anwar Arain","father":"ABDUL AZIZ","kanal":8,"marla":0,"amt":3002,"payable_due":3002,"payable_late":3303,"ur_name":"محمد انور آرائیں","ur_father":"عبد ال عزیز"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601015572414","cons":"253000012925","khata":253,"name":"Muhammad Ishfaq","father":"WILAYAT KHAN GUJJAR","kanal":48,"marla":0,"amt":5403,"payable_due":5403,"payable_late":5944,"ur_name":"محمد اشفاق","ur_father":"ولایت خان گوجر"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019004575","cons":"254000012925","khata":254,"name":"Riaz Ahmad Pirhar","father":"Allah Diwaya","kanal":220,"marla":0,"amt":26614,"payable_due":26614,"payable_late":29276,"ur_name":"ریاض احمد پیرہڑ","ur_father":"اللہ دوایا"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010946374","cons":"255000012925","khata":255,"name":"Sadiq Ali Arain","father":"MUHAMMAD IBRAHIM","kanal":16,"marla":14,"amt":1887,"payable_due":1887,"payable_late":2076,"ur_name":"صادق علی آرائیں","ur_father":"محمد ابراہیم"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010946560","cons":"256000012925","khata":256,"name":"Arif Ali","father":"MUHAMMAD IBRAHIM","kanal":16,"marla":15,"amt":1739,"payable_due":1739,"payable_late":1913,"ur_name":"عارف علی","ur_father":"محمد ابراہیم"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601010946876","cons":"257000012925","khata":257,"name":"Abdul Sattar","father":"MUHAMMAD IBRAHIM ARA","kanal":16,"marla":13,"amt":1734,"payable_due":1734,"payable_late":1908,"ur_name":"عبد ال ستار","ur_father":"محمد ابراہیم آراء"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012004017","cons":"258000012925","khata":258,"name":"Muhammad Javed","father":"HASHMAT ALI ARAIN","kanal":20,"marla":0,"amt":2502,"payable_due":2502,"payable_late":2753,"ur_name":"محمد جاوید","ur_father":"حشمت علی آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012004809","cons":"259000012925","khata":259,"name":"Muhammad Bilal Jutt","father":"Abdul Majeed","kanal":30,"marla":0,"amt":3752,"payable_due":3752,"payable_late":4128,"ur_name":"محمد بلال جٹ","ur_father":"عبد ال مجید"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013377060","cons":"260000012925","khata":260,"name":"Ghulam Yaseen Malik","father":"Gull Muhammad","kanal":100,"marla":0,"amt":12207,"payable_due":12207,"payable_late":13428,"ur_name":"غلام یٰسین ملک","ur_father":"گل محمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013377161","cons":"261000012925","khata":261,"name":"Muhammad Akhtar Pirh","father":"Abdul Khaliq","kanal":40,"marla":0,"amt":5003,"payable_due":5003,"payable_late":5504,"ur_name":"محمد اختر پیرہڑ","ur_father":"عبد ال خالق"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013710152","cons":"262000012925","khata":262,"name":"Asif Ali Arain","father":"ASHIQ ALI","kanal":40,"marla":0,"amt":5003,"payable_due":5003,"payable_late":5504,"ur_name":"آصف علی آرائیں","ur_father":"عاشق علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601015527276","cons":"263000012925","khata":263,"name":"Rashid Ali Arain","father":"ASGHAR ALI","kanal":44,"marla":0,"amt":4903,"payable_due":4903,"payable_late":5394,"ur_name":"راشد علی آرائیں","ur_father":"اصغر علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601015310325","cons":"264000012925","khata":264,"name":"Muhammad Shareef","father":"SOHRAB KORAI","kanal":112,"marla":0,"amt":13107,"payable_due":13107,"payable_late":14418,"ur_name":"محمد شریف","ur_father":"سہراب کورائی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601016630918","cons":"265000012925","khata":265,"name":"Faqeer Bakhsh Patafi","father":"NABI BAKHSH PATAFI","kanal":100,"marla":0,"amt":11907,"payable_due":11907,"payable_late":13098,"ur_name":"فقیر بخش پتافی","ur_father":"نبی بخش پتافی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019184441","cons":"266000012925","khata":266,"name":"Jan Muhammad Pirhar","father":"Gull Muhammad","kanal":90,"marla":0,"amt":8706,"payable_due":8706,"payable_late":9577,"ur_name":"جان محمد پیرہڑ","ur_father":"گل محمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601019184969","cons":"268000012925","khata":268,"name":"Saif Ul Rehman Arain","father":"Namet Ali","kanal":30,"marla":0,"amt":3752,"payable_due":3752,"payable_late":4128,"ur_name":"سیف ال رحمان آرائیں","ur_father":"نامت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011376359","cons":"269000012925","khata":269,"name":"Muhammad Muneer","father":"GHULAM HUSSAIN ARAIN","kanal":70,"marla":0,"amt":8305,"payable_due":8305,"payable_late":9136,"ur_name":"محمد منیر","ur_father":"غلام حسین آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011377062","cons":"270000012925","khata":270,"name":"Khizar Mehmood Rajpo","father":"RIAZ AHMAD","kanal":200,"marla":0,"amt":25013,"payable_due":25013,"payable_late":27515,"ur_name":"خضر محمود راجپوت","ur_father":"ریاض احمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011377962","cons":"271000012925","khata":271,"name":"Muhammad Boota Arain","father":"ABDUL SALAM","kanal":100,"marla":0,"amt":12207,"payable_due":12207,"payable_late":13428,"ur_name":"محمد بوٹا آرائیں","ur_father":"عبد ال سلام"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012596959","cons":"272000012925","khata":272,"name":"Safdar Hussain Arain","father":"Barkat Ali","kanal":120,"marla":0,"amt":15008,"payable_due":15008,"payable_late":16509,"ur_name":"صفدر حسین آرائیں","ur_father":"برکت علی"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012597329","cons":"273000012925","khata":273,"name":"Abdul Hameed Abdul R","father":"REHMAT ULLAH ARAIN","kanal":52,"marla":0,"amt":6504,"payable_due":6504,"payable_late":7155,"ur_name":"عبد ال حمید عبد ال آر","ur_father":"رحمت اللہ آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012597423","cons":"274000012925","khata":274,"name":"Muhammad Sajjad Arai","father":"ABDUL SALAM","kanal":112,"marla":13,"amt":14089,"payable_due":14089,"payable_late":15498,"ur_name":"محمد سجاد آرائیں","ur_father":"عبد ال سلام"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012597940","cons":"275000012925","khata":275,"name":"Sabir Ali Arain","father":"GHULAM MUHAMMAD","kanal":16,"marla":13,"amt":2034,"payable_due":2034,"payable_late":2238,"ur_name":"صابر علی آرائیں","ur_father":"غلام محمد"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601014376707","cons":"276000012925","khata":276,"name":"Muhammad Youasf","father":"GHULAM MUHAMMAD ARAI","kanal":16,"marla":13,"amt":2034,"payable_due":2034,"payable_late":2238,"ur_name":"محمد یوسف","ur_father":"غلام محمد آرائیں"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601014376792","cons":"277000012925","khata":277,"name":"Abdullah Arain","father":"Abdul Khaliq","kanal":16,"marla":14,"amt":2037,"payable_due":2037,"payable_late":2241,"ur_name":"عبد اللہ آرائیں","ur_father":"عبد ال خالق"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011223479","cons":"278000012925","khata":278,"name":"Muhammad Hussain","father":"ASHIQ HUSSAIN","kanal":50,"marla":0,"amt":6254,"payable_due":6254,"payable_late":6880,"ur_name":"محمد حسین","ur_father":"عاشق حسین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011223754","cons":"279000012925","khata":279,"name":"Muhammad Yousaf Jutt","father":"FAZAL DEEN","kanal":66,"marla":13,"amt":8336,"payable_due":8336,"payable_late":9170,"ur_name":"محمد یوسف جٹ","ur_father":"فضل دین"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601011223614","cons":"280000012925","khata":280,"name":"Muhammad Saeed Motan","father":"ABDUL RASHEED JUTT","kanal":66,"marla":14,"amt":8342,"payable_due":8342,"payable_late":9177,"ur_name":"محمد سعید موٹان","ur_father":"عبد ال رشید جٹ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012848828","cons":"281000012925","khata":281,"name":"Abdul Hameed","father":"JADOO FAQEER","kanal":66,"marla":13,"amt":8336,"payable_due":8336,"payable_late":9170,"ur_name":"عبد ال حمید","ur_father":"جادو فقیر"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012848746","cons":"282000012925","khata":282,"name":"Muhammad Saleem","father":"Hassu Pirhar","kanal":17,"marla":0,"amt":2127,"payable_due":2127,"payable_late":2340,"ur_name":"محمد سلیم","ur_father":"حسو پیرہڑ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601012848903","cons":"283000012925","khata":283,"name":"Azeem Bakhsh","father":"Hassu Pirhar","kanal":17,"marla":0,"amt":2127,"payable_due":2127,"payable_late":2340,"ur_name":"عظیم بخش","ur_father":"حسو پیرہڑ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601013370479","cons":"284000012925","khata":284,"name":"Hakeem Ali","father":"Hassu Pirhar","kanal":17,"marla":0,"amt":2127,"payable_due":2127,"payable_late":2340,"ur_name":"حکیم علی","ur_father":"حسو پیرہڑ"},{"season_id":"kharif2025","season":"Kharif 2025","issue":"02/01/2026","due":"15/06/2026","ref":"40412601016568451","cons":"300000012925","khata":300,"name":"Muhammad Amjad","father":"Bashir Ahmad","kanal":104,"marla":0,"amt":12707,"payable_due":12707,"payable_late":13978,"ur_name":"محمد امجد","ur_father":"بشیر احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606011855433","cons":"3000012925","khata":3,"name":"Muhammad Boota Jut","father":"Nawab Din","kanal":70,"marla":0,"amt":3505,"payable_due":3505,"payable_late":3856,"ur_name":"محمد بوٹا جٹ","ur_father":"نواب دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606018706682","cons":"6000012925","khata":6,"name":"Raheem Bakhsh","father":"Hassu Pirhar","kanal":18,"marla":0,"amt":902,"payable_due":902,"payable_late":993,"ur_name":"رحیم بخش","ur_father":"حسو پیرہڑ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606023455103","cons":"8000012925","khata":8,"name":"Irshad Hussain Jutt","father":"Gulam Hussain Jutt","kanal":168,"marla":0,"amt":8411,"payable_due":8411,"payable_late":9253,"ur_name":"ارشاد حسین جٹ","ur_father":"غلام حسین جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606042836211","cons":"12000012925","khata":12,"name":"Muhammad Younas Arain","father":"GHULAM MUHAMMAD ARAIN","kanal":25,"marla":0,"amt":1252,"payable_due":1252,"payable_late":1378,"ur_name":"محمد یونس آرائیں","ur_father":"غلام محمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606022954248","cons":"14000012925","khata":14,"name":"Muhammad Yousaf Arain","father":"GHULAM MUHAMMAD ARAIN","kanal":25,"marla":0,"amt":1252,"payable_due":1252,"payable_late":1378,"ur_name":"محمد یوسف آرائیں","ur_father":"غلام محمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606018111643","cons":"16000012925","khata":16,"name":"Muhammad Shareef","father":"CHARAGH DEEN","kanal":20,"marla":0,"amt":1002,"payable_due":1002,"payable_late":1103,"ur_name":"محمد شریف","ur_father":"چراغ دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605303952296","cons":"18000012925","khata":18,"name":"Sadiq Ali Arain","father":"CHARAGH DEEN","kanal":20,"marla":0,"amt":1002,"payable_due":1002,"payable_late":1103,"ur_name":"صادق علی آرائیں","ur_father":"چراغ دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606019277591","cons":"22000012925","khata":22,"name":"Arshad Ali","father":"Muhammad Shareef","kanal":96,"marla":0,"amt":4806,"payable_due":4806,"payable_late":5287,"ur_name":"ارشاد علی","ur_father":"محمد شریف"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606010626193","cons":"24000012925","khata":24,"name":"Muhammad Muneer Arain","father":"JAMAL DEEN","kanal":48,"marla":0,"amt":2403,"payable_due":2403,"payable_late":2644,"ur_name":"محمد منیر آرائیں","ur_father":"جمال دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606028163417","cons":"25000012925","khata":25,"name":"Irfan Ali Arain","father":"NAWAB DEEN","kanal":74,"marla":13,"amt":3738,"payable_due":3738,"payable_late":4112,"ur_name":"عرفان علی آرائیں","ur_father":"نواب دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605318225361","cons":"27000012925","khata":27,"name":"Shokat Ali Arain","father":"NAZEER AHMAD","kanal":16,"marla":0,"amt":801,"payable_due":801,"payable_late":882,"ur_name":"شوکت علی آرائیں","ur_father":"نذیر احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606036720096","cons":"29000012925","khata":29,"name":"Waris Ali Arain","father":"Nazeer Ahmad","kanal":16,"marla":0,"amt":801,"payable_due":801,"payable_late":882,"ur_name":"وارث علی آرائیں","ur_father":"نذیر احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606035975958","cons":"30000012925","khata":30,"name":"Muhammad Ilyas Arain","father":"Nazeer Ahmed","kanal":16,"marla":0,"amt":801,"payable_due":801,"payable_late":882,"ur_name":"محمد الیاس آرائیں","ur_father":"نذیر احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606042460409","cons":"31000012925","khata":31,"name":"Ramzan Ali Mughal","father":"WALI MUHAMMAD","kanal":48,"marla":0,"amt":2403,"payable_due":2403,"payable_late":2644,"ur_name":"رمضان علی مغل","ur_father":"ولی محمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605307549771","cons":"34000012925","khata":34,"name":"Irshad Ahmed Maril","father":"Fazal ul Haq","kanal":28,"marla":0,"amt":1402,"payable_due":1402,"payable_late":1543,"ur_name":"ارشاد احمد مرل","ur_father":"فضل ال حق"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605307550164","cons":"35000012925","khata":35,"name":"Ejaz Ahmed Maril","father":"Fazal Ul Haq","kanal":28,"marla":0,"amt":1402,"payable_due":1402,"payable_late":1543,"ur_name":"اعجاز احمد مرل","ur_father":"فضل ال حق"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606035818377","cons":"36000012925","khata":36,"name":"Naseer Ahmed Chak Ek So Satara","father":"Bashir Ahmed","kanal":24,"marla":0,"amt":1202,"payable_due":1202,"payable_late":1323,"ur_name":"نصیر احمد چک ایک سو ستارہ","ur_father":"بشیر احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606035942827","cons":"37000012925","khata":37,"name":"Fazal Hussain","father":"Sardar Muhammad Jutt","kanal":34,"marla":0,"amt":1703,"payable_due":1703,"payable_late":1874,"ur_name":"فضل حسین","ur_father":"سردار محمد جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605316552551","cons":"38000012925","khata":38,"name":"Abdul Majeed Jutt","father":"Sardar Muhammad","kanal":34,"marla":0,"amt":1703,"payable_due":1703,"payable_late":1874,"ur_name":"عبد ال مجید جٹ","ur_father":"سردار محمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606028881225","cons":"42000012925","khata":42,"name":"Muhammad Hanif Jutt","father":"Abdul Ghani JUTT","kanal":18,"marla":0,"amt":902,"payable_due":902,"payable_late":993,"ur_name":"محمد حنیف جٹ","ur_father":"عبد ال غنی جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605316554343","cons":"43000012925","khata":43,"name":"Muhammad Azim","father":"Abdul Ghani","kanal":18,"marla":0,"amt":902,"payable_due":902,"payable_late":993,"ur_name":"محمد عظیم","ur_father":"عبد ال غنی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606036461694","cons":"44000012925","khata":44,"name":"Muhammad Shahbaz Jut","father":"Muhammad Saleem Jutt","kanal":16,"marla":0,"amt":801,"payable_due":801,"payable_late":882,"ur_name":"محمد شہباز جٹ","ur_father":"محمد سلیم جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606025254653","cons":"45000012925","khata":45,"name":"Arif Ali","father":"Munshi Khan Jutt","kanal":32,"marla":0,"amt":1602,"payable_due":1602,"payable_late":1763,"ur_name":"عارف علی","ur_father":"منشی خان جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606042104767","cons":"47000012925","khata":47,"name":"Niaz Ali Junaid And Zubair","father":"MUHAMMAD MUNEER","kanal":380,"marla":0,"amt":19024,"payable_due":19024,"payable_late":20927,"ur_name":"نیاز علی جنید اینڈ زبیر","ur_father":"محمد منیر"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606031278985","cons":"49000012925","khata":49,"name":"Niaz Ali Arain","father":"KHAIR UD DEEN","kanal":34,"marla":0,"amt":1703,"payable_due":1703,"payable_late":1874,"ur_name":"نیاز علی آرائیں","ur_father":"خیر الد دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605308931152","cons":"50000012925","khata":50,"name":"Muhammad Iqbal Arain","father":"ABDUL AZIZ","kanal":53,"marla":0,"amt":2654,"payable_due":2654,"payable_late":2920,"ur_name":"محمد اقبال آرائیں","ur_father":"عبد ال عزیز"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605308934158","cons":"52000012925","khata":52,"name":"Muhammad Akram","father":"Abdul Aziz ARAIN","kanal":18,"marla":10,"amt":927,"payable_due":927,"payable_late":1020,"ur_name":"محمد اکرم","ur_father":"عبد ال عزیز آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606036012520","cons":"54000012925","khata":54,"name":"Muhammad Qasim","father":"HAZOOR BAKHSH","kanal":11,"marla":0,"amt":551,"payable_due":551,"payable_late":607,"ur_name":"محمد قاسم","ur_father":"حضور بخش"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605317744560","cons":"57000012925","khata":57,"name":"Ghulam Yasin","father":"ANAYAT ALI","kanal":20,"marla":0,"amt":1002,"payable_due":1002,"payable_late":1103,"ur_name":"غلام یٰسین","ur_father":"عنایت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606042617490","cons":"59000012925","khata":59,"name":"Muhammad Anwar Ameen","father":"Anayat Ali Arain","kanal":16,"marla":0,"amt":801,"payable_due":801,"payable_late":882,"ur_name":"محمد انور امین","ur_father":"عنایت علی آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606029206945","cons":"61000012925","khata":61,"name":"Muhammad Saleem Arain","father":"ANAYAT ALI","kanal":47,"marla":0,"amt":2353,"payable_due":2353,"payable_late":2589,"ur_name":"محمد سلیم آرائیں","ur_father":"عنایت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606042659992","cons":"62000012925","khata":62,"name":"Shafqat Mehmood","father":"SARFARAZ AHMAD JUT","kanal":102,"marla":0,"amt":5107,"payable_due":5107,"payable_late":5618,"ur_name":"شفقت محمود","ur_father":"سرفراز احمد جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606036113879","cons":"64000012925","khata":64,"name":"Nasir Ali","father":"SHOUKAT ALI JUT","kanal":98,"marla":0,"amt":4907,"payable_due":4907,"payable_late":5398,"ur_name":"ناصر علی","ur_father":"شوکت علی جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606046749257","cons":"65000012925","khata":65,"name":"Qadeer Sultan","father":"SULTAN AHMAD JUT","kanal":50,"marla":0,"amt":2504,"payable_due":2504,"payable_late":2755,"ur_name":"قدیر سلطان","ur_father":"سلطان احمد جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605308800383","cons":"66000012925","khata":66,"name":"Muhammad Asim Rajpoot","father":"SHOUKAT ALI","kanal":100,"marla":0,"amt":5007,"payable_due":5007,"payable_late":5508,"ur_name":"محمد عاصم راجپوت","ur_father":"شوکت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606028678393","cons":"71000012925","khata":71,"name":"Asghar Ali","father":"Sadiq Ali JUT","kanal":42,"marla":0,"amt":2103,"payable_due":2103,"payable_late":2314,"ur_name":"اصغر علی","ur_father":"صادق علی جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606031456261","cons":"82000012925","khata":82,"name":"Javed Iqbal Jutt","father":"Munshi Khan Jutt","kanal":8,"marla":0,"amt":401,"payable_due":401,"payable_late":442,"ur_name":"جاوید اقبال جٹ","ur_father":"منشی خان جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606029832926","cons":"85000012925","khata":85,"name":"Muhammad Kashif","father":"Muhammad Arshad","kanal":22,"marla":0,"amt":1102,"payable_due":1102,"payable_late":1213,"ur_name":"محمد کاشف","ur_father":"محمد ارشاد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606042785447","cons":"143000012925","khata":143,"name":"Iran Ali Arain","father":"Muhammad Akram","kanal":56,"marla":0,"amt":2804,"payable_due":2804,"payable_late":3085,"ur_name":"ایران علی آرائیں","ur_father":"محمد اکرم"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606033597493","cons":"159000012925","khata":159,"name":"Ghulam Ahmad","father":"Muhammad Nawaz","kanal":62,"marla":0,"amt":3104,"payable_due":3104,"payable_late":3415,"ur_name":"غلام احمد","ur_father":"محمد نواز"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606033594571","cons":"160000012925","khata":160,"name":"Kareem Bakhsh","father":"Hassu Pirhar","kanal":18,"marla":0,"amt":902,"payable_due":902,"payable_late":993,"ur_name":"کریم بخش","ur_father":"حسو پیرہڑ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606041972764","cons":"161000012925","khata":161,"name":"Muhammad Lateef","father":"HASSU PIRHAR","kanal":17,"marla":0,"amt":852,"payable_due":852,"payable_late":938,"ur_name":"محمد لطیف","ur_father":"حسو پیرہڑ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606020526718","cons":"162000012925","khata":162,"name":"Muhammad Ismail Pirhar","father":"PALIYA PIRHAR","kanal":34,"marla":13,"amt":1735,"payable_due":1735,"payable_late":1909,"ur_name":"محمد اسماعیل پیرہڑ","ur_father":"پالیا پیرہڑ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606013660936","cons":"164000012925","khata":164,"name":"M Arshad Arain","father":"M Munir","kanal":34,"marla":14,"amt":1738,"payable_due":1738,"payable_late":1912,"ur_name":"ایم ارشاد آرائیں","ur_father":"ایم منیر"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606013675351","cons":"165000012925","khata":165,"name":"Abdul Ghafoor Arain","father":"GHULAM MUHAMMAD ARIN","kanal":25,"marla":0,"amt":1252,"payable_due":1252,"payable_late":1378,"ur_name":"عبد ال غفور آرائیں","ur_father":"غلام محمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605316619492","cons":"166000012925","khata":166,"name":"Muhammad Yasin Arain","father":"GHULAM MUHAMMAD ARN","kanal":25,"marla":0,"amt":1252,"payable_due":1252,"payable_late":1378,"ur_name":"محمد یٰسین آرائیں","ur_father":"غلام محمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606013909659","cons":"167000012925","khata":167,"name":"Faisal Mehmood","father":"ANAYAT ALI","kanal":20,"marla":0,"amt":1002,"payable_due":1002,"payable_late":1103,"ur_name":"فیصل محمود","ur_father":"عنایت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605315713852","cons":"168000012925","khata":168,"name":"Ashiq Hussain","father":"CHARAGH DEEN","kanal":37,"marla":6,"amt":1868,"payable_due":1868,"payable_late":2055,"ur_name":"عاشق حسین","ur_father":"چراغ دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606013909108","cons":"169000012925","khata":169,"name":"Muhammad Sardar","father":"CHARAGH DEEN","kanal":37,"marla":7,"amt":1870,"payable_due":1870,"payable_late":2057,"ur_name":"محمد سردار","ur_father":"چراغ دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606034164968","cons":"170000012925","khata":170,"name":"Muhammad Rafiq Arain","father":"Barkat Ali Arain","kanal":24,"marla":0,"amt":1202,"payable_due":1202,"payable_late":1323,"ur_name":"محمد رفیق آرائیں","ur_father":"برکت علی آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605316122535","cons":"171000012925","khata":171,"name":"Jam Ghulam Fareed Maril","father":"MUHAMMAD UD DEEN","kanal":200,"marla":0,"amt":13013,"payable_due":13013,"payable_late":14315,"ur_name":"جام غلام فرید مرل","ur_father":"محمد الد دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606041616990","cons":"172000012925","khata":172,"name":"Ahmad Noor Arain","father":"NOOR MUHAMMAD ARAIN","kanal":40,"marla":0,"amt":2003,"payable_due":2003,"payable_late":2204,"ur_name":"احمد نور آرائیں","ur_father":"نور محمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606046391952","cons":"173000012925","khata":173,"name":"Liaquat Ali Arain","father":"NAZEER AHMAD","kanal":16,"marla":14,"amt":837,"payable_due":837,"payable_late":921,"ur_name":"لیاقت علی آرائیں","ur_father":"نذیر احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606041617195","cons":"175000012925","khata":175,"name":"Shoukat Ali Arain","father":"MUHAMMAD SHAFEE","kanal":52,"marla":0,"amt":2604,"payable_due":2604,"payable_late":2865,"ur_name":"شوکت علی آرائیں","ur_father":"محمد شفیع"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606011413872","cons":"176000012925","khata":176,"name":"Naeem Ali And Babar Ali","father":"Abdul Ghafoor Awan","kanal":192,"marla":0,"amt":9612,"payable_due":9612,"payable_late":10574,"ur_name":"نعیم علی اینڈ بابر علی","ur_father":"عبد ال غفور اعوان"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605308531225","cons":"177000012925","khata":177,"name":"Sajjad Hussain Jutt","father":"SARDAR MUHAMMAD JUTT","kanal":68,"marla":0,"amt":3405,"payable_due":3405,"payable_late":3746,"ur_name":"سجاد حسین جٹ","ur_father":"سردار محمد جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605300723425","cons":"178000012925","khata":178,"name":"Muhammad Afzal","father":"RASHEED AHMAD ARAIN","kanal":32,"marla":0,"amt":1602,"payable_due":1602,"payable_late":1763,"ur_name":"محمد افضل","ur_father":"رشید احمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605303354906","cons":"179000012925","khata":179,"name":"Muhammad Siddiq Jutt","father":"ABDUL GHANI JUTT","kanal":18,"marla":0,"amt":902,"payable_due":902,"payable_late":993,"ur_name":"محمد صدیق جٹ","ur_father":"عبد ال غنی جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605304678883","cons":"180000012925","khata":180,"name":"Muhammad Azeem Jutt","father":"ABDUL GHANI JUTT","kanal":16,"marla":0,"amt":801,"payable_due":801,"payable_late":882,"ur_name":"محمد عظیم جٹ","ur_father":"عبد ال غنی جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605305717664","cons":"181000012925","khata":181,"name":"Allah Ditta Arain","father":"ABDUL HAMEED ARAIN","kanal":154,"marla":0,"amt":7710,"payable_due":7710,"payable_late":8481,"ur_name":"اللہ دتہ آرائیں","ur_father":"عبد ال حمید آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605307909544","cons":"182000012925","khata":182,"name":"Muhammad Irshad Arain","father":"KHAIR UD DEEN","kanal":34,"marla":0,"amt":1703,"payable_due":1703,"payable_late":1874,"ur_name":"محمد ارشاد آرائیں","ur_father":"خیر الد دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605308567921","cons":"183000012925","khata":183,"name":"Allah Ditta Arain","father":"BAHIR AHMAD","kanal":104,"marla":0,"amt":5207,"payable_due":5207,"payable_late":5728,"ur_name":"اللہ دتہ آرائیں","ur_father":"باہر احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605309160897","cons":"184000012925","khata":184,"name":"Muhammad Arshad Arain","father":"MUHAMMAD MUNEER","kanal":18,"marla":0,"amt":902,"payable_due":902,"payable_late":993,"ur_name":"محمد ارشاد آرائیں","ur_father":"محمد منیر"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605309757356","cons":"185000012925","khata":185,"name":"Muhammad Deen","father":"ANAYAT ALI ARAIN","kanal":21,"marla":0,"amt":1052,"payable_due":1052,"payable_late":1158,"ur_name":"محمد دین","ur_father":"عنایت علی آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605302622991","cons":"186000012925","khata":186,"name":"Siraj Deen","father":"ANAYAT ALI","kanal":20,"marla":0,"amt":1002,"payable_due":1002,"payable_late":1103,"ur_name":"سراج دین","ur_father":"عنایت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605305535656","cons":"187000012925","khata":187,"name":"Yasir Nasir And Rashid Ali","father":"BASHARAT ALI","kanal":16,"marla":0,"amt":801,"payable_due":801,"payable_late":882,"ur_name":"یاسر ناصر اینڈ راشد علی","ur_father":"بشارت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605306301780","cons":"188000012925","khata":188,"name":"Rasheed Ahmad","father":"ANAYAT ALI ARAIN","kanal":19,"marla":0,"amt":952,"payable_due":952,"payable_late":1048,"ur_name":"رشید احمد","ur_father":"عنایت علی آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605308592369","cons":"189000012925","khata":189,"name":"Asmat Ullah","father":"LIAQAT ALI","kanal":89,"marla":10,"amt":4481,"payable_due":4481,"payable_late":4930,"ur_name":"عصمت اللہ","ur_father":"لیاقت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605309265501","cons":"190000012925","khata":190,"name":"Parvaiz Ahmad","father":"MUHAMMAD YAQOOB ARAIN","kanal":28,"marla":0,"amt":1402,"payable_due":1402,"payable_late":1543,"ur_name":"پرویز احمد","ur_father":"محمد یعقوب آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605300131455","cons":"191000012925","khata":191,"name":"Arshad Ali","father":"BARKAT ALI ARAIN","kanal":12,"marla":0,"amt":601,"payable_due":601,"payable_late":662,"ur_name":"ارشاد علی","ur_father":"برکت علی آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605302996394","cons":"192000012925","khata":192,"name":"Abdul Ghafoor Arain","father":"Barkat Ali","kanal":12,"marla":0,"amt":601,"payable_due":601,"payable_late":662,"ur_name":"عبد ال غفور آرائیں","ur_father":"برکت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605301577787","cons":"193000012925","khata":193,"name":"Balqees Bibi","father":"ZOJA LIAQUAT ALI","kanal":6,"marla":0,"amt":301,"payable_due":301,"payable_late":332,"ur_name":"بلقیس بی بی","ur_father":"زوجہ لیاقت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605303240171","cons":"194000012925","khata":194,"name":"Mohsin Akram Mughal","father":"MUHAMMAD AKRAM","kanal":220,"marla":0,"amt":11014,"payable_due":11014,"payable_late":12116,"ur_name":"محسن اکرم مغل","ur_father":"محمد اکرم"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605303788657","cons":"195000012925","khata":195,"name":"Ghulam Shabbir Jutt","father":"ALI AHMAD","kanal":88,"marla":0,"amt":4406,"payable_due":4406,"payable_late":4847,"ur_name":"غلام شبیر جٹ","ur_father":"علی احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605304459419","cons":"196000012925","khata":196,"name":"Muhammad Malik Jut","father":"ALI AHMAD JUT","kanal":32,"marla":0,"amt":1602,"payable_due":1602,"payable_late":1763,"ur_name":"محمد ملک جٹ","ur_father":"علی احمد جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605305587691","cons":"197000012925","khata":197,"name":"Ghulam Shabir Jut","father":"MUHAMMAD ALI JUTT","kanal":72,"marla":0,"amt":3605,"payable_due":3605,"payable_late":3966,"ur_name":"غلام شبیر جٹ","ur_father":"محمد علی جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605306278754","cons":"198000012925","khata":198,"name":"Zulfiqar Ali Jut","father":"AKBAR ALI","kanal":51,"marla":0,"amt":2554,"payable_due":2554,"payable_late":2810,"ur_name":"ذوالفقار علی جٹ","ur_father":"اکبر علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605307494200","cons":"199000012925","khata":199,"name":"Muhammad Nawaz Pirhar","father":"UNKNOWN","kanal":24,"marla":0,"amt":1202,"payable_due":1202,"payable_late":1323,"ur_name":"محمد نواز پیرہڑ","ur_father":"نامعلوم"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606015083530","cons":"200000012925","khata":200,"name":"Muhammad Ashraf","father":"MUHAMMAD MUNIR ARAIN","kanal":24,"marla":0,"amt":1202,"payable_due":1202,"payable_late":1323,"ur_name":"محمد اشرف","ur_father":"محمد منیر آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606015683494","cons":"201000012925","khata":201,"name":"Ghulam Rasool Jut","father":"MUHAMMAD ASLAM JUTT","kanal":24,"marla":0,"amt":1202,"payable_due":1202,"payable_late":1323,"ur_name":"غلام رسول جٹ","ur_father":"محمد اسلم جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606015680662","cons":"202000012925","khata":202,"name":"Muhammad Mukhtar","father":"MUHAMMAD IQBAL ARAIN","kanal":81,"marla":0,"amt":4056,"payable_due":4056,"payable_late":4462,"ur_name":"محمد مختار","ur_father":"محمد اقبال آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606021587943","cons":"204000012925","khata":204,"name":"Javed Iqbal","father":"Jutt","kanal":8,"marla":0,"amt":401,"payable_due":401,"payable_late":442,"ur_name":"جاوید اقبال","ur_father":"جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606015798038","cons":"205000012925","khata":205,"name":"Muhammad Ramzan Mughal","father":"WALI MUGHAL","kanal":16,"marla":0,"amt":801,"payable_due":801,"payable_late":882,"ur_name":"محمد رمضان مغل","ur_father":"ولی مغل"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606046982923","cons":"206000012925","khata":206,"name":"Jafar Ali Arain","father":"MUHAMMAD SHAREEF","kanal":48,"marla":0,"amt":2403,"payable_due":2403,"payable_late":2644,"ur_name":"جعفر علی آرائیں","ur_father":"محمد شریف"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606048924836","cons":"207000012925","khata":207,"name":"Muhammad Atif","father":"Muhammad Arshad","kanal":100,"marla":0,"amt":5007,"payable_due":5007,"payable_late":5508,"ur_name":"محمد عاطف","ur_father":"محمد ارشاد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606016672594","cons":"208000012925","khata":208,"name":"Muhammad Iqbal Arain","father":"ABDUL AZIZ","kanal":26,"marla":0,"amt":1302,"payable_due":1302,"payable_late":1433,"ur_name":"محمد اقبال آرائیں","ur_father":"عبد ال عزیز"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606033302774","cons":"209000012925","khata":209,"name":"Muhammad Siddiq Arain","father":"REHMAT ULLAH","kanal":34,"marla":0,"amt":1703,"payable_due":1703,"payable_late":1874,"ur_name":"محمد صدیق آرائیں","ur_father":"رحمت اللہ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606049419659","cons":"210000012925","khata":210,"name":"Abdul Hameed Abdul Rasheed","father":"REHMAT ULLAH ARAIN","kanal":26,"marla":2,"amt":1307,"payable_due":1307,"payable_late":1438,"ur_name":"عبد ال حمید عبد ال رشید","ur_father":"رحمت اللہ آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606022672855","cons":"211000012925","khata":211,"name":"Imran Sohail Arain","father":"MUSHTAQ AHMAD","kanal":100,"marla":0,"amt":5007,"payable_due":5007,"payable_late":5508,"ur_name":"عمران سہیل آرائیں","ur_father":"مشتاق احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606032430571","cons":"212000012925","khata":212,"name":"Muhammad Shareef","father":"CHARAGH DEEN","kanal":19,"marla":0,"amt":952,"payable_due":952,"payable_late":1048,"ur_name":"محمد شریف","ur_father":"چراغ دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605310825839","cons":"213000012925","khata":213,"name":"Faisal Mehmood","father":"ANAYAT ALI ARAIN","kanal":19,"marla":0,"amt":952,"payable_due":952,"payable_late":1048,"ur_name":"فیصل محمود","ur_father":"عنایت علی آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606011845868","cons":"214000012925","khata":214,"name":"Sadiq Ali Arain","father":"CHARAGH DEEN ARAIN","kanal":19,"marla":0,"amt":952,"payable_due":952,"payable_late":1048,"ur_name":"صادق علی آرائیں","ur_father":"چراغ دین آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606027849865","cons":"215000012925","khata":215,"name":"Ashiq Hussain","father":"CHARAGH DEEN ARAIN","kanal":19,"marla":0,"amt":952,"payable_due":952,"payable_late":1048,"ur_name":"عاشق حسین","ur_father":"چراغ دین آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606025274757","cons":"216000012925","khata":216,"name":"Muhammad Sardar Arain","father":"CHARAGH DEEN ARAIN","kanal":19,"marla":0,"amt":952,"payable_due":952,"payable_late":1048,"ur_name":"محمد سردار آرائیں","ur_father":"چراغ دین آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606018829471","cons":"217000012925","khata":217,"name":"Muhammad Akram","father":"WALI MUHAMMAD ARAIN","kanal":10,"marla":16,"amt":541,"payable_due":541,"payable_late":596,"ur_name":"محمد اکرم","ur_father":"ولی محمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606019090208","cons":"218000012925","khata":218,"name":"Muhammad Aslam Arain","father":"WALI MUHAMMAD","kanal":24,"marla":0,"amt":1202,"payable_due":1202,"payable_late":1323,"ur_name":"محمد اسلم آرائیں","ur_father":"ولی محمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606045972067","cons":"219000012925","khata":219,"name":"Muhammad Amjad","father":"WALI MUHAMMAD ARAIN","kanal":21,"marla":17,"amt":1094,"payable_due":1094,"payable_late":1204,"ur_name":"محمد امجد","ur_father":"ولی محمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606045114844","cons":"220000012925","khata":220,"name":"Zahid Mehmood Brothers","father":"ALI MUHAMMAD ARAIN","kanal":42,"marla":6,"amt":2118,"payable_due":2118,"payable_late":2330,"ur_name":"زاہد محمود برادرز","ur_father":"علی محمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606015219246","cons":"221000012925","khata":221,"name":"Alamdar Hussain Shah","father":"TALIB HUSSAIN SHAH","kanal":200,"marla":0,"amt":10013,"payable_due":10013,"payable_late":11015,"ur_name":"عالمدار حسین شاہ","ur_father":"طالب حسین شاہ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606022545805","cons":"222000012925","khata":222,"name":"General Muhammad Nawaz","father":"MUHAMMAD HABIB KHAN","kanal":400,"marla":0,"amt":20025,"payable_due":20025,"payable_late":22028,"ur_name":"جنرل محمد نواز","ur_father":"محمد حبیب خان"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606045150024","cons":"223000012925","khata":223,"name":"Master Arif Ali Jutt","father":"UNKNOWN","kanal":248,"marla":0,"amt":12416,"payable_due":12416,"payable_late":13658,"ur_name":"ماسٹر عارف علی جٹ","ur_father":"نامعلوم"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606034167037","cons":"224000012925","khata":224,"name":"Muhammad Ishfaq","father":"Wilayat Khan Gujjar","kanal":160,"marla":0,"amt":8010,"payable_due":8010,"payable_late":8811,"ur_name":"محمد اشفاق","ur_father":"ولایت خان گوجر"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606016297323","cons":"225000012925","khata":225,"name":"Muhammad Yousaf Jutt","father":"MUHAMMAD DEEN","kanal":314,"marla":0,"amt":15720,"payable_due":15720,"payable_late":17292,"ur_name":"محمد یوسف جٹ","ur_father":"محمد دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606017442942","cons":"226000012925","khata":226,"name":"Hafeez Ullah Arain","father":"AHMAD LATEEF","kanal":300,"marla":0,"amt":19819,"payable_due":19819,"payable_late":21801,"ur_name":"حفیظ اللہ آرائیں","ur_father":"احمد لطیف"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606041945163","cons":"227000012925","khata":227,"name":"Muhammad Rafiq","father":"MUHAMMAD RAMZAN","kanal":50,"marla":0,"amt":2504,"payable_due":2504,"payable_late":2755,"ur_name":"محمد رفیق","ur_father":"محمد رمضان"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605303765091","cons":"228000012925","khata":228,"name":"Abdul Rasheed Arain","father":"MUHAMMAD RAMZAN","kanal":50,"marla":0,"amt":2504,"payable_due":2504,"payable_late":2755,"ur_name":"عبد ال رشید آرائیں","ur_father":"محمد رمضان"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606025305370","cons":"229000012925","khata":229,"name":"Shahid Rasool","father":"AMANULLAH","kanal":33,"marla":0,"amt":1653,"payable_due":1653,"payable_late":1819,"ur_name":"شاہد رسول","ur_father":"امان اللہ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606040367491","cons":"230000012925","khata":230,"name":"Asif Rasool Rajpoot","father":"AMANULLAH","kanal":34,"marla":0,"amt":1703,"payable_due":1703,"payable_late":1874,"ur_name":"آصف رسول راجپوت","ur_father":"امان اللہ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606019463157","cons":"231000012925","khata":231,"name":"Irshad Ahmad Shahbaz Ahmad","father":"MUHAMMAD NAZIR JUTT","kanal":33,"marla":0,"amt":1653,"payable_due":1653,"payable_late":1819,"ur_name":"ارشاد احمد شہباز احمد","ur_father":"محمد نذیر جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606026953150","cons":"232000012925","khata":232,"name":"Arif Ali Arain","father":"ASGHAR ALI","kanal":40,"marla":0,"amt":2003,"payable_due":2003,"payable_late":2204,"ur_name":"عارف علی آرائیں","ur_father":"اصغر علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605311642456","cons":"233000012925","khata":233,"name":"Shafaqat Ali Arain","father":"Asghar Ali","kanal":32,"marla":0,"amt":1602,"payable_due":1602,"payable_late":1763,"ur_name":"شفاعت علی آرائیں","ur_father":"اصغر علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606041117969","cons":"234000012925","khata":234,"name":"Jiwana","father":"QAIM DEEN","kanal":24,"marla":0,"amt":1202,"payable_due":1202,"payable_late":1323,"ur_name":"جیوانا","ur_father":"قائم دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606030898405","cons":"235000012925","khata":235,"name":"Bakht Buland Arain","father":"MUHAMMAD HANEEF","kanal":100,"marla":0,"amt":5007,"payable_due":5007,"payable_late":5508,"ur_name":"بخت بلند آرائیں","ur_father":"محمد حنیف"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606032858823","cons":"236000012925","khata":236,"name":"Waris Ali Arain","father":"Akbar Ali","kanal":291,"marla":0,"amt":14569,"payable_due":14569,"payable_late":16026,"ur_name":"وارث علی آرائیں","ur_father":"اکبر علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606018963883","cons":"237000012925","khata":237,"name":"Muhammad Nawaz Jut","father":"MUHAMMAD ASLAM","kanal":24,"marla":0,"amt":1202,"payable_due":1202,"payable_late":1323,"ur_name":"محمد نواز جٹ","ur_father":"محمد اسلم"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605304225508","cons":"238000012925","khata":238,"name":"Muhammad Saeed Jutt","father":"MUHAMMAD ASLAM","kanal":24,"marla":0,"amt":1202,"payable_due":1202,"payable_late":1323,"ur_name":"محمد سعید جٹ","ur_father":"محمد اسلم"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606046864495","cons":"239000012925","khata":239,"name":"Basharat Ali Jutt","father":"TALIB HUSSAIN","kanal":18,"marla":0,"amt":902,"payable_due":902,"payable_late":993,"ur_name":"بشارت علی جٹ","ur_father":"طالب حسین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605304603326","cons":"240000012925","khata":240,"name":"Shoukat Ali","father":"MUHAMMAD HUSSAIN","kanal":8,"marla":5,"amt":414,"payable_due":414,"payable_late":456,"ur_name":"شوکت علی","ur_father":"محمد حسین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606014834834","cons":"241000012925","khata":241,"name":"Imran Ali","father":"Muhammad Saleem","kanal":7,"marla":15,"amt":388,"payable_due":388,"payable_late":427,"ur_name":"عمران علی","ur_father":"محمد سلیم"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606016715075","cons":"242000012925","khata":242,"name":"Rashid Ali","father":"GHULAM SARWAR JUTT","kanal":86,"marla":0,"amt":4306,"payable_due":4306,"payable_late":4737,"ur_name":"راشد علی","ur_father":"غلام سرور جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606010049499","cons":"243000012925","khata":243,"name":"Abdul Majid","father":"GHULAM SARWAR JUTT","kanal":64,"marla":0,"amt":3204,"payable_due":3204,"payable_late":3525,"ur_name":"عبد ال ماجد","ur_father":"غلام سرور جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606029995776","cons":"244000012925","khata":244,"name":"Muhammad Amjad Ali","father":"GHULAM SARWAR JUTT","kanal":64,"marla":0,"amt":3204,"payable_due":3204,"payable_late":3525,"ur_name":"محمد امجد علی","ur_father":"غلام سرور جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606038032595","cons":"245000012925","khata":245,"name":"Ghulam Rasool Rajpoot","father":"AMANULLAH","kanal":50,"marla":0,"amt":2504,"payable_due":2504,"payable_late":2755,"ur_name":"غلام رسول راجپوت","ur_father":"امان اللہ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606023528184","cons":"246000012925","khata":246,"name":"Anwar Ul Haq Rajpoot","father":"ABDUL SHAKOOR","kanal":50,"marla":0,"amt":2504,"payable_due":2504,"payable_late":2755,"ur_name":"انور ال حق راجپوت","ur_father":"عبد ال شکور"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606016839408","cons":"247000012925","khata":247,"name":"Muhammad Ishfaq Arain","father":"Abdul Rehman","kanal":66,"marla":0,"amt":3305,"payable_due":3305,"payable_late":3636,"ur_name":"محمد اشفاق آرائیں","ur_father":"عبد ال رحمان"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606025777372","cons":"248000012925","khata":248,"name":"Shakeel Ahmad","father":"SARDAR ALI","kanal":20,"marla":0,"amt":1002,"payable_due":1002,"payable_late":1103,"ur_name":"شکیل احمد","ur_father":"سردار علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606017790780","cons":"249000012925","khata":249,"name":"Zulfiqar Ali","father":"AKBAR ALI JUTT","kanal":12,"marla":0,"amt":601,"payable_due":601,"payable_late":662,"ur_name":"ذوالفقار علی","ur_father":"اکبر علی جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606043680701","cons":"250000012925","khata":250,"name":"Waqar Ahmad Arain","father":"MUSHTAQ AHMAD","kanal":18,"marla":0,"amt":902,"payable_due":902,"payable_late":993,"ur_name":"وقار احمد آرائیں","ur_father":"مشتاق احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606024198831","cons":"251000012925","khata":251,"name":"Muhammad Mohsin","father":"MUHAMMAD ASLAM ARAIN","kanal":56,"marla":0,"amt":2804,"payable_due":2804,"payable_late":3085,"ur_name":"محمد محسن","ur_father":"محمد اسلم آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606023334552","cons":"252000012925","khata":252,"name":"Muhammad Anwar Arain","father":"ABDUL AZIZ","kanal":8,"marla":0,"amt":401,"payable_due":401,"payable_late":442,"ur_name":"محمد انور آرائیں","ur_father":"عبد ال عزیز"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606019392804","cons":"254000012925","khata":254,"name":"Riaz Ahmad Pirhar","father":"Allah Diwaya","kanal":220,"marla":0,"amt":11014,"payable_due":11014,"payable_late":12116,"ur_name":"ریاض احمد پیرہڑ","ur_father":"اللہ دوایا"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606019419552","cons":"255000012925","khata":255,"name":"Sadiq Ali Arain","father":"MUHAMMAD IBRAHIM","kanal":16,"marla":14,"amt":837,"payable_due":837,"payable_late":921,"ur_name":"صادق علی آرائیں","ur_father":"محمد ابراہیم"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606021368087","cons":"256000012925","khata":256,"name":"Arif Ali","father":"MUHAMMAD IBRAHIM","kanal":16,"marla":15,"amt":839,"payable_due":839,"payable_late":923,"ur_name":"عارف علی","ur_father":"محمد ابراہیم"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606027940325","cons":"257000012925","khata":257,"name":"Abdul Sattar","father":"MUHAMMAD IBRAHIM ARAIN","kanal":16,"marla":13,"amt":834,"payable_due":834,"payable_late":918,"ur_name":"عبد ال ستار","ur_father":"محمد ابراہیم آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606024171509","cons":"258000012925","khata":258,"name":"Muhammad Javed","father":"HASHMAT ALI ARAIN","kanal":20,"marla":0,"amt":1002,"payable_due":1002,"payable_late":1103,"ur_name":"محمد جاوید","ur_father":"حشمت علی آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606036217920","cons":"259000012925","khata":259,"name":"Muhammad Bilal Jutt","father":"Abdul Majeed","kanal":30,"marla":0,"amt":1502,"payable_due":1502,"payable_late":1653,"ur_name":"محمد بلال جٹ","ur_father":"عبد ال مجید"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606030738654","cons":"260000012925","khata":260,"name":"Ghulam Yaseen Malik","father":"Gull Muhammad","kanal":100,"marla":0,"amt":5007,"payable_due":5007,"payable_late":5508,"ur_name":"غلام یٰسین ملک","ur_father":"گل محمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606035653315","cons":"261000012925","khata":261,"name":"Muhammad Akhtar Pirhar","father":"Abdul Khaliq","kanal":100,"marla":0,"amt":5007,"payable_due":5007,"payable_late":5508,"ur_name":"محمد اختر پیرہڑ","ur_father":"عبد ال خالق"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606041970569","cons":"262000012925","khata":262,"name":"Asif Ali Arain","father":"ASHIQ ALI","kanal":40,"marla":0,"amt":2003,"payable_due":2003,"payable_late":2204,"ur_name":"آصف علی آرائیں","ur_father":"عاشق علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606049130630","cons":"264000012925","khata":264,"name":"Muhammad Shareef","father":"SOHRAB KORAI","kanal":112,"marla":0,"amt":5607,"payable_due":5607,"payable_late":6168,"ur_name":"محمد شریف","ur_father":"سہراب کورائی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606018170701","cons":"265000012925","khata":265,"name":"Faqeer Bakhsh Patafi","father":"NABI BAKHSH PATAFI","kanal":100,"marla":0,"amt":5007,"payable_due":5007,"payable_late":5508,"ur_name":"فقیر بخش پتافی","ur_father":"نبی بخش پتافی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606040411194","cons":"266000012925","khata":266,"name":"Jan Muhammad Pirhar","father":"Gull Muhammad","kanal":90,"marla":0,"amt":4506,"payable_due":4506,"payable_late":4957,"ur_name":"جان محمد پیرہڑ","ur_father":"گل محمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605310314621","cons":"268000012925","khata":268,"name":"Saif Ul Rehman Arain","father":"Namet Ali","kanal":30,"marla":0,"amt":1502,"payable_due":1502,"payable_late":1653,"ur_name":"سیف ال رحمان آرائیں","ur_father":"نامت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606028676847","cons":"269000012925","khata":269,"name":"Muhammad Muneer","father":"GHULAM HUSSAIN ARAIN","kanal":68,"marla":0,"amt":3405,"payable_due":3405,"payable_late":3746,"ur_name":"محمد منیر","ur_father":"غلام حسین آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606030785873","cons":"270000012925","khata":270,"name":"Khizar Mehmood Rajpoot","father":"RIAZ AHMAD","kanal":200,"marla":0,"amt":10013,"payable_due":10013,"payable_late":11015,"ur_name":"خضر محمود راجپوت","ur_father":"ریاض احمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606021101826","cons":"271000012925","khata":271,"name":"Muhammad Boota Arain","father":"ABDUL SALAM","kanal":100,"marla":0,"amt":5007,"payable_due":5007,"payable_late":5508,"ur_name":"محمد بوٹا آرائیں","ur_father":"عبد ال سلام"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606023302050","cons":"272000012925","khata":272,"name":"Safdar Hussain Arain","father":"Barkat Ali","kanal":120,"marla":0,"amt":6008,"payable_due":6008,"payable_late":6609,"ur_name":"صفدر حسین آرائیں","ur_father":"برکت علی"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606024834108","cons":"273000012925","khata":273,"name":"Abdul Hameed Abdul Rasheed","father":"REHMAT ULLAH ARAIN","kanal":52,"marla":0,"amt":2604,"payable_due":2604,"payable_late":2865,"ur_name":"عبد ال حمید عبد ال رشید","ur_father":"رحمت اللہ آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606021144464","cons":"274000012925","khata":274,"name":"Muhammad Sajjad Arain","father":"ABDUL SALAM","kanal":112,"marla":13,"amt":5640,"payable_due":5640,"payable_late":6204,"ur_name":"محمد سجاد آرائیں","ur_father":"عبد ال سلام"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606042772929","cons":"275000012925","khata":275,"name":"Sabir Ali Arain","father":"GHULAM MUHAMMAD","kanal":16,"marla":13,"amt":834,"payable_due":834,"payable_late":918,"ur_name":"صابر علی آرائیں","ur_father":"غلام محمد"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606041603994","cons":"276000012925","khata":276,"name":"Muhammad Youasf","father":"GHULAM MUHAMMAD ARAIN","kanal":16,"marla":13,"amt":834,"payable_due":834,"payable_late":918,"ur_name":"محمد یوسف","ur_father":"غلام محمد آرائیں"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606029736735","cons":"277000012925","khata":277,"name":"Abdullah Arain","father":"Abdul Khaliq","kanal":16,"marla":14,"amt":837,"payable_due":837,"payable_late":921,"ur_name":"عبد اللہ آرائیں","ur_father":"عبد ال خالق"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606020800460","cons":"278000012925","khata":278,"name":"Muhammad Hussain","father":"ASHIQ HUSSAIN","kanal":50,"marla":0,"amt":2504,"payable_due":2504,"payable_late":2755,"ur_name":"محمد حسین","ur_father":"عاشق حسین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412605317112026","cons":"279000012925","khata":279,"name":"Muhammad Yousaf Jutt","father":"FAZAL DEEN","kanal":66,"marla":13,"amt":3337,"payable_due":3337,"payable_late":3671,"ur_name":"محمد یوسف جٹ","ur_father":"فضل دین"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606034155812","cons":"280000012925","khata":280,"name":"Muhammad Saeed Motan Wala","father":"ABDUL RASHEED JUTT","kanal":66,"marla":14,"amt":3340,"payable_due":3340,"payable_late":3674,"ur_name":"محمد سعید موٹان والا","ur_father":"عبد ال رشید جٹ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606011598089","cons":"281000012925","khata":281,"name":"Abdul Hameed","father":"JADOO FAQEER","kanal":66,"marla":13,"amt":3337,"payable_due":3337,"payable_late":3671,"ur_name":"عبد ال حمید","ur_father":"جادو فقیر"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606036719103","cons":"282000012925","khata":282,"name":"Muhammad Saleem","father":"Hassu Pirhar","kanal":17,"marla":0,"amt":852,"payable_due":852,"payable_late":938,"ur_name":"محمد سلیم","ur_father":"حسو پیرہڑ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606034164333","cons":"283000012925","khata":283,"name":"Azeem Bakhsh","father":"Hassu Pirhar","kanal":17,"marla":0,"amt":852,"payable_due":852,"payable_late":938,"ur_name":"عظیم بخش","ur_father":"حسو پیرہڑ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606018327424","cons":"284000012925","khata":284,"name":"Hakeem Ali","father":"Hassu Pirhar","kanal":17,"marla":0,"amt":852,"payable_due":852,"payable_late":938,"ur_name":"حکیم علی","ur_father":"حسو پیرہڑ"},{"season_id":"rabi2026","season":"Rabi 2026","issue":"04/06/2026","due":"17/11/2026","ref":"40412606017218524","cons":"300000012925","khata":300,"name":"Muhammad Amjad","father":"Bashir Ahmad","kanal":104,"marla":0,"amt":5207,"payable_due":5207,"payable_late":5728,"ur_name":"محمد امجد","ur_father":"بشیر احمد"}];
+var SEASONS = {
+  kharif2025: { id:"kharif2025", label:"Kharif 2025", ur:"خریف 2025", due:"15/06/2026" },
+  rabi2026:   { id:"rabi2026",   label:"Rabi 2026",   ur:"ربیع 2026", due:"17/11/2026" }
+};
+var SEASON_ORDER = ["kharif2025","rabi2026"];
+
+/* ==================== STORAGE ==================== */
+var LS_PAY = "abiana_payments_v1", LS_CUSTOM = "abiana_custom_bills_v1",
+    LS_PIN = "abiana_pin_hash", LS_LANG = "abiana_print_lang", LS_SEASON = "abiana_season";
+function lsGet(k, dflt){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : dflt; }catch(e){ return dflt; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function lsGetRaw(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSetRaw(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+
+var payments = lsGet(LS_PAY, {});          // {season_id:{khata:[{amount,date,note,ts}]}}
+var customBills = lsGet(LS_CUSTOM, []);     // [bill,...]
+var printLang = lsGetRaw(LS_LANG) || "bi";
+
+/* ==================== STATE ==================== */
+var seasonFilter = (function(){ var s = lsGetRaw(LS_SEASON); return (s==="rabi2026" || s==="kharif2025") ? s : "kharif2025"; })();  // exactly ONE season at a time
+var statusFilter = "All";
+var searchQuery = "";
+var currentBill = null;         // bill open in detail view
+var editPayIdx = -1;            // payment index being edited in detail
+
+/* ==================== HELPERS ==================== */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function fmt(n){ return "Rs " + Number(n||0).toLocaleString("en-US"); }
+function fmtN(n){ return Number(n||0).toLocaleString("en-US"); }
+function todayStr(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function ddmmyyyy(iso){ if(!iso) return ""; var p=String(iso).split("-"); if(p.length===3) return p[2]+"/"+p[1]+"/"+p[0]; return iso; }
+function nowDmy(){ var p=todayStr().split("-"); return p[2]+"/"+p[1]+"/"+p[0]; }
+function areaStr(b){ return b.kanal + "K " + b.marla + "M"; }
+
+/* Effective payable amount: Kharif 2025's due date (15/06/2026) has passed, so every
+   Kharif bill is payable WITH late fees (payable_late). Rabi 2026 uses the plain amount.
+   The embedded bill records themselves are never altered. */
+function effAmt(b){ return b.season_id==="kharif2025" ? (b.payable_late!=null ? b.payable_late : b.amt) : b.amt; }
+
+/* Per-season display override for the collection last date (bill data keeps its printed due date).
+   Rabi 2026: the Assistant Commissioner has set 27/10/2026 as the last date for collection. */
+var SEASON_LAST_DATE = { kharif2025:"15/06/2026", rabi2026:"27/10/2026" };
+function seasonLastDate(sid){ return SEASON_LAST_DATE[sid] || (SEASONS[sid] ? SEASONS[sid].due : ""); }
+function lastDateOf(b){ return seasonLastDate(b.season_id); }
+
+function allBills(){ return BILLS.concat(customBills); }
+function billsFor(season){ var a = allBills(); if(season && season!=="all") a = a.filter(function(b){ return b.season_id===season; }); return a.slice().sort(function(x,y){ return x.khata - y.khata; }); }
+function findBill(seasonId, khata){ var a = allBills(); for(var i=0;i<a.length;i++){ if(a[i].season_id===seasonId && a[i].khata===khata) return a[i]; } return null; }
+/* Payments are keyed by season + khata. A bill may carry its own pkey when a second,
+   separate bill exists for the same khata in the same season (the seeded baqaya bills
+   for Khata 206/248) — their payments must stay independent of the original bill's. */
+function payKey(bill){ return bill.pkey || bill.khata; }
+function getPays(bill){ try{ return (payments[bill.season_id] && payments[bill.season_id][payKey(bill)]) || []; }catch(e){ return []; } }
+function paidRaw(bill){ return getPays(bill).reduce(function(s,p){ return s + Number(p.amount||0); }, 0); }
+function paidCapped(bill){ return Math.min(paidRaw(bill), effAmt(bill)); }
+function remaining(bill){ return Math.max(0, effAmt(bill) - paidRaw(bill)); }
+function statusOf(bill){ var p = paidRaw(bill); if(p >= effAmt(bill)) return "Paid"; if(p > 0) return "Partial"; return "Unpaid"; }
+function savePayments(){ lsSet(LS_PAY, payments); }
+function addPayment(bill, amount, date, note){
+  if(!payments[bill.season_id]) payments[bill.season_id] = {};
+  var pk = payKey(bill);
+  if(!payments[bill.season_id][pk]) payments[bill.season_id][pk] = [];
+  payments[bill.season_id][pk].push({ amount:Number(amount), date:date, note:note||"", ts:Date.now() });
+  savePayments();
+}
+
+var ONES=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+var TENS=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+function twoWords(n){ if(n<20) return ONES[n]; var t=Math.floor(n/10), r=n%10; return TENS[t]+(r?" "+ONES[r]:""); }
+function threeWords(n){ var h=Math.floor(n/100), r=n%100; return (h?ONES[h]+" Hundred"+(r?" ":""):"")+(r?twoWords(r):""); }
+function amountWords(num){
+  num = Math.floor(Math.abs(Number(num)||0)); if(num===0) return "Zero";
+  var parts=[], scales=[[1000000000,"Billion"],[1000000,"Million"],[1000,"Thousand"],[1,""]];
+  for(var i=0;i<scales.length;i++){ var v=scales[i][0]; if(num>=v){ var q=Math.floor(num/v); parts.push(threeWords(q)+" "+scales[i][1]); num%=v; } }
+  return parts.join(" ").replace(/\s+/g," ").trim();
+}
+
+/* ==================== SEED — video statuses (official eAbiana app, 22 Oct 2026) ====================
+   Rule (per Numberdar): bills shown UNPAID in the video are the only ones still owed;
+   bills shown "Collected" were received in cash by the Numberdar (not yet deposited onward);
+   every other bill is already Paid. Seeded ONCE as full payments of the effective amount
+   (Kharif = with late fees). Never overwrites or repeats once any payments exist. */
+var LS_SEEDED = "abiana_seeded_v3";
+var SEED_UNPAID = {
+  kharif2025: [6,14,35,37,43,45,49,50,57,102,160,177,181,182,188,202,205,208,209,211,226,231,241,251,264,266,276,277,280,282,283],
+  rabi2026: [6,14,18,22,24,27,30,34,35,37,43,47,49,50,52,54,57,59,61,82,85,143,160,161,166,167,170,171,173,175,176,181,182,185,186,188,190,191,192,193,195,200,201,202,204,205,208,209,213,214,217,220,222,224,226,227,228,229,230,231,233,234,236,240,242,243,244,245,246,249,251,252,256,258,260,261,266,272,276,277,278,279,280,282,283,284]
+};
+var SEED_COLLECTED = {
+  kharif2025: [34,36,38,64,178,180,232,247,256,259],
+  rabi2026: [8,225,264]
+};
+/* Adjustments by the Numberdar, 22 Oct 2026:
+   - Khata 206 (both seasons) and Khata 248 (Kharif): bills are PAID (settled in the
+     Numberdar's own hisab) — full seed payment, but with the hisab note below.
+   - Rabi Khata 186 (Siraj Deen): the bill has two fareeq; Nasir paid Rs 617 for one
+     share — partial seed payment, Rs 385 remains.
+   - Shakeel Ahmad (Khata 248) Rs 1,630 and Jafar Ali Arain (Khata 206) Rs 1,000 are
+     still UNPAID as bills (Numberdar's hisab) — seeded below as extra Rabi 2026
+     custom bills with NO payment. Their original bills stay Paid as decided above.
+     Each seeded bill carries seeded:true and its own pkey, so its payments are
+     tracked independently of the original bill with the same khata. */
+var SEED_NOTE_OVERRIDE = { kharif2025: {206:1, 248:1}, rabi2026: {206:1} };
+var SEED_PARTIAL = { rabi2026: { 186: { amount:617, note:"Nasir ne diye — is bill ke do fareeq hain, aik fareeq ka hissa ada (22 Oct 2026)" } } };
+var SEED_CUSTOM_BILLS = [
+  { season_id:"rabi2026", khata:248, name:"Shakeel Ahmad", father:"SARDAR ALI", ur_name:"شکیل احمد", ur_father:"سردار علی", kanal:20, marla:0, amt:1630 },
+  { season_id:"rabi2026", khata:206, name:"Jafar Ali Arain", father:"MUHAMMAD SHAREEF", ur_name:"جعفر علی آرائیں", ur_father:"محمد شریف", kanal:48, marla:0, amt:1000 }
+];
+function seedCustomBaqayaBills(){
+  SEED_CUSTOM_BILLS.forEach(function(sc){
+    var exists = customBills.some(function(x){ return x.seeded && x.season_id===sc.season_id && x.khata===sc.khata; });
+    if(exists) return;  // never duplicate a seeded bill
+    customBills.push({ season_id:sc.season_id, season:SEASONS[sc.season_id].label, issue:"22/10/2026", due:SEASONS[sc.season_id].due,
+      ref:"", cons: sc.khata + "0000" + "12925", khata:sc.khata, name:sc.name, father:sc.father,
+      ur_name:sc.ur_name, ur_father:sc.ur_father, kanal:sc.kanal, marla:sc.marla,
+      amt:sc.amt, payable_due:sc.amt, payable_late:sc.amt,
+      custom:true, seeded:true, pkey:"seed_" + sc.season_id + "_" + sc.khata,
+      note:"Bill baqaya — Numberdar ke hisab se (22 Oct 2026)" });
+  });
+  lsSet(LS_CUSTOM, customBills);
+}
+function seedVideoStatuses(){
+  if(lsGetRaw(LS_SEEDED)) return;
+  for(var k in payments){ if(payments[k] && Object.keys(payments[k]).length) return; }  // payments already exist — never re-seed
+  BILLS.forEach(function(b){
+    var un = SEED_UNPAID[b.season_id] || [];
+    if(un.indexOf(b.khata) !== -1){
+      var part = (SEED_PARTIAL[b.season_id] || {})[b.khata];
+      if(part) addPayment(b, part.amount, "2026-10-22", part.note);  // partial share paid — rest remains
+      return;  // still owed (fully or partly) — no full payment
+    }
+    var coll = (SEED_COLLECTED[b.season_id] || []).indexOf(b.khata) !== -1;
+    var over = !!((SEED_NOTE_OVERRIDE[b.season_id] || {})[b.khata]);
+    var note = over
+      ? "Paid — Numberdar ke hisab se ada shuda (22 Oct 2026)"
+      : coll
+      ? "Collected — official eAbiana app (video 22 Oct 2026). Paisay Numberdar ke paas, jama baqi."
+      : "Paid — official eAbiana app video mein show nahi (22 Oct 2026)";
+    addPayment(b, effAmt(b), "2026-10-22", note);
+  });
+  seedCustomBaqayaBills();
+  lsSetRaw(LS_SEEDED, "1");
+}
+
+/* ==================== PIN (screen lock only) ==================== */
+function simpleHash(str){ var h1=0xdeadbeef, h2=0x41c6ce57; for(var i=0;i<str.length;i++){ var ch=str.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677); } h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909); return (h2>>>0).toString(16).padStart(8,"0")+(h1>>>0).toString(16).padStart(8,"0"); }
+function hashPin(pin){
+  var salted = "abiana::" + pin;
+  if(window.crypto && crypto.subtle && crypto.subtle.digest){
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(salted)).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+    }).catch(function(){ return simpleHash(salted); });
+  }
+  return Promise.resolve(simpleHash(salted));
+}
+function showLock(){
+  var has = !!lsGetRaw(LS_PIN);
+  $("pinSetupWrap").style.display = has ? "none" : "block";
+  $("pinUnlockWrap").style.display = has ? "block" : "none";
+  $("pinSetupMsg").textContent = ""; $("pinUnlockMsg").textContent = "";
+  $("lockScreen").classList.add("open");
+  var t = has ? $("pinEnter") : $("pinNew"); if(t) t.focus();
+}
+function hideLock(){ $("lockScreen").classList.remove("open"); }
+$("pinSetBtn").addEventListener("click", function(){
+  var a = $("pinNew").value.trim(), b = $("pinConfirm").value.trim();
+  if(!/^\d{4,6}$/.test(a)){ $("pinSetupMsg").textContent = "PIN must be 4–6 digits."; return; }
+  if(a !== b){ $("pinSetupMsg").textContent = "PINs do not match. Try again."; return; }
+  hashPin(a).then(function(h){ lsSetRaw(LS_PIN, h); $("pinNew").value=""; $("pinConfirm").value=""; hideLock(); });
+});
+$("pinUnlockBtn").addEventListener("click", tryUnlock);
+$("pinEnter").addEventListener("keydown", function(e){ if(e.key==="Enter") tryUnlock(); });
+function tryUnlock(){
+  var a = $("pinEnter").value.trim();
+  if(!a){ return; }
+  hashPin(a).then(function(h){
+    if(h === lsGetRaw(LS_PIN)){ $("pinEnter").value=""; hideLock(); }
+    else { $("pinUnlockMsg").textContent = "Wrong PIN. Try again."; $("pinEnter").value=""; }
+  });
+}
+
+/* ==================== NAVIGATION ==================== */
+function switchView(name){
+  var views = document.querySelectorAll(".view");
+  for(var i=0;i<views.length;i++) views[i].classList.toggle("active", views[i].id === "view-"+name);
+  var btns = document.querySelectorAll("nav button");
+  for(var j=0;j<btns.length;j++) btns[j].classList.toggle("on", btns[j].getAttribute("data-view")===name);
+  $("addBillBtn").classList.toggle("show", name==="farmers");
+  window.scrollTo(0,0);
+  if(name==="dashboard") renderDashboard();
+  if(name==="farmers") renderFarmers();
+}
+var navBtns = document.querySelectorAll("nav button");
+for(var nb=0; nb<navBtns.length; nb++){ (function(btn){ btn.addEventListener("click", function(){ switchView(btn.getAttribute("data-view")); }); })(navBtns[nb]); }
+function setSeason(sid){
+  if(!SEASONS[sid]) sid = "kharif2025";
+  seasonFilter = sid;
+  lsSetRaw(LS_SEASON, sid);
+  var sb = document.querySelectorAll("#seasonSel button");
+  for(var i=0;i<sb.length;i++) sb[i].classList.toggle("on", sb[i].getAttribute("data-season")===sid);
+  var ps = $("pSeason"); if(ps) ps.value = sid;
+  renderDashboard(); renderFarmers();
+}
+var seasonBtns = document.querySelectorAll("#seasonSel button");
+for(var sbi=0; sbi<seasonBtns.length; sbi++){ (function(btn){ btn.addEventListener("click", function(){ setSeason(btn.getAttribute("data-season")); }); })(seasonBtns[sbi]); }
+
+/* ==================== DASHBOARD ==================== */
+function seasonStats(season){
+  var bs = billsFor(season), tot=0, coll=0, np=0, npa=0, nu=0;
+  bs.forEach(function(b){ tot += effAmt(b); coll += paidCapped(b); var s = statusOf(b); if(s==="Paid") np++; else if(s==="Partial") npa++; else nu++; });
+  return { bills:bs, total:tot, coll:coll, rem:tot-coll, paid:np, partial:npa, unpaid:nu, pct: tot? Math.round(coll/tot*1000)/10 : 0 };
+}
+function renderDashboard(){
+  var st = seasonStats(seasonFilter);
+  $("dTotal").textContent = fmt(st.total);
+  $("dColl").textContent = fmt(st.coll);
+  $("dRem").textContent = fmt(st.rem);
+  $("dCount").textContent = fmtN(st.bills.length);
+  $("dPct").textContent = st.pct + "%";
+  $("dProg").style.width = Math.min(100, st.pct) + "%";
+  $("dPaid").textContent = st.paid; $("dPartial").textContent = st.partial; $("dUnpaid").textContent = st.unpaid;
+  var sc = "";
+  [seasonFilter].forEach(function(sid){
+    var s = seasonStats(sid);
+    sc += '<div class="seasoncard"><h3>' + esc(SEASONS[sid].label) + ' <span class="urdu mut" style="font-weight:400">' + esc(SEASONS[sid].ur) + '</span></h3>'
+      + '<div class="grid"><div>Bills<b>' + fmtN(s.bills.length) + '</b></div><div>Total<b>' + fmt(s.total) + '</b></div>'
+      + '<div>Collected<b>' + fmt(s.coll) + '</b></div><div>Remaining<b>' + fmt(s.rem) + '</b></div><div>Last Date<b>' + seasonLastDate(sid) + '</b></div><div>Done<b>' + s.pct + '%</b></div></div></div>';
+  });
+  $("seasonCards").innerHTML = sc;
+  var all = [];
+  billsFor(seasonFilter).forEach(function(b){ getPays(b).forEach(function(p){ all.push({ bill:b, p:p }); }); });
+  all.sort(function(a,b){ return (b.p.ts||0) - (a.p.ts||0); });
+  all = all.slice(0,10);
+  if(!all.length){ $("recentList").innerHTML = '<div class="empty">No payments recorded yet.<br><span class="small">Open a farmer and tap “Add Payment”.</span></div>'; return; }
+  $("recentList").innerHTML = all.map(function(x){
+    return '<div class="recent"><div><b>' + esc(x.bill.name) + '</b> <span class="mut">· Khata ' + x.bill.khata + ' · ' + esc(SEASONS[x.bill.season_id].label) + '</span><br><span class="mut small">' + esc(ddmmyyyy(x.p.date)) + (x.p.note ? ' · ' + esc(x.p.note) : '') + '</span></div><div class="amt">' + fmt(x.p.amount) + '</div></div>';
+  }).join("");
+}
+
+/* ==================== FARMERS LIST ==================== */
+$("searchInput").addEventListener("input", function(){ searchQuery = this.value.trim().toLowerCase(); renderFarmers(); });
+var chips = document.querySelectorAll("#filterChips .chip");
+for(var ci=0; ci<chips.length; ci++){ (function(ch){ ch.addEventListener("click", function(){
+  for(var k=0;k<chips.length;k++) chips[k].classList.remove("on"); ch.classList.add("on");
+  statusFilter = ch.getAttribute("data-f"); renderFarmers();
+}); })(chips[ci]); }
+
+function matchSearch(b){
+  if(!searchQuery) return true;
+  var hay = [b.name, b.father, b.ur_name, b.ur_father, String(b.khata), String(b.cons||"")].join(" ").toLowerCase();
+  return hay.indexOf(searchQuery) !== -1;
+}
+function farmerRow(b){
+  var st = statusOf(b), paid = paidCapped(b), rem = remaining(b);
+  return '<div class="farmer" data-sid="' + b.season_id + '" data-khata="' + b.khata + '">'
+    + '<div class="khata"><div class="k">KHATA</div><div class="n">' + b.khata + '</div></div>'
+    + '<div class="info"><div class="nm">' + esc(b.name) + '</div>'
+    + (b.ur_name ? '<div class="urnm urdu">' + esc(b.ur_name) + '</div>' : '')
+    + '<div class="fa">s/o ' + esc(b.father||"") + ' · ' + areaStr(b) + ' · ' + esc(SEASONS[b.season_id].label) + '</div>'
+    + '<div class="amts"><span>Bill <b>' + fmt(effAmt(b)) + '</b></span><span>Paid <b style="color:var(--em2)">' + fmt(paid) + '</b></span>' + (rem>0 ? '<span>Remaining <b style="color:var(--red)">' + fmt(rem) + '</b></span>' : '') + '</div></div>'
+    + '<span class="pill ' + st + '">' + st + '</span></div>';
+}
+function bindFarmerRows(container){
+  var rows = container.querySelectorAll(".farmer");
+  for(var i=0;i<rows.length;i++){ (function(r){ r.addEventListener("click", function(){
+    var b = findBill(r.getAttribute("data-sid"), Number(r.getAttribute("data-khata")));
+    if(b) openDetail(b);
+  }); })(rows[i]); }
+}
+function renderFarmers(){
+  var html = "", total = 0;
+  var seasonsToShow = [seasonFilter];
+  seasonsToShow.forEach(function(sid){
+    var bs = billsFor(sid).filter(function(b){ return matchSearch(b) && (statusFilter==="All" || statusOf(b)===statusFilter); });
+    html += bs.map(farmerRow).join("");
+    total += bs.length;
+  });
+  $("farmersList").innerHTML = html || '<div class="empty">No farmers match.</div>';
+  $("farmersCount").textContent = total + " bill(s) shown";
+  bindFarmerRows($("farmersList"));
+}
+
+/* ==================== FARMER DETAIL ==================== */
+function openDetail(b){
+  currentBill = b; editPayIdx = -1;
+  $("detailTitle").textContent = "Khata " + b.khata + " — " + b.name;
+  renderDetail();
+  $("detailOverlay").classList.add("open");
+}
+function closeDetail(){ $("detailOverlay").classList.remove("open"); currentBill = null; renderDashboard(); renderFarmers(); }
+$("detailBack").addEventListener("click", closeDetail);
+
+function renderDetail(){
+  var b = currentBill; if(!b) return;
+  var st = statusOf(b), paid = paidCapped(b), raw = paidRaw(b), rem = remaining(b), pays = getPays(b);
+  var h = "";
+  h += '<div class="panel"><h3 style="margin-bottom:2px">' + esc(b.name) + '</h3>'
+     + (b.ur_name ? '<div class="urdu" style="font-size:21px;line-height:1.9;color:var(--em3)">' + esc(b.ur_name) + '</div>' : '')
+     + '<div class="kv"><span>Father</span><span>' + esc(b.father||"") + (b.ur_father ? ' · <span class="urdu">' + esc(b.ur_father) + '</span>' : '') + '</span></div>'
+     + '<div class="kv"><span>Season</span><span>' + esc(SEASONS[b.season_id].label) + '</span></div>'
+     + '<div class="kv"><span>Khata No.</span><span>' + b.khata + '</span></div>'
+     + '<div class="kv"><span>Consumer No.</span><span>' + esc(b.cons||"—") + '</span></div>'
+     + '<div class="kv"><span>Bill Reference</span><span>' + esc(b.ref||"—") + '</span></div>'
+     + '<div class="kv"><span>Area</span><span>' + b.kanal + ' Kanal ' + b.marla + ' Marla</span></div>'
+     + '<div class="kv"><span>Issue Date</span><span>' + esc(b.issue||"—") + '</span></div>'
+     + '<div class="kv"><span>' + (b.season_id==="rabi2026" ? "Last Date" : "Due Date") + '</span><span>' + esc(lastDateOf(b)) + '</span></div>'
+     + '<div class="kv"><span>Bill Amount</span><span>' + fmt(effAmt(b)) + '</span></div>'
+     + (b.season_id==="kharif2025" ? '<div class="kv"><span>Amount Detail</span><span>Due-date amount ' + fmt(b.amt) + ' · With late fees ' + fmt(effAmt(b)) + '</span></div>' : '')
+     + '<div class="kv"><span>Payable After Due Date</span><span>' + fmt(b.payable_late!=null ? b.payable_late : b.amt) + '</span></div>'
+     + '<div class="kv"><span>Total Paid</span><span style="color:var(--em2)">' + fmt(paid) + (raw>paid ? ' (actual ' + fmt(raw) + ')' : '') + '</span></div>'
+     + '<div class="kv"><span>Remaining</span><span style="color:' + (rem>0 ? 'var(--red)' : 'var(--green)') + '">' + fmt(rem) + '</span></div>'
+     + '<div class="kv" style="border-bottom:none"><span>Status</span><span><span class="pill ' + st + '">' + st + '</span></span></div>'
+     + (rem>0 ? '<button class="btn block gold" id="markFullBtn">✓ Mark Full Paid (' + fmt(rem) + ')</button>' : '')
+     + '</div>';
+
+  h += '<div class="panel"><h3>Payment History</h3>';
+  if(!pays.length) h += '<p class="mut small" style="margin:0">No payments recorded yet.</p>';
+  pays.forEach(function(p, i){
+    h += '<div class="payrow"><div><span class="pa">' + fmt(p.amount) + '</span><br><span class="mut small">' + esc(ddmmyyyy(p.date)) + (p.note ? ' · ' + esc(p.note) : '') + '</span></div>'
+       + '<div class="acts"><button class="iconbtn" data-edit="' + i + '">Edit</button><button class="iconbtn" data-del="' + i + '">Delete</button></div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="panel"><h3>' + (editPayIdx>=0 ? 'Edit Payment' : 'Add Payment') + '</h3>'
+     + '<div class="fld"><label>Amount (Rs) *</label><input id="payAmt" type="number" inputmode="numeric" placeholder="Amount received"></div>'
+     + '<div class="fld"><label>Date</label><input id="payDate" type="date" value="' + todayStr() + '"></div>'
+     + '<div class="fld"><label>Note (optional)</label><input id="payNote" type="text" placeholder="Cash / bank / remarks"></div>'
+     + '<button class="btn block" id="paySave">' + (editPayIdx>=0 ? 'Save Changes' : 'Add Payment') + '</button>'
+     + (editPayIdx>=0 ? '<button class="btn block ghost" id="payCancelEdit">Cancel Edit</button>' : '')
+     + '</div>';
+
+  h += '<div class="panel"><h3>Receipt — رسید</h3>'
+     + '<div class="fld"><label>Receipt Language</label><select id="rcLang">'
+     + '<option value="en"' + (printLang==="en"?" selected":"") + '>English</option>'
+     + '<option value="ur"' + (printLang==="ur"?" selected":"") + '>Urdu — اردو</option>'
+     + '<option value="bi"' + (printLang==="bi"?" selected":"") + '>Bilingual</option></select></div>'
+     + '<button class="btn block ghost" id="printReceiptBtn">🖨 Print Receipt</button></div>';
+
+  if(b.custom){
+    h += '<div class="panel"><h3>Manually Added Bill</h3><p class="small mut">This bill was added by hand in this app.</p>' + (b.note ? '<p class="small">' + esc(b.note) + '</p>' : '') + '<button class="btn red sm" id="delCustomBtn">Delete This Bill</button></div>';
+  }
+
+  $("detailBody").innerHTML = h;
+
+  var mf = $("markFullBtn");
+  if(mf) mf.addEventListener("click", function(){
+    if(confirm("Mark Khata " + b.khata + " (" + b.name + ") as FULLY PAID with a payment of " + fmt(remaining(b)) + "?")){
+      addPayment(b, remaining(b), todayStr(), "Full payment");
+      renderDetail(); alert("Marked as Paid ✓");
+    }
+  });
+  var delBtns = $("detailBody").querySelectorAll("[data-del]");
+  for(var d=0; d<delBtns.length; d++){ (function(btn){ btn.addEventListener("click", function(){
+    var i = Number(btn.getAttribute("data-del"));
+    if(confirm("Delete this payment of " + fmt(pays[i].amount) + "?")){
+      payments[b.season_id][payKey(b)].splice(i,1); savePayments(); if(editPayIdx===i) editPayIdx=-1; renderDetail();
+    }
+  }); })(delBtns[d]); }
+  var edBtns = $("detailBody").querySelectorAll("[data-edit]");
+  for(var e=0; e<edBtns.length; e++){ (function(btn){ btn.addEventListener("click", function(){
+    var i = Number(btn.getAttribute("data-edit")); editPayIdx = i; renderDetail();
+    $("payAmt").value = pays[i].amount; $("payDate").value = pays[i].date || todayStr(); $("payNote").value = pays[i].note || "";
+    $("payAmt").focus(); window.scrollTo(0, document.body.scrollHeight);
+  }); })(edBtns[e]); }
+  var ce = $("payCancelEdit"); if(ce) ce.addEventListener("click", function(){ editPayIdx = -1; renderDetail(); });
+  $("paySave").addEventListener("click", function(){
+    var amt = Number($("payAmt").value), date = $("payDate").value || todayStr(), note = $("payNote").value.trim();
+    if(!amt || amt <= 0){ alert("Please enter a valid amount."); return; }
+    if(editPayIdx >= 0){
+      payments[b.season_id][payKey(b)][editPayIdx] = { amount:amt, date:date, note:note, ts:payments[b.season_id][payKey(b)][editPayIdx].ts || Date.now() };
+      savePayments(); editPayIdx = -1; renderDetail(); return;
+    }
+    var remNow = remaining(b);
+    if(amt > remNow && !confirm("Warning: This payment (" + fmt(amt) + ") is more than the remaining amount (" + fmt(remNow) + "). The extra will be recorded but the bill will simply show as Paid. Continue?")) return;
+    addPayment(b, amt, date, note); renderDetail();
+  });
+  $("rcLang").addEventListener("change", function(){ printLang = this.value; lsSetRaw(LS_LANG, printLang); $("pLang").value = printLang; });
+  $("printReceiptBtn").addEventListener("click", function(){ printReceipt(b, printLang); });
+  var dc = $("delCustomBtn");
+  if(dc) dc.addEventListener("click", function(){
+    if(confirm("Delete this manually added bill (Khata " + b.khata + ")? Its payments will also be removed.")){
+      customBills = customBills.filter(function(x){ return !(x.season_id===b.season_id && x.khata===b.khata); });
+      lsSet(LS_CUSTOM, customBills);
+      if(payments[b.season_id]) delete payments[b.season_id][payKey(b)];
+      savePayments(); closeDetail();
+    }
+  });
+}
+
+/* ==================== ADD MISSING BILL ==================== */
+function openAddBill(){ $("addOverlay").classList.add("open"); }
+function closeAddBill(){ $("addOverlay").classList.remove("open"); }
+$("addBillBtn").addEventListener("click", openAddBill);
+$("addBillBtn2").addEventListener("click", openAddBill);
+$("addBack").addEventListener("click", closeAddBill);
+$("abSave").addEventListener("click", function(){
+  var sid = $("abSeason").value, khata = Number($("abKhata").value), name = $("abName").value.trim(),
+      amt = Number($("abAmt").value);
+  if(!khata || !name || !amt || amt<=0){ alert("Please fill Khata No., Farmer Name and a valid Bill Amount."); return; }
+  if(findBill(sid, khata)){ alert("A bill for Khata " + khata + " already exists in " + SEASONS[sid].label + "."); return; }
+  var kanal = Number($("abKanal").value||0), marla = Number($("abMarla").value||0);
+  var cons = $("abCons").value.trim() || (khata + "0000" + "12925");
+  var t = todayStr().split("-");
+  var nb = { season_id:sid, season:SEASONS[sid].label, issue:t[2]+"/"+t[1]+"/"+t[0], due:SEASONS[sid].due,
+    ref:"", cons:cons, khata:khata, name:name, father:$("abFather").value.trim(),
+    ur_name:$("abUrName").value.trim(), ur_father:$("abUrFather").value.trim(),
+    kanal:kanal, marla:marla, amt:amt, payable_due:amt, payable_late:Math.round(amt*1.1), custom:true };
+  customBills.push(nb); lsSet(LS_CUSTOM, customBills);
+  closeAddBill(); renderDashboard(); renderFarmers();
+  alert("Bill added ✓ — Khata " + khata + ", " + name + ", " + fmt(amt) + " (" + SEASONS[sid].label + ")");
+  ["abKhata","abName","abFather","abUrName","abUrFather","abAmt","abCons"].forEach(function(id){ $(id).value=""; });
+  $("abKanal").value = 0; $("abMarla").value = 0;
+});
+
+/* ==================== SETTINGS ==================== */
+$("exportBtn").addEventListener("click", function(){
+  var data = { app:"Abiana Manager", exportedAt:new Date().toISOString(), payments:payments, customBills:customBills };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "abiana-backup-" + todayStr() + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+});
+$("importFile").addEventListener("change", function(){
+  var f = this.files && this.files[0]; if(!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    try{
+      var d = JSON.parse(rd.result);
+      if(typeof d.payments !== "object" || !Array.isArray(d.customBills)) throw new Error("bad file");
+      if(!confirm("Import this backup? It will REPLACE all current payments and manually added bills.")) return;
+      payments = d.payments; customBills = d.customBills;
+      savePayments(); lsSet(LS_CUSTOM, customBills);
+      renderDashboard(); renderFarmers(); alert("Backup restored ✓");
+    }catch(e){ alert("This file is not a valid Abiana backup."); }
+  };
+  rd.readAsText(f); this.value = "";
+});
+$("resetBtn").addEventListener("click", function(){
+  if(!confirm("Reset ALL payments for ALL seasons? This deletes every payment record.")) return;
+  if(!confirm("Are you absolutely sure? Export a backup first if you need the records. Press OK to delete all payments permanently.")) return;
+  payments = {}; savePayments(); renderDashboard(); renderFarmers(); alert("All payments have been reset.");
+});
+$("lockBtn").addEventListener("click", function(){ showLock(); });
+
+/* ==================== PRINTING ==================== */
+var LBL = {
+  en:{ sr:"Sr", khata:"Khata", farmer:"Farmer", father:"Father", area:"Area (K-M)", bill:"Bill (Rs)", paid:"Paid (Rs)", rem:"Remaining (Rs)", status:"Status",
+       paidT:"Paid List", unpaidT:"Unpaid & Partial List", completeT:"Complete List", summaryT:"Season Summary",
+       Paid:"Paid", Partial:"Partial", Unpaid:"Unpaid", receipt:"Payment Receipt", season:"Season", date:"Print Date",
+       total:"TOTAL", bills:"Bills", collected:"Collected", remainingL:"Remaining", pct:"Collection %",
+       cons:"Consumer No.", ref:"Bill Reference", issue:"Issue Date", due:"Due Date", afterdue:"Payable After Due Date",
+       payhist:"Payments Received", pdate:"Date", pamt:"Amount (Rs)", pnote:"Note", words:"Amount in Words", sig:"Signature & Seal — Muhammad Atif, Numberdar",
+       metric:"Detail", value:"Value", received:"Received", balance:"Balance",
+       lastdate:"Last Date", kharifB:"Kharif 2025 Baqaya (Rs)", rabiB:"Rabi 2026 Baqaya (Rs)", totB:"TOTAL Baqaya (Rs)" },
+  ur:{ sr:"نمبر", khata:"کھاتہ", farmer:"کسان", father:"والد", area:"رقبہ (کنال-مرلہ)", bill:"بل (روپے)", paid:"ادا شدہ (روپے)", rem:"بقایا (روپے)", status:"حالت",
+       paidT:"ادا شدہ فہرست", unpaidT:"بقایا و جزوی فہرست", completeT:"مکمل فہرست", summaryT:"سیزن خلاصہ",
+       Paid:"ادا شدہ", Partial:"جزوی ادا", Unpaid:"غیر ادا", receipt:"ادائیگی رسید", season:"سیزن", date:"تاریخ اشاعت",
+       total:"کل", bills:"بلوں کی تعداد", collected:"وصول شدہ", remainingL:"بقایا", pct:"وصولی فیصد",
+       cons:"صارف نمبر", ref:"بل حوالہ نمبر", issue:"تاریخ اجرا", due:"آخری تاریخ", afterdue:"آخری تاریخ کے بعد قابل ادا",
+       payhist:"وصول شدہ ادائیگیاں", pdate:"تاریخ", pamt:"رقم (روپے)", pnote:"نوٹ", words:"رقم لفظوں میں", sig:"دستخط و مہر — محمد عاطف، نمبردار",
+       metric:"تفصیل", value:"قدر", received:"موصول", balance:"بقایا",
+       lastdate:"آخری تاریخ", kharifB:"خریف 2025 بقایا (روپے)", rabiB:"ربیع 2026 بقایا (روپے)", totB:"کل بقایا (روپے)" },
+  bi:{ sr:"Sr / نمبر", khata:"Khata / کھاتہ", farmer:"Farmer / کسان", father:"Father / والد", area:"Area / رقبہ (K-M)", bill:"Bill / بل (Rs)", paid:"Paid / ادا (Rs)", rem:"Remaining / بقایا (Rs)", status:"Status / حالت",
+       paidT:"Paid List / ادا شدہ فہرست", unpaidT:"Unpaid & Partial List / بقایا فہرست", completeT:"Complete List / مکمل فہرست", summaryT:"Season Summary / سیزن خلاصہ",
+       Paid:"Paid / ادا شدہ", Partial:"Partial / جزوی", Unpaid:"Unpaid / غیر ادا", receipt:"Payment Receipt / ادائیگی رسید", season:"Season / سیزن", date:"Print Date / تاریخ",
+       total:"TOTAL / کل", bills:"Bills / بل", collected:"Collected / وصول", remainingL:"Remaining / بقایا", pct:"Collection % / وصولی فیصد",
+       cons:"Consumer No. / صارف نمبر", ref:"Bill Reference / حوالہ نمبر", issue:"Issue Date / تاریخ اجرا", due:"Due Date / آخری تاریخ", afterdue:"After Due Date / بعد از تاریخ قابل ادا",
+       payhist:"Payments Received / وصول شدہ ادائیگیاں", pdate:"Date / تاریخ", pamt:"Amount / رقم (Rs)", pnote:"Note / نوٹ", words:"Amount in Words / رقم لفظوں میں", sig:"Signature & Seal / دستخط و مہر — Muhammad Atif, Numberdar / محمد عاطف، نمبردار",
+       metric:"Detail / تفصیل", value:"Value / قدر", received:"Received / موصول", balance:"Balance / بقایا",
+       lastdate:"Last Date / آخری تاریخ", kharifB:"Kharif 2025 Baqaya / خریف بقایا (Rs)", rabiB:"Rabi 2026 Baqaya / ربیع بقایا (Rs)", totB:"TOTAL Baqaya / کل بقایا (Rs)" }
+};
+function letterhead(lang, title, seasonLabel, seasonId){
+  var L = LBL[lang];
+  var h = '<div class="lh"><div class="n1">OFFICE OF THE NUMBERDAR</div>'
+    + '<div class="n2">Chak No. 130/1-L · Tehsil Khanpur · District Rahim Yar Khan</div>'
+    + '<div class="n2 urdu">چک نمبر 130/1-L · تحصیل خانپور، ضلع رحیم یار خان</div>'
+    + '<div class="n3">Abiana (Water Tax) Collection Record</div>'
+    + '<div class="n4">Outlet / Moga 12925 · Revenue Circle 92 1-L</div></div>'
+    + '<div class="rt">' + esc(title) + '</div>'
+    + '<div class="meta"><span><b>' + esc(L.season) + ':</b> ' + esc(seasonLabel) + '</span>'
+    + (seasonId ? '<span><b>' + esc(L.lastdate) + ':</b> ' + seasonLastDate(seasonId) + '</span>' : '')
+    + '<span><b>' + esc(L.date) + ':</b> ' + nowDmy() + '</span></div>';
+  return h;
+}
+function sigBlock(lang){
+  return '<div class="sigfoot"><div class="sigbox"><div class="line"></div><div>Muhammad Atif — Numberdar, Chak 130/1-L</div></div>'
+    + '<div class="stampbox">Stamp / <span class="urdu">مہر</span></div></div>';
+}
+function nameCell(b, lang, father){
+  var rn = father ? (b.father||"") : b.name, un = father ? (b.ur_father||"") : (b.ur_name||"");
+  if(lang==="ur") return '<span class="urdu">' + esc(un || rn) + '</span>';
+  if(lang==="bi") return (un ? '<span class="urdu">' + esc(un) + '</span><br>' : '') + esc(rn);
+  return esc(rn);
+}
+function doPrint(html, lang){
+  $("printArea").innerHTML = '<div' + (lang==="ur" ? ' dir="rtl"' : '') + '>' + html + '</div>';
+  setTimeout(function(){ window.print(); }, 60);
+}
+function printReport(){
+  var season = $("pSeason").value, type = $("pType").value, lang = $("pLang").value, L = LBL[lang];
+  var seasonLabel = SEASONS[season].label;
+  var title = type==="paid" ? L.paidT : type==="unpaid" ? L.unpaidT : type==="complete" ? L.completeT : L.summaryT;
+  if(type==="summary"){
+    var rows = "";
+    var seasons = [season];
+    var gT=0,gC=0,gN=0;
+    seasons.forEach(function(sid){
+      var s = seasonStats(sid); gT+=s.total; gC+=s.coll; gN+=s.bills.length;
+      rows += '<tr><td>' + esc(SEASONS[sid].label) + '</td><td class="num">' + fmtN(s.bills.length) + '</td><td class="num">' + fmtN(s.total) + '</td><td class="num">' + fmtN(s.coll) + '</td><td class="num">' + fmtN(s.rem) + '</td><td class="num">' + s.pct + '%</td><td class="num">' + s.paid + ' / ' + s.partial + ' / ' + s.unpaid + '</td></tr>';
+    });
+    if(seasons.length>1) rows += '<tr class="tot"><td>' + esc(L.total) + '</td><td class="num">' + fmtN(gN) + '</td><td class="num">' + fmtN(gT) + '</td><td class="num">' + fmtN(gC) + '</td><td class="num">' + fmtN(gT-gC) + '</td><td class="num">' + (gT? Math.round(gC/gT*1000)/10 : 0) + '%</td><td></td></tr>';
+    var h = letterhead(lang, title, seasonLabel, season)
+      + '<table><tr><th>' + esc(L.season) + '</th><th class="num">' + esc(L.bills) + '</th><th class="num">' + esc(L.bill) + '</th><th class="num">' + esc(L.collected) + '</th><th class="num">' + esc(L.remainingL) + '</th><th class="num">' + esc(L.pct) + '</th><th class="num">' + esc(L.Paid) + ' / ' + esc(L.Partial) + ' / ' + esc(L.Unpaid) + '</th></tr>'
+      + rows + '</table>' + sigBlock(lang);
+    doPrint(h, lang); return;
+  }
+  var bs = billsFor(season);
+  if(type==="paid") bs = bs.filter(function(b){ return statusOf(b)==="Paid"; });
+  if(type==="unpaid") bs = bs.filter(function(b){ return statusOf(b)!=="Paid"; });
+  var tB=0,tP=0,tR=0, rowsHtml="";
+  bs.forEach(function(b, i){
+    var paid = paidCapped(b), rem = remaining(b), st = statusOf(b);
+    tB+=effAmt(b); tP+=paid; tR+=rem;
+    rowsHtml += '<tr><td>' + (i+1) + '</td><td>' + b.khata + '</td><td>' + nameCell(b, lang, false) + '</td><td>' + nameCell(b, lang, true) + '</td><td>' + areaStr(b) + '</td>'
+      + '<td class="num">' + fmtN(effAmt(b)) + '</td><td class="num">' + fmtN(paid) + '</td><td class="num">' + fmtN(rem) + '</td><td>' + esc(L[st]) + '</td></tr>';
+  });
+  if(!bs.length) rowsHtml = '<tr><td colspan="9" style="text-align:center">—</td></tr>';
+  var html = letterhead(lang, title, seasonLabel, season)
+    + '<table><tr><th>' + esc(L.sr) + '</th><th>' + esc(L.khata) + '</th><th>' + esc(L.farmer) + '</th><th>' + esc(L.father) + '</th><th>' + esc(L.area) + '</th>'
+    + '<th class="num">' + esc(L.bill) + '</th><th class="num">' + esc(L.paid) + '</th><th class="num">' + esc(L.rem) + '</th><th>' + esc(L.status) + '</th></tr>'
+    + rowsHtml
+    + '<tr class="tot"><td colspan="5">' + esc(L.total) + ' (' + bs.length + ')</td><td class="num">' + fmtN(tB) + '</td><td class="num">' + fmtN(tP) + '</td><td class="num">' + fmtN(tR) + '</td><td></td></tr></table>'
+    + sigBlock(lang);
+  doPrint(html, lang);
+}
+$("pGo").addEventListener("click", printReport);
+
+/* Chowkidar Copy — the ONE cross-season report: every farmer who still owes anything,
+   with Kharif 2025 baqaya, Rabi 2026 baqaya and the combined TOTAL, grouped by khata. */
+function printChowkidar(){
+  var lang = $("pLang").value, L = LBL[lang];
+  var map = {};
+  allBills().forEach(function(b){
+    var k = b.khata;
+    if(!map[k]) map[k] = { khata:k, kh:0, ra:0, kb:null, rb:null };
+    var rem = remaining(b);
+    if(b.season_id==="kharif2025"){ map[k].kh += rem; if(!map[k].kb) map[k].kb = b; }
+    else if(b.season_id==="rabi2026"){ map[k].ra += rem; if(!map[k].rb) map[k].rb = b; }
+  });
+  var keys = Object.keys(map).map(function(x){ return Number(x); }).sort(function(a,b){ return a-b; });
+  var rowsHtml = "", n = 0, gKh = 0, gRa = 0;
+  keys.forEach(function(k){
+    var g = map[k], tot = g.kh + g.ra;
+    if(tot <= 0) return;
+    n++; gKh += g.kh; gRa += g.ra;
+    var nb = g.rb || g.kb;
+    var fa = nameCell(nb, lang, true);
+    var nameHtml = nameCell(nb, lang, false) + (fa ? '<br><span style="font-size:11px;color:#444">' + (lang==="en" ? "s/o " : "") + fa + '</span>' : '');
+    rowsHtml += '<tr><td>' + n + '</td><td>' + k + '</td><td>' + nameHtml + '</td>'
+      + '<td class="num">' + (g.kh ? fmtN(g.kh) : '—') + '</td><td class="num">' + (g.ra ? fmtN(g.ra) : '—') + '</td>'
+      + '<td class="num bold">' + fmtN(tot) + '</td></tr>';
+  });
+  if(!n) rowsHtml = '<tr><td colspan="6" style="text-align:center">—</td></tr>';
+  var h = letterhead(lang, "COPY FOR CHOWKIDAR / نقل برائے چوکیدار", "Kharif 2025 + Rabi 2026")
+    + '<div class="chowinst urdu" dir="rtl">درج ذیل کاشتکاروں کو مطلع کریں کہ ان کے ذمے آبیانہ کی درج شدہ رقم باقی ہے۔</div>'
+    + '<div class="chowline">Last date for payment: 27 October 2026</div>'
+    + '<div class="chowline urdu">آخری تاریخ: 27 اکتوبر 2026</div>'
+    + '<table><tr><th>' + esc(L.sr) + '</th><th>' + esc(L.khata) + '</th><th>' + esc(L.farmer) + '</th>'
+    + '<th class="num">' + esc(L.kharifB) + '</th><th class="num">' + esc(L.rabiB) + '</th><th class="num">' + esc(L.totB) + '</th></tr>'
+    + rowsHtml
+    + '<tr class="tot"><td colspan="3">' + esc(L.total) + ' (' + n + ')</td><td class="num">' + fmtN(gKh) + '</td><td class="num">' + fmtN(gRa) + '</td><td class="num">' + fmtN(gKh + gRa) + '</td></tr></table>'
+    + sigBlock(lang);
+  doPrint(h, lang);
+}
+$("pChowk").addEventListener("click", printChowkidar);
+$("pLang").value = printLang;
+$("pLang").addEventListener("change", function(){ printLang = this.value; lsSetRaw(LS_LANG, printLang); });
+
+function printReceipt(b, lang){
+  var L = LBL[lang], pays = getPays(b), paid = paidCapped(b), rem = remaining(b), st = statusOf(b);
+  var rows = "";
+  if(!pays.length) rows = '<tr><td colspan="4" style="text-align:center">—</td></tr>';
+  pays.forEach(function(p, i){
+    rows += '<tr><td>' + (i+1) + '</td><td>' + esc(ddmmyyyy(p.date)) + '</td><td class="num">' + fmtN(p.amount) + '</td><td>' + esc(p.note||"") + '</td></tr>';
+  });
+  var h = letterhead(lang, L.receipt, SEASONS[b.season_id].label, b.season_id)
+    + '<table><tr><th style="width:34%">' + esc(L.farmer) + '</th><td>' + nameCell(b, lang, false) + '</td><th style="width:18%">' + esc(L.khata) + '</th><td>' + b.khata + '</td></tr>'
+    + '<tr><th>' + esc(L.father) + '</th><td>' + nameCell(b, lang, true) + '</td><th>' + esc(L.area) + '</th><td>' + b.kanal + ' Kanal ' + b.marla + ' Marla</td></tr>'
+    + '<tr><th>' + esc(L.cons) + '</th><td>' + esc(b.cons||"—") + '</td><th>' + esc(L.ref) + '</th><td>' + esc(b.ref||"—") + '</td></tr>'
+    + '<tr><th>' + esc(L.issue) + '</th><td>' + esc(b.issue||"—") + '</td><th>' + esc(b.season_id==="rabi2026" ? L.lastdate : L.due) + '</th><td>' + esc(lastDateOf(b)) + '</td></tr>'
+    + '<tr><th>' + esc(L.bill) + '</th><td class="num">' + fmtN(effAmt(b)) + '</td><th>' + esc(L.afterdue) + '</th><td class="num">' + fmtN(b.payable_late!=null ? b.payable_late : b.amt) + '</td></tr></table>'
+    + '<div style="font-weight:800;margin:14px 0 6px">' + esc(L.payhist) + '</div>'
+    + '<table><tr><th>' + esc(L.sr) + '</th><th>' + esc(L.pdate) + '</th><th class="num">' + esc(L.pamt) + '</th><th>' + esc(L.pnote) + '</th></tr>' + rows
+    + '<tr class="tot"><td colspan="2">' + esc(L.total) + ' ' + esc(L.received) + '</td><td class="num">' + fmtN(paid) + '</td><td></td></tr></table>'
+    + '<table style="margin-top:10px"><tr><th>' + esc(L.bill) + '</th><th class="num">' + esc(L.paid) + '</th><th class="num">' + esc(L.rem) + '</th><th>' + esc(L.status) + '</th></tr>'
+    + '<tr><td class="num">' + fmtN(effAmt(b)) + '</td><td class="num">' + fmtN(paid) + '</td><td class="num">' + fmtN(rem) + '</td><td>' + esc(L[st]) + '</td></tr></table>'
+    + '<p style="margin-top:12px"><b>' + esc(L.words) + ':</b> Rupees ' + amountWords(paid) + ' Only</p>'
+    + sigBlock(lang);
+  doPrint(h, lang);
+}
+
+/* ==================== INIT ==================== */
+seedVideoStatuses();
+setSeason(seasonFilter);
+showLock();
+if("serviceWorker" in navigator && (location.protocol==="http:" || location.protocol==="https:")){
+  window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+}
+</script>
+</body>
+</html>
