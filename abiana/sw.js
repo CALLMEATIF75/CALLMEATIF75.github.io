@@ -1,5 +1,5 @@
 /* Abiana Manager — service worker (cache-first, fully offline) */
-var CACHE = 'abiana-manager-v8';
+var CACHE = 'abiana-manager-v9';
 var ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', function (e) {
