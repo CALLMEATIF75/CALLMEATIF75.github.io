@@ -338,7 +338,7 @@ nav button.on .ic{filter:none}
       <button class="btn block gold" id="pChowk">🖨 Chowkidar Copy</button>
       <p class="small mut" style="margin-top:8px">Chowkidar Copy lists <b>only farmers who still owe something</b>, with the Kharif 2025 and Rabi 2026 outstanding amounts and the combined TOTAL for each farmer. Totals include Kharif 2024 / Rabi 2025 dues where noted.</p>
       <button class="btn block" id="pContacts" style="margin-top:16px">📞 Contact Numbers List — Print (Urdu)</button>
-      <p class="small mut" style="margin-top:8px">Urdu list of the farmers who still owe money: <b>name, khata no., owner &amp; thekedar numbers, total baqaya</b>. Jo number save hai wo khud print hoga; khali jagah par haath se number likh sakte ho. Number save karne ke liye kisan ka bill kholo — wahan <b>📞 Contact Numbers</b> wala hissa hai.</p>
+      <p class="small mut" style="margin-top:8px">Urdu list of the farmers who still owe money: <b>name, khata no., owner number, thekedar name + number, total baqaya</b>. Jo number save hai wo khud print hoga; khali jagah par haath se number likh sakte ho. Number save karne ke liye kisan ka bill kholo — wahan <b>📞 Contact Numbers</b> wala hissa hai.</p>
       <button class="btn block ghost" id="pContactsView">📋 Contact List Screen Par Dekho (tap = call)</button>
     </div>
   </section>
@@ -371,7 +371,7 @@ nav button.on .ic{filter:none}
       <p class="small mut" id="installHint" style="margin-top:8px">Agar install prompt na aye: Chrome menu (⋮) → <b>Install app / Add to Home screen</b> dabao. · If no prompt appears, use Chrome menu (⋮) → <b>Install app / Add to Home screen</b>.</p>
       <button class="btn block gold" id="updateBtn" style="margin-top:12px">🔄 Reload — Naya Version Lagao (Update)</button>
       <p class="small mut" style="margin-top:8px">Naya version check karke lagata hai aur app dobara kholta hai. Tumhari entries (payments, bills) mehfooz rehti hain — update mein kuch delete nahi hota.</p>
-      <p class="small" id="updStatus" style="margin-top:6px"><b>Abiana Manager — Version v19</b></p>
+      <p class="small" id="updStatus" style="margin-top:6px"><b>Abiana Manager — Version v20</b></p>
     </div>
     <div class="panel">
       <h3>☁️ Data Sync — Kai ke paas copy</h3>
@@ -473,7 +473,7 @@ function lsSetRaw(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
 
 var payments = lsGet(LS_PAY, {});          // {season_id:{khata:[{amount,date,note,ts}]}}
 var customBills = lsGet(LS_CUSTOM, []);     // [bill,...]
-var contacts = lsGet(LS_CONTACTS, {});      // {khata:{owner:"...",thekedar:"..."}} — per FARMER (khata), spans all seasons; starts empty, owner types numbers in by hand
+var contacts = lsGet(LS_CONTACTS, {});      // {khata:{owner:"...",tkName:"...",thekedar:"..."}} — per FARMER (khata), spans all seasons; starts empty, owner types numbers in by hand (or they arrive from his Sheet, v19+)
 var printLang = lsGetRaw(LS_LANG) || "bi";
 
 /* ==================== STATE ==================== */
@@ -518,19 +518,21 @@ function paidCapped(bill){ return Math.min(paidRaw(bill), effAmt(bill)); }
 function remaining(bill){ return Math.max(0, effAmt(bill) - paidRaw(bill)); }
 function statusOf(bill){ var p = paidRaw(bill); if(p >= effAmt(bill)) return "Paid"; if(p > 0) return "Partial"; return "Unpaid"; }
 function savePayments(){ lsSet(LS_PAY, payments); }
-/* Contact numbers (owner, 23 Oct 2026): two mobile numbers per farmer —
-   the owner (maalik) and the thekedar (contractor), for land held on
-   contract. Stored in their OWN localStorage store, keyed by khata, so a
-   number saved on any season's bill shows on every bill of that farmer and
-   in the Contact Numbers list. Saving contacts NEVER touches payments,
-   statuses or bill data. */
-function getContact(khata){ var c = contacts[khata]; return { owner:(c && c.owner) || "", thekedar:(c && c.thekedar) || "" }; }
+/* Contact numbers (owner, 23 Oct 2026): per farmer — the owner (maalik)
+   mobile, the thekedar (contractor) NAME and the thekedar mobile, for land
+   held on contract (tkName added v20 — the owner writes thekedar names in
+   his Sheet and they must live in the app + print too). Stored in their OWN
+   localStorage store, keyed by khata, so a number saved on any season's bill
+   shows on every bill of that farmer and in the Contact Numbers list.
+   Saving contacts NEVER touches payments, statuses or bill data. */
+function getContact(khata){ var c = contacts[khata]; return { owner:(c && c.owner) || "", tkName:(c && c.tkName) || "", thekedar:(c && c.thekedar) || "" }; }
 function saveContacts(){ lsSet(LS_CONTACTS, contacts); }
-function setContact(khata, owner, thekedar){
+function setContact(khata, owner, tkName, thekedar){
   owner = String(owner == null ? "" : owner).trim();
+  tkName = String(tkName == null ? "" : tkName).trim();
   thekedar = String(thekedar == null ? "" : thekedar).trim();
-  if(!owner && !thekedar) delete contacts[khata];
-  else contacts[khata] = { owner:owner, thekedar:thekedar };
+  if(!owner && !tkName && !thekedar) delete contacts[khata];
+  else contacts[khata] = { owner:owner, tkName:tkName, thekedar:thekedar };
   saveContacts();
 }
 function telHref(num){ return "tel:" + String(num || "").replace(/[\s\-()]/g, ""); }
@@ -962,8 +964,9 @@ function renderDetail(){
   h += '<div class="panel" style="border:2px solid var(--gold)"><h3>📞 Contact Numbers — Maalik / Thekedar</h3>'
      + '<p class="mut small" style="margin:0 0 10px">Khata ' + b.khata + ' ke number yahan likho — ye number is kisan ke <b>tamam seasons</b> par lag jayenge aur <b>Contact List</b> mein khud aa jayenge. Zameen contract (theka) par ho to <b>thekedar ka number bhi zaroor</b> likho.</p>'
      + (ctc.owner ? '<div class="kv"><span>📞 Owner (Maalik)</span><span><a href="' + telHref(ctc.owner) + '" style="color:var(--em2)">' + esc(ctc.owner) + '</a></span></div>' : '')
-     + (ctc.thekedar ? '<div class="kv"><span>📞 Thekedar (Contractor)</span><span><a href="' + telHref(ctc.thekedar) + '" style="color:var(--em2)">' + esc(ctc.thekedar) + '</a></span></div>' : '')
+     + (ctc.tkName || ctc.thekedar ? '<div class="kv"><span>📞 Thekedar (Contractor)</span><span>' + (ctc.tkName ? esc(ctc.tkName) : '') + (ctc.tkName && ctc.thekedar ? ' · ' : '') + (ctc.thekedar ? '<a href="' + telHref(ctc.thekedar) + '" style="color:var(--em2)">' + esc(ctc.thekedar) + '</a>' : '') + '</span></div>' : '')
      + '<div class="fld"><label>Owner (Maalik) Mobile Number</label><input id="ctOwnerNum" type="tel" inputmode="tel" autocomplete="tel" placeholder="03XX-XXXXXXX" value="' + esc(ctc.owner) + '"></div>'
+     + '<div class="fld"><label>Thekedar (Contractor) Name</label><input id="ctThekName" type="text" placeholder="Thekedar ka naam" value="' + esc(ctc.tkName) + '"></div>'
      + '<div class="fld"><label>Thekedar (Contractor) Mobile Number</label><input id="ctThekNum" type="tel" inputmode="tel" placeholder="03XX-XXXXXXX" value="' + esc(ctc.thekedar) + '"></div>'
      + '<button class="btn block" id="ctSaveBtn">💾 Save Numbers</button>'
      + '</div>';
@@ -1033,8 +1036,8 @@ function renderDetail(){
   });
   var ctS = $("ctSaveBtn");
   if(ctS) ctS.addEventListener("click", function(){
-    setContact(b.khata, $("ctOwnerNum").value, $("ctThekNum").value);
-    renderDetail(); alert("Contact numbers save ho gaye ✓ — Khata " + b.khata);
+    setContact(b.khata, $("ctOwnerNum").value, $("ctThekName").value, $("ctThekNum").value);
+    renderDetail(); alert("Contact save ho gaya ✓ — Khata " + b.khata);
   });
   var delBtns = $("detailBody").querySelectorAll("[data-del]");
   for(var d=0; d<delBtns.length; d++){ (function(btn){ btn.addEventListener("click", function(){
@@ -1145,7 +1148,7 @@ $("resetBtn").addEventListener("click", function(){
 $("lockBtn").addEventListener("click", function(){ showLock(); });
 
 /* ==================== APP INSTALL & UPDATE (Settings) ==================== */
-var APP_VERSION = "v19";
+var APP_VERSION = "v20";
 (function(){ var el = $("updStatus"); if(el) el.innerHTML = "<b>Abiana Manager — Version " + APP_VERSION + "</b>"; })();
 var bipEvent = null;   // captured beforeinstallprompt (Chrome install offer)
 window.addEventListener("beforeinstallprompt", function(e){
@@ -1290,8 +1293,9 @@ setSyncStatus();
    Google "Contact Numbers" sheet (khata + owner name pehle se wahan hain,
    wo numbers wahan type/paste karta hai). The SAME Apps Script endpoint
    serves them back as JSONP: GET SYNC_URL?cb=<fn> -> <fn>({ok, updated_at,
-   contacts:{khata:{owner, thekedar}}}) — only khatas with at least one
-   number. JSONP (a <script> tag) because Apps Script does not send CORS
+   contacts:{khata:{owner, thekedarName, thekedar}}}) — only khatas with at
+   least one of the three fields filled (v20: thekedar NAME bhi ata hai).
+   JSONP (a <script> tag) because Apps Script does not send CORS
    headers for a plain fetch from this origin.
    MERGE RULE (owner ki hifazat): a sheet value only ever FILLS an empty
    field — jo number app mein pehle se likha hai wo KABHI overwrite nahi
@@ -1311,12 +1315,14 @@ function mergeContacts(map){
   Object.keys(map).forEach(function(k){
     var sv = map[k]; if(!sv || typeof sv !== "object") return;
     var so = String(sv.owner == null ? "" : sv.owner).trim();
+    var sn = String(sv.thekedarName == null ? "" : sv.thekedarName).trim();
     var st = String(sv.thekedar == null ? "" : sv.thekedar).trim();
-    if(!so && !st) return;
+    if(!so && !sn && !st) return;
     var cur = getContact(k), did = false;
     if(!cur.owner && so){ cur.owner = so; did = true; }
+    if(!cur.tkName && sn){ cur.tkName = sn; did = true; }
     if(!cur.thekedar && st){ cur.thekedar = st; did = true; }
-    if(did){ contacts[k] = { owner:cur.owner, thekedar:cur.thekedar }; res.changed++; res.khatas[k] = true; }
+    if(did){ contacts[k] = { owner:cur.owner, tkName:cur.tkName, thekedar:cur.thekedar }; res.changed++; res.khatas[k] = true; }
   });
   if(res.changed) saveContacts();
   return res;
@@ -1621,10 +1627,21 @@ $("pChowk").addEventListener("click", printChowkidar);
    A number that is not saved yet prints as a dotted write-in line so it can
    be filled in by hand with a pen. Urdu print sizes follow the v16 size-up
    rules (names .urdu 16px/600, RTL headers 15px Nastaliq). No 'Office of
-   Numberdar' line, no stamp box (standing print rules). */
+   Numberdar' line, no stamp box (standing print rules).
+   v20 (owner): the thekedar cell carries the thekedar ka NAAM bhi — name on
+   its own line above the number (naam ho, number na ho to naam + write-in
+   line). Aur is print ke aakhir mein NA kul-jama (grand total) ki line hai,
+   NA signature/footer — "ye just contact list hai". Per-farmer کل بقایا
+   wala column waisa hi rehta hai. */
 function contactNumCell(num){
   if(num) return '<span class="ctnum" dir="ltr">' + esc(num) + '</span>';
   return '<span class="ctblank">&nbsp;</span>';
+}
+function contactThekCell(c){
+  if(!c.tkName) return contactNumCell(c.thekedar);
+  var nm = '<span class="urdu">' + esc(c.tkName) + '</span>';
+  if(c.thekedar) return nm + '<br><span class="ctnum" dir="ltr">' + esc(c.thekedar) + '</span>';
+  return nm + '<span class="ctblank">&nbsp;</span>';
 }
 function printContactList(){
   /* PRINT FILTER (owner, 23 Oct 2026): print mein SIRF wo kisan ate hain
@@ -1632,7 +1649,8 @@ function printContactList(){
      "jo numbers dalo ge bas unhi ka printout niklana, jisme number nahi
      hoga wo print page mein nahi aye ga". Screen wali Contacts list
      mukammal rehti hai (sab baqaya walay kisan), filter sirf print par
-     hai. Count aur کل بقایا bhi printed subset ke hi hain. */
+     hai. Letterhead wala count bhi printed subset ka hi hai (v20: kul
+     baqaya ka total row is print se nikal gaya hai). */
   var rows = farmerTotals().filter(function(g){
     var c = getContact(g.khata);
     return !!(c.owner || c.thekedar);
@@ -1643,21 +1661,19 @@ function printContactList(){
     var h0 = letterhead("ur", title, "خریف 2025 + ربیع 2026", null, 0)
       + noteLine
       + '<div class="chowline urdu" dir="rtl">آخری تاریخ: 27 اکتوبر 2026</div>'
-      + '<div class="urdu" dir="rtl" style="font-size:18px;text-align:center;margin:26px 0">ابھی تک کسی کسان کا نمبر درج نہیں ہے۔</div>'
-      + sigBlock("ur") + docFoot(title);
+      + '<div class="urdu" dir="rtl" style="font-size:18px;text-align:center;margin:26px 0">ابھی تک کسی کسان کا نمبر درج نہیں ہے۔</div>';
     doPrint(h0, "ur");
     return;
   }
-  var rowsHtml = "", gTot = 0;
+  var rowsHtml = "";
   rows.forEach(function(g, i){
-    gTot += g.tot;
     var c = getContact(g.khata);
     var un = g.rep.ur_name || g.rep.name;
     rowsHtml += '<tr><td>' + (i+1) + '</td>'
       + '<td><span class="urdu">' + esc(un) + '</span></td>'
       + '<td>' + g.khata + '</td>'
       + '<td class="ctn">' + contactNumCell(c.owner) + '</td>'
-      + '<td class="ctn">' + contactNumCell(c.thekedar) + '</td>'
+      + '<td class="ctn">' + contactThekCell(c) + '</td>'
       + '<td class="num bold">' + fmtN(g.tot) + (g.nSeasons > 2 ? chowCountNote(g.nSeasons, "ur") : '') + '</td></tr>';
   });
   var h = letterhead("ur", title, "خریف 2025 + ربیع 2026", null, rows.length)
@@ -1666,9 +1682,8 @@ function printContactList(){
     + '<table class="ctlist"><colgroup><col style="width:5%"><col style="width:25%"><col style="width:10%"><col style="width:22%"><col style="width:22%"><col style="width:16%"></colgroup>'
     + '<thead><tr><th>نمبر</th><th>نام</th><th>کھاتہ نمبر</th><th>مالک کا نمبر</th><th>ٹھیکیدار کا نمبر</th><th class="num">کل بقایا (روپے)</th></tr></thead><tbody>'
     + rowsHtml
-    + '<tr class="tot"><td colspan="5">کل (' + rows.length + ')</td><td class="num">' + fmtN(gTot) + '</td></tr></tbody></table>'
-    + '<div class="urdu" dir="rtl" style="font-size:16px;margin-top:8px">نوٹ: کل بقایا میں جہاں لاگو ہو، خریف 2024 اور ربیع 2025 کا بقایا بھی شامل ہے۔ خالی جگہ پر نمبر ہاتھ سے لکھا جا سکتا ہے۔</div>'
-    + sigBlock("ur") + docFoot(title);
+    + '</tbody></table>'
+    + '<div class="urdu" dir="rtl" style="font-size:16px;margin-top:8px">نوٹ: کل بقایا میں جہاں لاگو ہو، خریف 2024 اور ربیع 2025 کا بقایا بھی شامل ہے۔ خالی جگہ پر نمبر ہاتھ سے لکھا جا سکتا ہے۔</div>';
   doPrint(h, "ur");
 }
 $("pContacts").addEventListener("click", printContactList);
@@ -1686,6 +1701,11 @@ function renderContacts(){
     if(num) return '<div class="amts"><span>' + lbl + ': <b><a href="' + telHref(num) + '" style="color:var(--em2);text-decoration:none">📞 ' + esc(num) + '</a></b></span></div>';
     return '<div class="amts"><span class="mut">' + lbl + ': number nahi likha — bill khol kar likho</span></div>';
   }
+  function thekLine(c){
+    if(c.tkName && c.thekedar) return '<div class="amts"><span>Thekedar: <b>' + esc(c.tkName) + '</b> — <b><a href="' + telHref(c.thekedar) + '" style="color:var(--em2);text-decoration:none">📞 ' + esc(c.thekedar) + '</a></b></span></div>';
+    if(c.tkName) return '<div class="amts"><span>Thekedar: <b>' + esc(c.tkName) + '</b> <span class="mut">— number nahi likha</span></span></div>';
+    return numLine("Thekedar", c.thekedar);
+  }
   el.innerHTML = rows.map(function(g){
     var c = getContact(g.khata);
     return '<div class="farmer" data-sid="' + g.rep.season_id + '" data-khata="' + g.khata + '">'
@@ -1693,7 +1713,7 @@ function renderContacts(){
       + '<div class="info"><div class="nm">' + esc(g.rep.name) + '</div>'
       + (g.rep.ur_name ? '<div class="urnm urdu">' + esc(g.rep.ur_name) + '</div>' : '')
       + numLine("Owner (Maalik)", c.owner)
-      + numLine("Thekedar", c.thekedar)
+      + thekLine(c)
       + '<div class="amts"><span>Total Baqaya <b style="color:var(--red)">' + fmt(g.tot) + '</b></span></div></div>'
       + '<span class="pill Unpaid">Baqaya</span></div>';
   }).join("");
