@@ -371,12 +371,13 @@ nav button.on .ic{filter:none}
       <p class="small mut" id="installHint" style="margin-top:8px">Agar install prompt na aye: Chrome menu (⋮) → <b>Install app / Add to Home screen</b> dabao. · If no prompt appears, use Chrome menu (⋮) → <b>Install app / Add to Home screen</b>.</p>
       <button class="btn block gold" id="updateBtn" style="margin-top:12px">🔄 Reload — Naya Version Lagao (Update)</button>
       <p class="small mut" style="margin-top:8px">Naya version check karke lagata hai aur app dobara kholta hai. Tumhari entries (payments, bills) mehfooz rehti hain — update mein kuch delete nahi hota.</p>
-      <p class="small" id="updStatus" style="margin-top:6px"><b>Abiana Manager — Version v18</b></p>
+      <p class="small" id="updStatus" style="margin-top:6px"><b>Abiana Manager — Version v19</b></p>
     </div>
     <div class="panel">
       <h3>☁️ Data Sync — Kai ke paas copy</h3>
       <p class="small mut">Tumhara hisaab (payments, bills, contact numbers) khud bakhud Kai ke paas Google Sheet mein mehfooz ho jata hai — taake wo asal current hisaab dekh kar madad kar sake, aur phone kho jaye to copy wahan se mil jaye. Sync sirf <b>upload</b> hota hai; app ka data kabhi khud download ya restore nahi hota.</p>
       <button class="btn block" id="syncBtn">☁️ Abhi Sync Karo</button>
+      <button class="btn block ghost" id="pullBtn" style="margin-top:10px">📥 Sheet se Numbers Lao</button>
       <p class="small" id="syncStatus" style="margin-top:6px">Sync status yahan nazar ayega</p>
     </div>
     <div class="panel">
@@ -480,6 +481,7 @@ var seasonFilter = (function(){ var s = lsGetRaw(LS_SEASON); return SEASONS[s] ?
 var statusFilter = "All";
 var searchQuery = "";
 var currentBill = null;         // bill open in detail view
+var currentViewName = "dashboard";  // last view passed to switchView (contacts pull re-render ke liye)
 var editPayIdx = -1;            // payment index being edited in detail
 
 /* ==================== HELPERS ==================== */
@@ -797,13 +799,14 @@ function tryUnlock(){
   var a = $("pinEnter").value.trim();
   if(!a){ return; }
   hashPin(a).then(function(h){
-    if(h === lsGetRaw(LS_PIN)){ $("pinEnter").value=""; $("pinUnlockMsg").textContent = ""; hideLock(); }
+    if(h === lsGetRaw(LS_PIN)){ $("pinEnter").value=""; $("pinUnlockMsg").textContent = ""; hideLock(); try{ pullContacts(); }catch(e){} }
     else { $("pinUnlockMsg").textContent = "Wrong PIN. Try again."; $("pinEnter").value=""; }
   });
 }
 
 /* ==================== NAVIGATION ==================== */
 function switchView(name){
+  currentViewName = name;
   var views = document.querySelectorAll(".view");
   for(var i=0;i<views.length;i++) views[i].classList.toggle("active", views[i].id === "view-"+name);
   var btns = document.querySelectorAll("nav button");
@@ -1142,7 +1145,7 @@ $("resetBtn").addEventListener("click", function(){
 $("lockBtn").addEventListener("click", function(){ showLock(); });
 
 /* ==================== APP INSTALL & UPDATE (Settings) ==================== */
-var APP_VERSION = "v18";
+var APP_VERSION = "v19";
 (function(){ var el = $("updStatus"); if(el) el.innerHTML = "<b>Abiana Manager — Version " + APP_VERSION + "</b>"; })();
 var bipEvent = null;   // captured beforeinstallprompt (Chrome install offer)
 window.addEventListener("beforeinstallprompt", function(e){
@@ -1281,6 +1284,96 @@ $("syncBtn").addEventListener("click", function(){ syncNow(); });
 /* First run after the v18 update: his CURRENT real data uploads on first open. */
 if(!lsGetRaw(LS_SYNC_INIT)){ lsSetRaw(LS_SYNC_INIT, "1"); lsSetRaw(LS_SYNC_DIRTY, "1"); }
 setSyncStatus();
+
+/* ==================== CONTACTS PULL (Sheet se numbers, v19) ====================
+   The mirror of the upload above: the owner also maintains numbers in his
+   Google "Contact Numbers" sheet (khata + owner name pehle se wahan hain,
+   wo numbers wahan type/paste karta hai). The SAME Apps Script endpoint
+   serves them back as JSONP: GET SYNC_URL?cb=<fn> -> <fn>({ok, updated_at,
+   contacts:{khata:{owner, thekedar}}}) — only khatas with at least one
+   number. JSONP (a <script> tag) because Apps Script does not send CORS
+   headers for a plain fetch from this origin.
+   MERGE RULE (owner ki hifazat): a sheet value only ever FILLS an empty
+   field — jo number app mein pehle se likha hai wo KABHI overwrite nahi
+   hota. Merge persists through saveContacts(), so backup + sync-dirty
+   behave exactly as if the owner had typed the number himself.
+   Failures (offline, timeout, bad shape, script error) are SILENT for the
+   automatic pull; sirf Settings wala button status line par batata hai. */
+var PULL_TIMEOUT_MS = 12000;
+var pullInFlight = false, pullSeq = 0;
+
+function setPullStatus(msg){ var el = $("syncStatus"); if(el) el.textContent = msg; }
+
+/* Returns {changed:<khatas updated>, khatas:{khata:true}} */
+function mergeContacts(map){
+  var res = { changed:0, khatas:{} };
+  if(!map || typeof map !== "object" || Array.isArray(map)) return res;
+  Object.keys(map).forEach(function(k){
+    var sv = map[k]; if(!sv || typeof sv !== "object") return;
+    var so = String(sv.owner == null ? "" : sv.owner).trim();
+    var st = String(sv.thekedar == null ? "" : sv.thekedar).trim();
+    if(!so && !st) return;
+    var cur = getContact(k), did = false;
+    if(!cur.owner && so){ cur.owner = so; did = true; }
+    if(!cur.thekedar && st){ cur.thekedar = st; did = true; }
+    if(did){ contacts[k] = { owner:cur.owner, thekedar:cur.thekedar }; res.changed++; res.khatas[k] = true; }
+  });
+  if(res.changed) saveContacts();
+  return res;
+}
+
+function pullContacts(manual){
+  if(pullInFlight) return;
+  if(typeof navigator !== "undefined" && navigator.onLine === false){
+    if(manual) setPullStatus("Offline — numbers nahi aa sake; net ate hi 📥 wala button dobara dabao");
+    return;
+  }
+  pullInFlight = true;
+  var cbName = "__abianaContactsCb" + Date.now() + "_" + (++pullSeq);
+  var tag = null, timer = null, done = false;
+  function cleanup(){
+    if(timer){ clearTimeout(timer); timer = null; }
+    try{ delete window[cbName]; }catch(e){ window[cbName] = undefined; }
+    if(tag){ try{ if(tag.parentNode && tag.parentNode.removeChild) tag.parentNode.removeChild(tag); else if(tag.remove) tag.remove(); }catch(e){} tag = null; }
+    pullInFlight = false;
+  }
+  window[cbName] = function(resp){
+    if(done) return; done = true;
+    var okShape = resp && resp.ok === true && resp.contacts && typeof resp.contacts === "object" && !Array.isArray(resp.contacts);
+    var received = okShape ? Object.keys(resp.contacts).length : 0;
+    var merged = okShape ? mergeContacts(resp.contacts) : { changed:0, khatas:{} };
+    cleanup();
+    if(manual){
+      if(okShape) setPullStatus("Numbers mil gaye: " + received + " ✓ (Sheet se)");
+      else setPullStatus("Sheet se numbers nahi mile — dobara koshish karo");
+    }
+    if(merged.changed){
+      try{
+        if(currentViewName === "contacts") renderContacts();
+        else if(currentBill && merged.khatas[currentBill.khata]) renderDetail();
+      }catch(e){}
+    }
+  };
+  timer = setTimeout(function(){
+    if(done) return; done = true;
+    cleanup();
+    if(manual) setPullStatus("Sheet se numbers nahi mile — dobara koshish karo");
+  }, PULL_TIMEOUT_MS);
+  try{
+    tag = document.createElement("script");
+    tag.src = SYNC_URL + "?cb=" + cbName;
+    tag.onerror = function(){
+      if(done) return; done = true;
+      cleanup();
+      if(manual) setPullStatus("Sheet se numbers nahi mile — dobara koshish karo");
+    };
+    var parent = document.body || document.documentElement;
+    if(parent && parent.appendChild) parent.appendChild(tag);
+  }catch(e){
+    if(!done){ done = true; cleanup(); }
+  }
+}
+$("pullBtn").addEventListener("click", function(){ pullContacts(true); });
 
 /* ==================== PRINTING ==================== */
 var LBL = {
@@ -1519,8 +1612,10 @@ function printChowkidar(){
 $("pChowk").addEventListener("click", printChowkidar);
 
 /* ==================== CONTACT NUMBERS LIST (owner, 23 Oct 2026) ====================
-   URDU-ONLY list of every farmer who still owes money — the same cross-season
-   roll-up as the Chowkidar Copy (farmerTotals), so the totals reconcile.
+   URDU-ONLY print of the farmers who still owe money AND have a number
+   saved (print filter — see printContactList); the on-screen list shows
+   every owing farmer. Same cross-season roll-up as the Chowkidar Copy
+   (farmerTotals), so the totals reconcile.
    Columns: # | نام (Urdu name ONLY — no father name) | کھاتہ نمبر |
    مالک کا نمبر | ٹھیکیدار کا نمبر | کل بقایا (his TOTAL unpaid, all seasons).
    A number that is not saved yet prints as a dotted write-in line so it can
@@ -1532,7 +1627,27 @@ function contactNumCell(num){
   return '<span class="ctblank">&nbsp;</span>';
 }
 function printContactList(){
-  var rows = farmerTotals();
+  /* PRINT FILTER (owner, 23 Oct 2026): print mein SIRF wo kisan ate hain
+     jinka kam az kam AIK number (maalik ya thekedar) app mein darj hai —
+     "jo numbers dalo ge bas unhi ka printout niklana, jisme number nahi
+     hoga wo print page mein nahi aye ga". Screen wali Contacts list
+     mukammal rehti hai (sab baqaya walay kisan), filter sirf print par
+     hai. Count aur کل بقایا bhi printed subset ke hi hain. */
+  var rows = farmerTotals().filter(function(g){
+    var c = getContact(g.khata);
+    return !!(c.owner || c.thekedar);
+  });
+  var title = "بقایا آبیانہ — رابطہ نمبرز کی فہرست";
+  var noteLine = '<div class="urdu" dir="rtl" style="font-size:16px;margin:4px 0 8px">نوٹ: اس فہرست میں صرف وہ کسان شامل ہیں جن کا نمبر درج ہے۔</div>';
+  if(!rows.length){
+    var h0 = letterhead("ur", title, "خریف 2025 + ربیع 2026", null, 0)
+      + noteLine
+      + '<div class="chowline urdu" dir="rtl">آخری تاریخ: 27 اکتوبر 2026</div>'
+      + '<div class="urdu" dir="rtl" style="font-size:18px;text-align:center;margin:26px 0">ابھی تک کسی کسان کا نمبر درج نہیں ہے۔</div>'
+      + sigBlock("ur") + docFoot(title);
+    doPrint(h0, "ur");
+    return;
+  }
   var rowsHtml = "", gTot = 0;
   rows.forEach(function(g, i){
     gTot += g.tot;
@@ -1545,9 +1660,8 @@ function printContactList(){
       + '<td class="ctn">' + contactNumCell(c.thekedar) + '</td>'
       + '<td class="num bold">' + fmtN(g.tot) + (g.nSeasons > 2 ? chowCountNote(g.nSeasons, "ur") : '') + '</td></tr>';
   });
-  if(!rows.length) rowsHtml = '<tr><td colspan="6" style="text-align:center">—</td></tr>';
-  var title = "بقایا آبیانہ — رابطہ نمبرز کی فہرست";
   var h = letterhead("ur", title, "خریف 2025 + ربیع 2026", null, rows.length)
+    + noteLine
     + '<div class="chowline urdu" dir="rtl">آخری تاریخ: 27 اکتوبر 2026</div>'
     + '<table class="ctlist"><colgroup><col style="width:5%"><col style="width:25%"><col style="width:10%"><col style="width:22%"><col style="width:22%"><col style="width:16%"></colgroup>'
     + '<thead><tr><th>نمبر</th><th>نام</th><th>کھاتہ نمبر</th><th>مالک کا نمبر</th><th>ٹھیکیدار کا نمبر</th><th class="num">کل بقایا (روپے)</th></tr></thead><tbody>'
