@@ -191,6 +191,29 @@ nav button.on .ic{filter:none}
 #printArea [dir="rtl"] table{direction:rtl}
 #printArea [dir="rtl"] th,#printArea [dir="rtl"] td{text-align:right}
 #printArea [dir="rtl"] td.num,#printArea [dir="rtl"] th.num{text-align:left}
+
+/* ---------- Print Urdu size-up (owner, 23 Oct 2026) ----------
+   On paper the Urdu words were too small and thin: Nastaliq needs a much
+   larger nominal size than Latin to read at the same visual size. Body Urdu
+   (names etc.) goes from the inherited 11px cell size to 16px (+45%), with
+   a 600 weight in table cells; Urdu headings and table headers scale up to
+   match. English/numeric sizes stay as they were (except a small header
+   bump for balance in bilingual tables). More pages are fine (owner). */
+#printArea [dir="rtl"]{font-size:15px}
+#printArea .urdu{font-size:16px;line-height:1.85}
+#printArea td .urdu{font-weight:600}
+#printArea .lh .n1.urdu{font-size:25px}
+#printArea .lh .n2.urdu{font-size:16px;line-height:1.8}
+#printArea .rt .urdu{font-size:22px}
+#printArea th{font-size:12px}
+#printArea table.chow th{font-size:12.5px}
+#printArea [dir="rtl"] th{font-size:15px;font-family:"Noto Nastaliq Urdu","Segoe UI",serif;line-height:1.7;padding-top:5px;padding-bottom:5px}
+#printArea [dir="rtl"] table.chow th{font-size:15px}
+#printArea [dir="rtl"] table.meta .ml{font-size:12px}
+#printArea .sigfoot .sname.urdu{font-size:17px}
+#printArea .sigfoot .stitle.urdu{font-size:15px}
+#printArea .chowinst{font-size:18px}
+#printArea [dir="rtl"] .docfoot{font-size:13px}
 </style>
 </head>
 <body>
@@ -201,13 +224,6 @@ nav button.on .ic{filter:none}
     <div class="drop">💧</div>
     <h2>Abiana Manager</h2>
     <p>Muhammad Atif — Numberdar<br>Chak No. 130/1-L</p>
-    <div id="pinSetupWrap" style="display:none">
-      <p><b>Create your PIN</b> (4–6 digits). This locks the app screen on this phone.</p>
-      <input id="pinNew" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="New PIN" autocomplete="new-password">
-      <input id="pinConfirm" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Confirm PIN" autocomplete="new-password">
-      <div class="lockmsg" id="pinSetupMsg"></div>
-      <button class="btn block" id="pinSetBtn">Set PIN &amp; Open App</button>
-    </div>
     <div id="pinUnlockWrap" style="display:none">
       <p><b>Enter PIN</b> to open the app.</p>
       <input id="pinEnter" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="PIN" autocomplete="current-password">
@@ -704,28 +720,38 @@ function hashPin(pin){
   }
   return Promise.resolve(simpleHash(salted));
 }
+/* Built-in PIN (owner, 23 Oct 2026): the PIN is a fixed part of the app, no
+   longer chosen per install. Before this, the PIN hash lived only in
+   localStorage, so any fresh/incognito open found no PIN and offered a
+   "Create your PIN" setup — anyone holding the phone could set their own
+   PIN and walk in. Now the stored hash is (re)written from the built-in
+   value before the lock screen shows: fresh storage goes straight to
+   ENTER-PIN, an older self-chosen PIN is replaced by the built-in one, and
+   the setup flow no longer exists anywhere in the app. Flag-guarded and
+   idempotent; also self-heals if the stored PIN is ever missing. */
+var BUILTIN_PIN = "12096";
+var LS_FIXPIN = "abiana_fix_pin_v1";
+function fixBuiltinPin(){
+  if(lsGetRaw(LS_FIXPIN) && lsGetRaw(LS_PIN)) return Promise.resolve();
+  return hashPin(BUILTIN_PIN).then(function(h){
+    if(lsGetRaw(LS_PIN) !== h) lsSetRaw(LS_PIN, h);
+    lsSetRaw(LS_FIXPIN, "1");
+  }).catch(function(){});
+}
 function showLock(){
-  var has = !!lsGetRaw(LS_PIN);
-  $("pinSetupWrap").style.display = has ? "none" : "block";
-  $("pinUnlockWrap").style.display = has ? "block" : "none";
-  $("pinSetupMsg").textContent = ""; $("pinUnlockMsg").textContent = "";
+  $("pinUnlockWrap").style.display = "block";
+  $("pinUnlockMsg").textContent = "";
   $("lockScreen").classList.add("open");
-  var t = has ? $("pinEnter") : $("pinNew"); if(t) t.focus();
+  var t = $("pinEnter"); if(t) t.focus();
 }
 function hideLock(){ $("lockScreen").classList.remove("open"); }
-$("pinSetBtn").addEventListener("click", function(){
-  var a = $("pinNew").value.trim(), b = $("pinConfirm").value.trim();
-  if(!/^\d{4,6}$/.test(a)){ $("pinSetupMsg").textContent = "PIN must be 4–6 digits."; return; }
-  if(a !== b){ $("pinSetupMsg").textContent = "PINs do not match. Try again."; return; }
-  hashPin(a).then(function(h){ lsSetRaw(LS_PIN, h); $("pinNew").value=""; $("pinConfirm").value=""; hideLock(); });
-});
 $("pinUnlockBtn").addEventListener("click", tryUnlock);
 $("pinEnter").addEventListener("keydown", function(e){ if(e.key==="Enter") tryUnlock(); });
 function tryUnlock(){
   var a = $("pinEnter").value.trim();
   if(!a){ return; }
   hashPin(a).then(function(h){
-    if(h === lsGetRaw(LS_PIN)){ $("pinEnter").value=""; hideLock(); }
+    if(h === lsGetRaw(LS_PIN)){ $("pinEnter").value=""; $("pinUnlockMsg").textContent = ""; hideLock(); }
     else { $("pinUnlockMsg").textContent = "Wrong PIN. Try again."; $("pinEnter").value=""; }
   });
 }
@@ -1043,7 +1069,7 @@ $("resetBtn").addEventListener("click", function(){
 $("lockBtn").addEventListener("click", function(){ showLock(); });
 
 /* ==================== APP INSTALL & UPDATE (Settings) ==================== */
-var APP_VERSION = "v15";
+var APP_VERSION = "v16";
 (function(){ var el = $("updStatus"); if(el) el.innerHTML = "<b>Abiana Manager — Version " + APP_VERSION + "</b>"; })();
 var bipEvent = null;   // captured beforeinstallprompt (Chrome install offer)
 window.addEventListener("beforeinstallprompt", function(e){
@@ -1278,8 +1304,8 @@ function chowSeasonLabel(sid, lang){
 function chowCountNote(n, lang){
   var enTxt = "Total of " + n + (n===1 ? " season" : " seasons");
   var urTxt = "کل " + n + " فصلوں کا بقایا";
-  if(lang==="ur") return '<br><span class="urdu" style="font-size:12px;color:#555">' + esc(urTxt) + '</span>';
-  if(lang==="bi") return '<br><span class="urdu" style="font-size:12px;color:#555">' + esc(urTxt) + '</span><br><span style="font-size:10.5px;color:#555">' + esc(enTxt) + '</span>';
+  if(lang==="ur") return '<br><span class="urdu" style="font-size:15px;color:#555">' + esc(urTxt) + '</span>';
+  if(lang==="bi") return '<br><span class="urdu" style="font-size:15px;color:#555">' + esc(urTxt) + '</span><br><span style="font-size:10.5px;color:#555">' + esc(enTxt) + '</span>';
   return '<br><span style="font-size:10.5px;color:#555">' + esc(enTxt) + '</span>';
 }
 function printChowkidar(){
@@ -1314,7 +1340,7 @@ function printChowkidar(){
     : '<div class="cornerlabel">COPY FOR CHOWKIDAR</div>';
   var seasonsLine = "Kharif 2025 + Rabi 2026";
   var noteEn = '<div style="font-size:11px;margin-top:8px">Note: Totals include Kharif 2024 and Rabi 2025 dues where applicable.</div>';
-  var noteUr = '<div class="urdu" dir="rtl" style="font-size:12.5px;margin-top:8px">نوٹ: کل بقایا میں جہاں لاگو ہو، خریف 2024 اور ربیع 2025 کا بقایا بھی شامل ہے۔</div>';
+  var noteUr = '<div class="urdu" dir="rtl" style="font-size:16px;margin-top:8px">نوٹ: کل بقایا میں جہاں لاگو ہو، خریف 2024 اور ربیع 2025 کا بقایا بھی شامل ہے۔</div>';
   var footnote = lang==="ur" ? noteUr : lang==="bi" ? noteUr + noteEn : noteEn;
   var h = corner + '<div style="clear:both"></div>'
     + letterhead(lang, L.unpaidT, seasonsLine, null, n)
@@ -1363,7 +1389,7 @@ seedVideoStatuses();
 fixOwner22Oct();
 fixSeededCustomNames();
 setSeason(seasonFilter);
-showLock();
+fixBuiltinPin().then(function(){ showLock(); });
 if("serviceWorker" in navigator && (location.protocol==="http:" || location.protocol==="https:")){
   /* Prompt updates (stale-names fix, 22 Oct 2026): bill data is baked into
      this document, and the service worker used to serve its cached copy
