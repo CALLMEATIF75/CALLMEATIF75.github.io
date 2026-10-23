@@ -371,7 +371,13 @@ nav button.on .ic{filter:none}
       <p class="small mut" id="installHint" style="margin-top:8px">Agar install prompt na aye: Chrome menu (⋮) → <b>Install app / Add to Home screen</b> dabao. · If no prompt appears, use Chrome menu (⋮) → <b>Install app / Add to Home screen</b>.</p>
       <button class="btn block gold" id="updateBtn" style="margin-top:12px">🔄 Reload — Naya Version Lagao (Update)</button>
       <p class="small mut" style="margin-top:8px">Naya version check karke lagata hai aur app dobara kholta hai. Tumhari entries (payments, bills) mehfooz rehti hain — update mein kuch delete nahi hota.</p>
-      <p class="small" id="updStatus" style="margin-top:6px"><b>Abiana Manager — Version v17</b></p>
+      <p class="small" id="updStatus" style="margin-top:6px"><b>Abiana Manager — Version v18</b></p>
+    </div>
+    <div class="panel">
+      <h3>☁️ Data Sync — Kai ke paas copy</h3>
+      <p class="small mut">Tumhara hisaab (payments, bills, contact numbers) khud bakhud Kai ke paas Google Sheet mein mehfooz ho jata hai — taake wo asal current hisaab dekh kar madad kar sake, aur phone kho jaye to copy wahan se mil jaye. Sync sirf <b>upload</b> hota hai; app ka data kabhi khud download ya restore nahi hota.</p>
+      <button class="btn block" id="syncBtn">☁️ Abhi Sync Karo</button>
+      <p class="small" id="syncStatus" style="margin-top:6px">Sync status yahan nazar ayega</p>
     </div>
     <div class="panel">
       <h3>🔒 Security</h3>
@@ -460,7 +466,7 @@ var LS_PAY = "abiana_payments_v1", LS_CUSTOM = "abiana_custom_bills_v1",
     LS_PIN = "abiana_pin_hash", LS_LANG = "abiana_print_lang", LS_SEASON = "abiana_season",
     LS_CONTACTS = "abiana_contacts_v1";
 function lsGet(k, dflt){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : dflt; }catch(e){ return dflt; } }
-function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} if(k===LS_PAY||k===LS_CUSTOM||k===LS_CONTACTS) markSyncDirty(); }
 function lsGetRaw(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSetRaw(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
 
@@ -1136,7 +1142,7 @@ $("resetBtn").addEventListener("click", function(){
 $("lockBtn").addEventListener("click", function(){ showLock(); });
 
 /* ==================== APP INSTALL & UPDATE (Settings) ==================== */
-var APP_VERSION = "v17";
+var APP_VERSION = "v18";
 (function(){ var el = $("updStatus"); if(el) el.innerHTML = "<b>Abiana Manager — Version " + APP_VERSION + "</b>"; })();
 var bipEvent = null;   // captured beforeinstallprompt (Chrome install offer)
 window.addEventListener("beforeinstallprompt", function(e){
@@ -1197,6 +1203,84 @@ function forceAppUpdate(){
   }).catch(function(){ wipeShellAndReload(); });
 }
 $("updateBtn").addEventListener("click", forceAppUpdate);
+
+/* ==================== DATA SYNC (Kai ke paas copy) ==================== */
+/* One-way AUTO-UPLOAD of the app's backup — the exact JSON string the Export
+   Backup button downloads — to the owner's private Google Sheet (Apps Script
+   endpoint; anonymous access, the key in the POST body is the gate). It lets
+   Kai see the REAL current hisaab (payments / custom bills / contact numbers)
+   and rebuild things like the Contact Numbers sheet from the truth instead
+   of the seed. Upload ONLY: the app never downloads or auto-restores —
+   restoring stays the manual Import Backup flow.
+   Behaviour: every persistence of payments / customBills / contacts goes
+   through lsSet, which calls markSyncDirty() (see STORAGE). A sync is
+   attempted ~5s after the last change (debounced), on app load when dirty,
+   and when the phone comes back online. All background attempts are silent.
+   The POST uses mode:"no-cors", so the response is opaque — a completed
+   fetch counts as "sent" (lastSync recorded, dirty cleared); a rejected
+   fetch keeps the dirty flag for the next attempt. */
+var SYNC_URL = "https://script.google.com/macros/s/AKfycbx0BR-1e0hLQ7YsTdVX_T6raI9QbAUVB_pLhbce7t2O_ww_w1-DdGyQQchtlFkwHvjiLg/exec";
+var SYNC_KEY = "9844c16b0fed88b382cb24fd";
+var LS_SYNC_LAST = "abiana_sync_last", LS_SYNC_DIRTY = "abiana_sync_dirty", LS_SYNC_INIT = "abiana_sync_init_v1";
+var SYNC_DEBOUNCE_MS = 5000;
+var syncTimer = null, syncInFlight = false, syncGen = 0;
+
+function syncIsDirty(){ return lsGetRaw(LS_SYNC_DIRTY) === "1"; }
+function markSyncDirty(){
+  syncGen++;
+  lsSetRaw(LS_SYNC_DIRTY, "1");
+  setSyncStatus();
+  scheduleSync();
+}
+function scheduleSync(){
+  if(syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(function(){ syncTimer = null; if(syncIsDirty()) syncNow(); }, SYNC_DEBOUNCE_MS);
+}
+function fmtSyncTime(iso){
+  try{
+    var d = new Date(iso); if(isNaN(d.getTime())) return String(iso || "");
+    var ymd = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+    return ddmmyyyy(ymd) + " " + String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+  }catch(e){ return String(iso || ""); }
+}
+function setSyncStatus(force){
+  var el = $("syncStatus"); if(!el) return;
+  if(force === "syncing"){ el.textContent = "Sync ho raha hai… / Syncing…"; return; }
+  if(force === "done"){ el.textContent = "Sync ho gaya ✓ — Last sync: " + fmtSyncTime(lsGetRaw(LS_SYNC_LAST)); return; }
+  if(typeof navigator !== "undefined" && navigator.onLine === false){ el.textContent = "Offline — net ate hi sync ho jayega"; return; }
+  if(syncIsDirty()){ el.textContent = "Sync baqi hai — taaza hisaab abhi Kai tak nahi gaya"; return; }
+  var last = lsGetRaw(LS_SYNC_LAST);
+  el.textContent = last ? ("Last sync: " + fmtSyncTime(last) + " ✓") : "Abhi tak sync nahi hua";
+}
+function syncNow(){
+  if(syncInFlight) return Promise.resolve(false);
+  if(typeof fetch !== "function") return Promise.resolve(false);
+  if(typeof navigator !== "undefined" && navigator.onLine === false){ setSyncStatus(); return Promise.resolve(false); }
+  var gen = syncGen;
+  var body = null;
+  try{ body = JSON.stringify({ key: SYNC_KEY, backup: JSON.stringify(buildBackup(), null, 2), ts: new Date().toISOString() }); }
+  catch(e){ setSyncStatus(); return Promise.resolve(false); }
+  syncInFlight = true; setSyncStatus("syncing");
+  return fetch(SYNC_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: body })
+    .then(function(){
+      syncInFlight = false;
+      lsSetRaw(LS_SYNC_LAST, new Date().toISOString());
+      if(gen === syncGen){ lsSetRaw(LS_SYNC_DIRTY, "0"); setSyncStatus("done"); }
+      else { setSyncStatus(); scheduleSync(); }  /* changed again mid-sync — upload the newer state too */
+      return true;
+    })
+    .catch(function(){ syncInFlight = false; setSyncStatus(); return false; });
+}
+function syncAttemptOnLoad(){ if(syncIsDirty()) syncNow(); }
+function syncOnOnline(){ if(syncIsDirty()) syncNow(); else setSyncStatus(); }
+if(typeof window !== "undefined" && window.addEventListener){
+  window.addEventListener("online", syncOnOnline);
+  window.addEventListener("load", syncAttemptOnLoad);
+}
+$("syncBtn").addEventListener("click", function(){ syncNow(); });
+/* First run after the v18 update: his CURRENT real data uploads on first open. */
+if(!lsGetRaw(LS_SYNC_INIT)){ lsSetRaw(LS_SYNC_INIT, "1"); lsSetRaw(LS_SYNC_DIRTY, "1"); }
+setSyncStatus();
 
 /* ==================== PRINTING ==================== */
 var LBL = {
