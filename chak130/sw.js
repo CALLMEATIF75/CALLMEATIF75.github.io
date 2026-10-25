@@ -1,6 +1,6 @@
 /* ZameenMap service worker — caches the app shell for instant offline open.
    Satellite tiles are NOT handled here; they live in the app's IndexedDB cache. */
-var CACHE = 'zameenmap-shell-v7.5';
+var CACHE = 'zameenmap-shell-v7.8';
 var SHELL = ['./', './index.html', './manifest.webmanifest', './favicon.svg',
   './favicon-32.png', './apple-touch-icon.png', './icon-192.png',
   './icon-512.png', './icon-maskable-512.png'];

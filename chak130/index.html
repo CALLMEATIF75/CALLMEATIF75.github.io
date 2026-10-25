@@ -1117,6 +1117,27 @@ body.theme-streets .lbl-q-sel,body.theme-plain .lbl-q-sel{color:#b45309;text-sha
   </div>
 
   <div class="tabbody" id="tab-pm" style="display:none">
+    <h5>Land Calculator</h5>
+    <p class="hint">Just type the measurement in feet — the rest is calculated automatically. <b>Fully offline:</b> this calculator lives inside this page, it fetches nothing from the internet.</p>
+    <div class="searchrow">
+      <input id="calcLen" type="number" min="0" step="any" inputmode="decimal" placeholder="Length (ft)" oninput="calcLandUpdate()">
+      <input id="calcWid" type="number" min="0" step="any" inputmode="decimal" placeholder="Width (ft)" oninput="calcLandUpdate()">
+    </div>
+    <p class="hint" style="margin-top:6px">Or enter the area directly (if you already know it):</p>
+    <div class="searchrow">
+      <input id="calcSqft" type="number" min="0" step="any" inputmode="decimal" placeholder="Area (sq ft) — optional" oninput="calcLandUpdate()">
+    </div>
+    <div class="res" id="calcRes" style="display:none">
+      <div class="resline big"><span>Total Area</span><b id="calcBreak">—</b></div>
+      <div class="resline mid"><span>Square Feet</span><b id="calcSqftOut">0</b></div>
+      <div class="resline big"><span>Marla</span><b id="calcMarla">0</b></div>
+      <div class="resline"><span>Kanal</span><b id="calcKanal">0</b></div>
+      <div class="resline"><span>Acre</span><b id="calcAcre">0</b></div>
+      <div class="resline"><span>Square Yard (Gaj)</span><b id="calcGaj">0</b></div>
+      <div class="resline"><span>Square Meter</span><b id="calcSqm">0</b></div>
+    </div>
+    <div class="btnrow"><button onclick="calcLandClear()">Clear Calculator</button></div>
+    <p class="hint">Hisab: 1 Marla = 272.25 sq ft &middot; 1 Kanal = 20 Marla = 5,445 sq ft &middot; 1 Acre = 8 Kanal = 160 Marla = 43,560 sq ft.</p>
     <h5>Measure (Paimaish)</h5>
     <button class="big" id="pmBtn" onclick="toggleMeasure()">Start Measurement</button>
     <div class="btnrow"><button id="unFt" class="on2" onclick="v6SetUnits('ft')">Units: Feet</button><button id="unM" onclick="v6SetUnits('m')">Units: Metres</button></div>
@@ -1165,7 +1186,7 @@ body.theme-streets .lbl-q-sel,body.theme-plain .lbl-q-sel{color:#b45309;text-sha
     <div id="ownList"></div>
   </div>
 
-  <div class="dash-foot"><div class="owner-name">Muhammad Atif</div><div class="owner-role">Numberdar &middot; Chak 130/1-L</div><div class="owner-ver">ZameenMap &middot; v7.5</div></div>
+  <div class="dash-foot"><div class="owner-name">Muhammad Atif</div><div class="owner-role">Numberdar &middot; Chak 130/1-L</div><div class="owner-ver">ZameenMap &middot; v7.8</div></div>
 </aside>
 <div id="pmChip" class="glass" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:1200;border-radius:14px;padding:10px 16px;font-size:14px;font-weight:800;color:#facc15;text-align:center;max-width:86vw"><span id="pmChipTxt">Points: 0</span></div>
 <button id="cleanExit" onclick="toggleCleanView()" aria-label="Close clean view">&#10005;</button>
@@ -2822,7 +2843,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 /* test hooks */
-window.__v6 = { version:'v7.5',
+window.__v6 = { version:'v7.8',
   theme:function(){ return theme; },
   units:function(){ return window.V6_UNITS; },
   gotoCount:function(){ return gotoPts.length; },
@@ -2831,6 +2852,44 @@ window.__v6 = { version:'v7.5',
   geoToLL:geoToLL, llToGeo:llToGeo, mCorners:mCorners, qCorners:qCorners, locate:locate,
   dms:v6DmsToDeg };
 window.__v7 = window.__v6;
+})();
+</script>
+<script>
+/* ===== v7.8: Land Calculator (Measure tab) — pure inline JS, works fully offline.
+   No network, no external file: it lives in this page, so the service worker's
+   cached index.html carries it offline. Conversions match the map's own
+   Measure tool: 1 Marla = 272.25 sq ft, 1 Kanal = 5445 sq ft, 1 Acre = 43560 sq ft. */
+(function(){
+  function num(id){ var el=document.getElementById(id); if(!el) return 0; var v=parseFloat(el.value); return (isFinite(v) && v>0) ? v : 0; }
+  function fmt(n, d){ return n.toLocaleString('en-US', {maximumFractionDigits:(d===undefined?2:d), minimumFractionDigits:0}); }
+  window.calcLandUpdate = function(){
+    var direct = num('calcSqft');
+    var sqft = direct > 0 ? direct : num('calcLen') * num('calcWid');
+    var box = document.getElementById('calcRes'); if(!box) return;
+    if(!(sqft > 0)){ box.style.display = 'none'; return; }
+    var acres = Math.floor(sqft / 43560);
+    var rem = sqft - acres * 43560;
+    var kanal = Math.floor(rem / 5445);
+    rem = rem - kanal * 5445;
+    var marla = rem / 272.25;
+    var parts = [];
+    if(acres > 0) parts.push(acres + (acres === 1 ? ' Acre' : ' Acres'));
+    if(kanal > 0) parts.push(kanal + (kanal === 1 ? ' Kanal' : ' Kanal'));
+    parts.push(fmt(marla, 2) + ' Marla');
+    document.getElementById('calcBreak').textContent = parts.join('  ');
+    document.getElementById('calcSqftOut').textContent = fmt(sqft, 2);
+    document.getElementById('calcMarla').textContent = fmt(sqft / 272.25, 2);
+    document.getElementById('calcKanal').textContent = fmt(sqft / 5445, 3);
+    document.getElementById('calcAcre').textContent = fmt(sqft / 43560, 4);
+    document.getElementById('calcGaj').textContent = fmt(sqft / 9, 1);
+    document.getElementById('calcSqm').textContent = fmt(sqft * 0.09290304, 2);
+    box.style.display = 'block';
+  };
+  window.calcLandClear = function(){
+    ['calcLen','calcWid','calcSqft'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+    var box = document.getElementById('calcRes'); if(box) box.style.display = 'none';
+  };
+  window.__calcLand = { version:'v7.8', convert:function(sqft){ return {sqft:sqft, marla:sqft/272.25, kanal:sqft/5445, acre:sqft/43560}; } };
 })();
 </script>
 <style>
