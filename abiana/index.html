@@ -1001,7 +1001,8 @@ function renderDetail(){
      + '<option value="en"' + (printLang==="en"?" selected":"") + '>English</option>'
      + '<option value="ur"' + (printLang==="ur"?" selected":"") + '>Urdu</option>'
      + '<option value="bi"' + (printLang==="bi"?" selected":"") + '>Bilingual</option></select></div>'
-     + '<button class="btn block ghost" id="printReceiptBtn">🖨 Print Receipt</button></div>';
+     + '<button class="btn block ghost" id="printReceiptBtn">🖨 Print Receipt</button>'
+     + '<button class="btn block ghost" id="printBillBtn" style="margin-top:8px">🖨 Print Bill</button></div>';
 
   if(b.custom){
     h += '<div class="panel"><h3>Manually Added Bill</h3><p class="small mut">This bill was added by hand in this app.</p>' + (b.note ? '<p class="small">' + esc(b.note) + '</p>' : '') + '<button class="btn red sm" id="delCustomBtn">Delete This Bill</button></div>';
@@ -1068,6 +1069,7 @@ function renderDetail(){
   });
   $("rcLang").addEventListener("change", function(){ printLang = this.value; lsSetRaw(LS_LANG, printLang); $("pLang").value = printLang; });
   $("printReceiptBtn").addEventListener("click", function(){ printReceipt(b, printLang); });
+  $("printBillBtn").addEventListener("click", function(){ printFarmerBill(b, printLang); });
   var dc = $("delCustomBtn");
   if(dc) dc.addEventListener("click", function(){
     if(confirm("Delete this manually added bill (Khata " + b.khata + ")? Its payments will also be removed.")){
@@ -1391,7 +1393,8 @@ var LBL = {
        cons:"Consumer No.", ref:"Bill Reference", issue:"Issue Date", due:"Due Date", afterdue:"Payable After Due Date",
        payhist:"Payments Received", pdate:"Date", pamt:"Amount (Rs)", pnote:"Note", words:"Amount in Words", sig:"Signature & Seal — Muhammad Atif, Numberdar",
        metric:"Detail", value:"Value", received:"Received", balance:"Balance",
-       lastdate:"Last Date", kharifB:"Kharif 2025 Baqaya (Rs)", rabiB:"Rabi 2026 Baqaya (Rs)", totB:"TOTAL Baqaya (Rs)" },
+       lastdate:"Last Date", kharifB:"Kharif 2025 Baqaya (Rs)", rabiB:"Rabi 2026 Baqaya (Rs)", totB:"TOTAL Baqaya (Rs)",
+       billT:"ABIANA BILL", paidtodate:"Paid to Date", remL:"Remaining to Pay", lastpay:"Last date for payment: 27 October 2026", paynote:"Please pay by the last date.", psid:"PSID" },
   ur:{ sr:"نمبر", khata:"کھاتہ", farmer:"کسان", father:"والد", area:"رقبہ (کنال-مرلہ)", bill:"بل (روپے)", paid:"ادا شدہ (روپے)", rem:"بقایا (روپے)", status:"حالت",
        paidT:"ادا شدہ فہرست", unpaidT:"بقایا آبیانہ کی فہرست", completeT:"مکمل فہرست", summaryT:"سیزن خلاصہ",
        jama:"جمع شدہ (روپے)", paas:"میرے پاس (روپے)", baq:"بقایا (روپے)", farmers:"کل کسان",
@@ -1400,7 +1403,8 @@ var LBL = {
        cons:"صارف نمبر", ref:"بل حوالہ نمبر", issue:"تاریخ اجرا", due:"آخری تاریخ", afterdue:"آخری تاریخ کے بعد قابل ادا",
        payhist:"وصول شدہ ادائیگیاں", pdate:"تاریخ", pamt:"رقم (روپے)", pnote:"نوٹ", words:"رقم لفظوں میں", sig:"دستخط و مہر — محمد عاطف، نمبردار",
        metric:"تفصیل", value:"قدر", received:"موصول", balance:"بقایا",
-       lastdate:"آخری تاریخ", kharifB:"خریف 2025 بقایا (روپے)", rabiB:"ربیع 2026 بقایا (روپے)", totB:"کل بقایا (روپے)" },
+       lastdate:"آخری تاریخ", kharifB:"خریف 2025 بقایا (روپے)", rabiB:"ربیع 2026 بقایا (روپے)", totB:"کل بقایا (روپے)",
+       billT:"آبیانہ بل", paidtodate:"اب تک ادا شدہ", remL:"بقایا ادائیگی", lastpay:"آخری تاریخ: 27 اکتوبر 2026", paynote:"براہ کرم آخری تاریخ تک ادائیگی کریں۔", psid:"پی ایس آئی ڈی" },
   bi:{ sr:"Sr / نمبر", khata:"Khata / کھاتہ", farmer:"Farmer / کسان", father:"Father / والد", area:"Area / رقبہ (K-M)", bill:"Bill / بل (Rs)", paid:"Paid / ادا (Rs)", rem:"Remaining / بقایا (Rs)", status:"Status / حالت",
        paidT:"Paid List / ادا شدہ فہرست", unpaidT:"Outstanding Abiana List / بقایا آبیانہ کی فہرست", completeT:"Complete List / مکمل فہرست", summaryT:"Season Summary / سیزن خلاصہ",
        jama:"Paid — Jama / جمع شدہ (Rs)", paas:"Collected — Paas / میرے پاس (Rs)", baq:"Baqaya / بقایا (Rs)", farmers:"Total Farmers / کل کسان",
@@ -1409,7 +1413,8 @@ var LBL = {
        cons:"Consumer No. / صارف نمبر", ref:"Bill Reference / حوالہ نمبر", issue:"Issue Date / تاریخ اجرا", due:"Due Date / آخری تاریخ", afterdue:"After Due Date / بعد از تاریخ قابل ادا",
        payhist:"Payments Received / وصول شدہ ادائیگیاں", pdate:"Date / تاریخ", pamt:"Amount / رقم (Rs)", pnote:"Note / نوٹ", words:"Amount in Words / رقم لفظوں میں", sig:"Signature & Seal / دستخط و مہر — Muhammad Atif, Numberdar / محمد عاطف، نمبردار",
        metric:"Detail / تفصیل", value:"Value / قدر", received:"Received / موصول", balance:"Balance / بقایا",
-       lastdate:"Last Date / آخری تاریخ", kharifB:"Kharif 2025 Baqaya / خریف بقایا (Rs)", rabiB:"Rabi 2026 Baqaya / ربیع بقایا (Rs)", totB:"TOTAL Baqaya / کل بقایا (Rs)" }
+       lastdate:"Last Date / آخری تاریخ", kharifB:"Kharif 2025 Baqaya / خریف بقایا (Rs)", rabiB:"Rabi 2026 Baqaya / ربیع بقایا (Rs)", totB:"TOTAL Baqaya / کل بقایا (Rs)",
+       billT:"ABIANA BILL / آبیانہ بل", paidtodate:"Paid to Date / اب تک ادا شدہ", remL:"Remaining to Pay / بقایا ادائیگی", lastpay:"Last date for payment: 27 October 2026 / آخری تاریخ: 27 اکتوبر 2026", paynote:"Please pay by the last date. / براہ کرم آخری تاریخ تک ادائیگی کریں۔", psid:"PSID / پی ایس آئی ڈی" }
 };
 var EMBLEM_SVG = '<svg width="32" height="32" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#000" stroke-width="2"/><circle cx="24" cy="24" r="18.5" fill="none" stroke="#000" stroke-width="1"/><path d="M24 12 C24 12 15.5 21.5 15.5 28.5 a8.5 8.5 0 0 0 17 0 C32.5 21.5 24 12 24 12 Z" fill="none" stroke="#000" stroke-width="1.8"/></svg>';
 function titleHtml(lang, title){
@@ -1744,6 +1749,38 @@ function printReceipt(b, lang){
     + '<tbody><tr><td class="num">' + fmtN(effAmt(b)) + '</td><td class="num">' + fmtN(paid) + '</td><td class="num">' + fmtN(rem) + '</td><td>' + esc(L[st]) + '</td></tr></tbody></table>'
     + '<p style="margin-top:12px"><b>' + esc(L.words) + ':</b> Rupees ' + amountWords(paid) + ' Only</p>'
     + sigBlock(lang) + docFoot(L.receipt);
+  doPrint(h, lang);
+}
+
+/* Farmer bill (26 Oct 2026): one farmer's own bill, printable from the
+   farmer detail screen — so a farmer who wants to pay himself gets his bill
+   to print / save as PDF. The last date is ALWAYS the collection deadline
+   27 October 2026, whatever the bill's original due date was. */
+function printFarmerBill(b, lang){
+  var L = LBL[lang], paid = paidCapped(b), rem = remaining(b);
+  var rows = [
+    [L.season, esc(SEASONS[b.season_id].label), ""],
+    [L.khata, String(b.khata), ""],
+    [L.farmer, nameCell(b, lang, false), ""],
+    [L.father, nameCell(b, lang, true), ""],
+    [L.area, esc(b.kanal + " Kanal " + b.marla + " Marla"), ""],
+    [L.cons, esc(b.cons||"—"), ""],
+    [L.psid, '<b>' + esc(b.ref||"—") + '</b>', "num"],
+    [L.ref, esc(b.ref||"—"), ""],
+    [L.bill, fmtN(effAmt(b)), "num"]
+  ];
+  if(paid > 0) rows.push([L.paidtodate, fmtN(paid), "num"]);
+  rows.push([L.remL, fmtN(rem), "num"]);
+  var h = letterhead(lang, L.billT, SEASONS[b.season_id].label, null)
+    + '<table><colgroup><col style="width:32%"><col style="width:68%"></colgroup><tbody>'
+    + rows.map(function(r){
+      return '<tr><th>' + esc(r[0]) + '</th><td' + (r[2] ? ' class="num"' : '') + '>' + r[1] + '</td></tr>';
+    }).join("")
+    + '</tbody></table>'
+    + '<div style="border:2px solid #000;padding:12px;margin-top:16px;text-align:center">'
+    + '<div style="font-size:19px;font-weight:800">' + esc(L.lastpay) + '</div>'
+    + '<div style="margin-top:5px">' + esc(L.paynote) + '</div></div>'
+    + sigBlock(lang) + docFoot(L.billT);
   doPrint(h, lang);
 }
 
