@@ -1394,7 +1394,7 @@ var LBL = {
        payhist:"Payments Received", pdate:"Date", pamt:"Amount (Rs)", pnote:"Note", words:"Amount in Words", sig:"Signature & Seal — Muhammad Atif, Numberdar",
        metric:"Detail", value:"Value", received:"Received", balance:"Balance",
        lastdate:"Last Date", kharifB:"Kharif 2025 Baqaya (Rs)", rabiB:"Rabi 2026 Baqaya (Rs)", totB:"TOTAL Baqaya (Rs)",
-       billT:"ABIANA BILL", paidtodate:"Paid to Date", remL:"Remaining to Pay", lastpay:"Last date for payment: 27 October 2026", paynote:"Please pay by the last date.", psid:"PSID" },
+       billT:"ABIANA BILL", paidtodate:"Paid to Date", remL:"Remaining to Pay", lastpay:"Last date for payment: 27 October 2026", paynote:"Please pay by the last date.", psid:"PSID", psidManual:"Manual Collection" },
   ur:{ sr:"نمبر", khata:"کھاتہ", farmer:"کسان", father:"والد", area:"رقبہ (کنال-مرلہ)", bill:"بل (روپے)", paid:"ادا شدہ (روپے)", rem:"بقایا (روپے)", status:"حالت",
        paidT:"ادا شدہ فہرست", unpaidT:"بقایا آبیانہ کی فہرست", completeT:"مکمل فہرست", summaryT:"سیزن خلاصہ",
        jama:"جمع شدہ (روپے)", paas:"میرے پاس (روپے)", baq:"بقایا (روپے)", farmers:"کل کسان",
@@ -1404,7 +1404,7 @@ var LBL = {
        payhist:"وصول شدہ ادائیگیاں", pdate:"تاریخ", pamt:"رقم (روپے)", pnote:"نوٹ", words:"رقم لفظوں میں", sig:"دستخط و مہر — محمد عاطف، نمبردار",
        metric:"تفصیل", value:"قدر", received:"موصول", balance:"بقایا",
        lastdate:"آخری تاریخ", kharifB:"خریف 2025 بقایا (روپے)", rabiB:"ربیع 2026 بقایا (روپے)", totB:"کل بقایا (روپے)",
-       billT:"آبیانہ بل", paidtodate:"اب تک ادا شدہ", remL:"بقایا ادائیگی", lastpay:"آخری تاریخ: 27 اکتوبر 2026", paynote:"براہ کرم آخری تاریخ تک ادائیگی کریں۔", psid:"پی ایس آئی ڈی" },
+       billT:"آبیانہ بل", paidtodate:"اب تک ادا شدہ", remL:"بقایا ادائیگی", lastpay:"آخری تاریخ: 27 اکتوبر 2026", paynote:"براہ کرم آخری تاریخ تک ادائیگی کریں۔", psid:"پی ایس آئی ڈی", psidManual:"دستی وصولی" },
   bi:{ sr:"Sr / نمبر", khata:"Khata / کھاتہ", farmer:"Farmer / کسان", father:"Father / والد", area:"Area / رقبہ (K-M)", bill:"Bill / بل (Rs)", paid:"Paid / ادا (Rs)", rem:"Remaining / بقایا (Rs)", status:"Status / حالت",
        paidT:"Paid List / ادا شدہ فہرست", unpaidT:"Outstanding Abiana List / بقایا آبیانہ کی فہرست", completeT:"Complete List / مکمل فہرست", summaryT:"Season Summary / سیزن خلاصہ",
        jama:"Paid — Jama / جمع شدہ (Rs)", paas:"Collected — Paas / میرے پاس (Rs)", baq:"Baqaya / بقایا (Rs)", farmers:"Total Farmers / کل کسان",
@@ -1414,7 +1414,7 @@ var LBL = {
        payhist:"Payments Received / وصول شدہ ادائیگیاں", pdate:"Date / تاریخ", pamt:"Amount / رقم (Rs)", pnote:"Note / نوٹ", words:"Amount in Words / رقم لفظوں میں", sig:"Signature & Seal / دستخط و مہر — Muhammad Atif, Numberdar / محمد عاطف، نمبردار",
        metric:"Detail / تفصیل", value:"Value / قدر", received:"Received / موصول", balance:"Balance / بقایا",
        lastdate:"Last Date / آخری تاریخ", kharifB:"Kharif 2025 Baqaya / خریف بقایا (Rs)", rabiB:"Rabi 2026 Baqaya / ربیع بقایا (Rs)", totB:"TOTAL Baqaya / کل بقایا (Rs)",
-       billT:"ABIANA BILL / آبیانہ بل", paidtodate:"Paid to Date / اب تک ادا شدہ", remL:"Remaining to Pay / بقایا ادائیگی", lastpay:"Last date for payment: 27 October 2026 / آخری تاریخ: 27 اکتوبر 2026", paynote:"Please pay by the last date. / براہ کرم آخری تاریخ تک ادائیگی کریں۔", psid:"PSID / پی ایس آئی ڈی" }
+       billT:"ABIANA BILL / آبیانہ بل", paidtodate:"Paid to Date / اب تک ادا شدہ", remL:"Remaining to Pay / بقایا ادائیگی", lastpay:"Last date for payment: 27 October 2026 / آخری تاریخ: 27 اکتوبر 2026", paynote:"Please pay by the last date. / براہ کرم آخری تاریخ تک ادائیگی کریں۔", psid:"PSID / پی ایس آئی ڈی", psidManual:"Manual Collection / دستی وصولی" }
 };
 var EMBLEM_SVG = '<svg width="32" height="32" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#000" stroke-width="2"/><circle cx="24" cy="24" r="18.5" fill="none" stroke="#000" stroke-width="1"/><path d="M24 12 C24 12 15.5 21.5 15.5 28.5 a8.5 8.5 0 0 0 17 0 C32.5 21.5 24 12 24 12 Z" fill="none" stroke="#000" stroke-width="1.8"/></svg>';
 function titleHtml(lang, title){
@@ -1765,8 +1765,8 @@ function printFarmerBill(b, lang){
     [L.father, nameCell(b, lang, true), ""],
     [L.area, esc(b.kanal + " Kanal " + b.marla + " Marla"), ""],
     [L.cons, esc(b.cons||"—"), ""],
-    [L.psid, '<b>' + esc(b.ref||"—") + '</b>', "num"],
-    [L.ref, esc(b.ref||"—"), ""],
+    [L.psid, '<b>' + esc(b.ref||L.psidManual) + '</b>', "num"],
+    [L.ref, esc(b.ref||L.psidManual), ""],
     [L.bill, fmtN(effAmt(b)), "num"]
   ];
   if(paid > 0) rows.push([L.paidtodate, fmtN(paid), "num"]);
