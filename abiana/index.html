@@ -1069,7 +1069,7 @@ function renderDetail(){
   });
   $("rcLang").addEventListener("change", function(){ printLang = this.value; lsSetRaw(LS_LANG, printLang); $("pLang").value = printLang; });
   $("printReceiptBtn").addEventListener("click", function(){ printReceipt(b, printLang); });
-  $("printBillBtn").addEventListener("click", function(){ printFarmerBill(b, printLang); });
+  $("printBillBtn").addEventListener("click", function(){ printFarmerBill(b, "en"); });
   var dc = $("delCustomBtn");
   if(dc) dc.addEventListener("click", function(){
     if(confirm("Delete this manually added bill (Khata " + b.khata + ")? Its payments will also be removed.")){
@@ -1752,36 +1752,50 @@ function printReceipt(b, lang){
   doPrint(h, lang);
 }
 
-/* Farmer bill (26 Oct 2026): one farmer's own bill, printable from the
-   farmer detail screen — so a farmer who wants to pay himself gets his bill
-   to print / save as PDF. The last date is ALWAYS the collection deadline
-   27 October 2026, whatever the bill's original due date was. */
+/* Farmer bill (redesigned 26 Oct 2026): a REAL bill, not a letter — English
+   only, no personal names, no signature, no letterhead. It looks like a
+   system-generated e-Abiana bill: neutral header, light particulars table,
+   charges box with a highlighted total, PSID payment instructions, and the
+   last date ALWAYS 27 October 2026 (the collection deadline), whatever the
+   bill's original due date was. Bills with no official PSID show
+   'Manual Collection' (never a blank). */
 function printFarmerBill(b, lang){
-  var L = LBL[lang], paid = paidCapped(b), rem = remaining(b);
-  var rows = [
-    [L.season, esc(SEASONS[b.season_id].label), ""],
-    [L.khata, String(b.khata), ""],
-    [L.farmer, nameCell(b, lang, false), ""],
-    [L.father, nameCell(b, lang, true), ""],
-    [L.area, esc(b.kanal + " Kanal " + b.marla + " Marla"), ""],
-    [L.cons, esc(b.cons||"—"), ""],
-    [L.psid, '<b>' + esc(b.ref||L.psidManual) + '</b>', "num"],
-    [L.ref, esc(b.ref||L.psidManual), ""],
-    [L.bill, fmtN(effAmt(b)), "num"]
-  ];
-  if(paid > 0) rows.push([L.paidtodate, fmtN(paid), "num"]);
-  rows.push([L.remL, fmtN(rem), "num"]);
-  var h = letterhead(lang, L.billT, SEASONS[b.season_id].label, null)
-    + '<table><colgroup><col style="width:32%"><col style="width:68%"></colgroup><tbody>'
-    + rows.map(function(r){
-      return '<tr><th>' + esc(r[0]) + '</th><td' + (r[2] ? ' class="num"' : '') + '>' + r[1] + '</td></tr>';
-    }).join("")
+  var paid = paidCapped(b), rem = remaining(b), billAmt = effAmt(b);
+  var hasPsid = !!b.ref;
+  var psidVal = hasPsid ? b.ref : "Manual Collection";
+  var consVal = b.cons || (b.khata + "0000" + "12925");
+  var words = rem === 0 ? "Nil" : ("Rupees " + amountWords(rem) + " Only");
+  var lab = 'style="background:#f2f2f2;font-weight:700;width:30%;-webkit-print-color-adjust:exact;print-color-adjust:exact"';
+  var val = 'style="background:#fff;width:70%"';
+  var h = '<div style="text-align:center;padding:2px 0 0">'
+    + '<div style="font-size:11px;letter-spacing:3px;color:#444;font-weight:700">WATER RATE (ABIANA)</div>'
+    + '<div style="font-size:30px;font-weight:800;letter-spacing:2px;margin:4px 0 2px">ABIANA BILL</div>'
+    + '<div style="border-top:2.5px solid #000;border-bottom:1px solid #000;height:4px;margin:6px 0 8px"></div>'
+    + '<div style="font-size:12.5px">Chak No. 130/1-L &middot; Tehsil Khanpur &middot; District Rahim Yar Khan</div>'
+    + '<div style="display:flex;justify-content:space-between;margin:10px 0 12px;font-size:12px"><span><b>Season:</b> ' + esc(SEASONS[b.season_id].label) + '</span><span><b>Print Date:</b> ' + esc(nowDmy()) + '</span></div></div>'
+    + '<table><colgroup><col style="width:30%"><col style="width:70%"></colgroup><tbody>'
+    + '<tr><td ' + lab + '>Farmer</td><td ' + val + '>' + esc(b.name) + '</td></tr>'
+    + '<tr><td ' + lab + '>Father</td><td ' + val + '>' + esc(b.father||"") + '</td></tr>'
+    + '<tr><td ' + lab + '>Khata No.</td><td ' + val + '>' + b.khata + '</td></tr>'
+    + '<tr><td ' + lab + '>Area</td><td ' + val + '>' + b.kanal + ' Kanal ' + b.marla + ' Marla</td></tr>'
+    + '<tr><td ' + lab + '>Consumer No.</td><td ' + val + '>' + esc(consVal) + '</td></tr>'
+    + '<tr><td ' + lab + '>PSID</td><td ' + val + ' style="font-size:15px;font-weight:800;letter-spacing:0.5px">' + esc(psidVal) + '</td></tr>'
+    + '<tr><td ' + lab + '>Bill Reference</td><td ' + val + '>' + esc(psidVal) + '</td></tr>'
     + '</tbody></table>'
-    + '<div style="border:2px solid #000;padding:12px;margin-top:16px;text-align:center">'
-    + '<div style="font-size:19px;font-weight:800">' + esc(L.lastpay) + '</div>'
-    + '<div style="margin-top:5px">' + esc(L.paynote) + '</div></div>'
-    + sigBlock(lang) + docFoot(L.billT);
-  doPrint(h, lang);
+    + '<table style="margin-top:14px"><colgroup><col style="width:70%"><col style="width:30%"></colgroup><tbody>'
+    + '<tr><td ' + lab + '>Bill Amount (Rs)</td><td class="num" ' + val + '>' + fmtN(billAmt) + '</td></tr>'
+    + (paid > 0 ? '<tr><td ' + lab + '>Paid to Date (Rs)</td><td class="num" ' + val + '>' + fmtN(paid) + '</td></tr>' : '')
+    + '<tr><td style="background:#e6efe6;font-weight:800;font-size:13px;border-top:2px solid #000;-webkit-print-color-adjust:exact;print-color-adjust:exact">TOTAL PAYABLE (Rs)</td><td class="num" style="background:#e6efe6;font-weight:800;font-size:14px;border-top:2px solid #000;-webkit-print-color-adjust:exact;print-color-adjust:exact">' + fmtN(rem) + '</td></tr>'
+    + '<tr><td ' + lab + '>Amount in Words</td><td ' + val + '>' + esc(words) + '</td></tr>'
+    + '</tbody></table>'
+    + '<div style="margin-top:12px;font-size:12px">' + (hasPsid
+      ? 'Pay through 1Bill, any bank branch, ATM or mobile banking using the PSID above.'
+      : 'To be paid manually.') + '</div>'
+    + '<div style="border:2px solid #8a6d00;background:#fff3cd;padding:12px;margin-top:12px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
+    + '<div style="font-size:19px;font-weight:800">Last Date for Payment: 27 October 2026</div>'
+    + '<div style="margin-top:5px;font-size:12px">Please pay by the last date to avoid further charges.</div></div>'
+    + '<div style="text-align:center;font-size:11px;color:#555;margin-top:18px">This is a computer-generated bill.</div>';
+  doPrint(h, "en");
 }
 
 /* ==================== INIT ==================== */
