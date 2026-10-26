@@ -1477,8 +1477,8 @@ function chowFatherCell(b, lang){
   if(lang==="bi") return '<span class="urdu">' + esc(uf) + '</span><br><span style="font-size:11px;color:#555">' + esc(b.father||"") + '</span>';
   return esc(b.father||"");
 }
-function doPrint(html, lang){
-  $("printArea").innerHTML = '<div class="docframe"' + (lang==="ur" ? ' dir="rtl"' : '') + '><div class="docframe-in">' + html + '</div></div>';
+function doPrint(html, lang, plain){
+  $("printArea").innerHTML = plain ? ('<div>' + html + '</div>') : ('<div class="docframe"' + (lang==="ur" ? ' dir="rtl"' : '') + '><div class="docframe-in">' + html + '</div></div>');
   if(lang==="ur"){
     document.documentElement.setAttribute("dir", "rtl");
     var restoreDir = function(){ document.documentElement.removeAttribute("dir"); window.removeEventListener("afterprint", restoreDir); };
@@ -1752,52 +1752,77 @@ function printReceipt(b, lang){
   doPrint(h, lang);
 }
 
-/* Farmer bill (redesigned 26 Oct 2026): a REAL bill, not a letter — English
-   only, no personal names, no signature, no letterhead. It looks like a
-   system-generated e-Abiana bill: neutral header, light particulars table,
-   charges box with a highlighted total, PSID payment instructions, and the
-   last date ALWAYS 27 October 2026 (the collection deadline), whatever the
-   bill's original due date was. Bills with no official PSID show
+/* Farmer bill — TWO-PART original e-Abiana bill (26 Oct 2026): the UPPER
+   part is the customer copy the farmer keeps; the LOWER part is cut off
+   along the perforation and taken by the bank/collector. This is a BILL,
+   not a challan: no bank/depositor copies, no challan fields, no QR, no
+   logos, no user name, no signature. English only. The last date shown to
+   the farmer is ALWAYS 27 October 2026 (collection deadline), distinct
+   from the bill's own Due Date box. Bills with no official PSID show
    'Manual Collection' (never a blank). */
 function printFarmerBill(b, lang){
-  var paid = paidCapped(b), rem = remaining(b), billAmt = effAmt(b);
+  var paid = paidCapped(b), rem = remaining(b);
   var hasPsid = !!b.ref;
   var psidVal = hasPsid ? b.ref : "Manual Collection";
   var consVal = b.cons || (b.khata + "0000" + "12925");
-  var words = rem === 0 ? "Nil" : ("Rupees " + amountWords(rem) + " Only");
-  var lab = 'style="background:#f2f2f2;font-weight:700;width:30%;-webkit-print-color-adjust:exact;print-color-adjust:exact"';
-  var val = 'style="background:#fff;width:70%"';
-  var h = '<div style="text-align:center;padding:2px 0 0">'
-    + '<div style="font-size:11px;letter-spacing:3px;color:#444;font-weight:700">WATER RATE (ABIANA)</div>'
-    + '<div style="font-size:30px;font-weight:800;letter-spacing:2px;margin:4px 0 2px">ABIANA BILL</div>'
-    + '<div style="border-top:2.5px solid #000;border-bottom:1px solid #000;height:4px;margin:6px 0 8px"></div>'
-    + '<div style="font-size:12.5px">Chak No. 130/1-L &middot; Tehsil Khanpur &middot; District Rahim Yar Khan</div>'
-    + '<div style="display:flex;justify-content:space-between;margin:10px 0 12px;font-size:12px"><span><b>Season:</b> ' + esc(SEASONS[b.season_id].label) + '</span><span><b>Print Date:</b> ' + esc(nowDmy()) + '</span></div></div>'
-    + '<table><colgroup><col style="width:30%"><col style="width:70%"></colgroup><tbody>'
-    + '<tr><td ' + lab + '>Farmer</td><td ' + val + '>' + esc(b.name) + '</td></tr>'
-    + '<tr><td ' + lab + '>Father</td><td ' + val + '>' + esc(b.father||"") + '</td></tr>'
-    + '<tr><td ' + lab + '>Khata No.</td><td ' + val + '>' + b.khata + '</td></tr>'
-    + '<tr><td ' + lab + '>Area</td><td ' + val + '>' + b.kanal + ' Kanal ' + b.marla + ' Marla</td></tr>'
-    + '<tr><td ' + lab + '>Consumer No.</td><td ' + val + '>' + esc(consVal) + '</td></tr>'
-    + '<tr><td ' + lab + '>PSID</td><td ' + val + ' style="font-size:15px;font-weight:800;letter-spacing:0.5px">' + esc(psidVal) + '</td></tr>'
-    + '<tr><td ' + lab + '>Bill Reference</td><td ' + val + '>' + esc(psidVal) + '</td></tr>'
+  var areaVal = b.kanal + " Kanal, " + b.marla + " Marla";
+  var seasonVal = SEASONS[b.season_id] ? SEASONS[b.season_id].label : b.season;
+  var payDue = Math.max(0, (b.payable_due!=null ? b.payable_due : b.amt) - paid);
+  var payAfter = Math.max(0, (b.payable_late!=null ? b.payable_late : b.amt) - paid);
+  var payLine = hasPsid ? 'The payment will be made against "GOPb" biller in all banks.' : 'To be paid manually.';
+  function fld(lab, val){
+    return '<div style="margin-bottom:10px"><div style="font-size:9.5px;color:#444">' + lab + '</div><div style="font-size:13px;margin-top:1px">' + esc(val) + '</div></div>';
+  }
+  function sumRow(lab, val, band){
+    return '<div style="display:flex;padding:5px 0;border-bottom:1px solid #bbb' + (band ? ';background:' + band + ';padding-left:6px;padding-right:6px' : '') + '"><span style="flex:1">' + lab + '</span><span style="font-weight:700">' + val + '</span></div>';
+  }
+  var dateBoxes = '<div style="text-align:right;font-size:12px;line-height:1.9">'
+    + '<span style="border:1px solid #888;padding:3px 10px;display:inline-block">' + (b.issue ? 'Bill Date: ' + esc(b.issue) : 'Print Date: ' + nowDmy()) + '</span> '
+    + (b.due ? '<span style="border:1px solid #888;background:#fdeeda;padding:3px 10px;display:inline-block">Due Date: ' + esc(b.due) + '</span>' : '')
+    + '</div>';
+  var upper = '<div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:21px;font-weight:800">E-Bill Abiana</div><div style="font-size:15px;margin-top:2px">Punjab Irrigation Department</div></div>' + dateBoxes + '</div>'
+    + '<div style="background:#d9e8c9;padding:8px 12px;margin:14px 0;font-size:19px;font-weight:800;letter-spacing:0.5px">PSID# ' + esc(psidVal) + '</div>'
+    + '<div style="display:flex;gap:20px;margin-bottom:14px">'
+    + '<div style="flex:1.2">' + fld("Consumer ID", consVal) + fld("Name", b.name) + fld("Father Name", b.father || "") + fld("Khata Number", String(b.khata)) + '</div>'
+    + '<div style="flex:1">' + fld("Canal Zone", "Bahawalpur") + fld("Canal Circle", "Rahimyar Khan") + fld("Canal Division", "Khanpur") + fld("District", "Rahim Yar Khan") + '</div>'
+    + '<div style="flex:1">' + fld("Tehsil", "Khanpur") + fld("Village", "Chak No. 130/1-L") + fld("Crop Season", seasonVal) + '</div>'
+    + '</div>'
+    + '<table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:13px"><thead><tr>'
+    + '<th style="text-align:left;border:1px solid #888;padding:5px 8px;font-weight:700">Authorized Use</th>'
+    + '<th style="text-align:left;border:1px solid #888;padding:5px 8px;font-weight:700">Rate (Rs.)</th>'
+    + '<th style="text-align:left;border:1px solid #888;padding:5px 8px;font-weight:700">Area</th>'
+    + '<th style="text-align:right;border:1px solid #888;padding:5px 8px;font-weight:700">Amount Due (Rs.)</th></tr></thead><tbody>'
+    + '<tr><td style="border:1px solid #888;padding:5px 8px">Total Area</td><td style="border:1px solid #888;padding:5px 8px"></td><td style="border:1px solid #888;padding:5px 8px">' + esc(areaVal) + '</td><td style="border:1px solid #888;padding:5px 8px;text-align:right">' + fmtN(b.amt) + '</td></tr>'
+    + '<tr style="background:#d9e8c9"><td style="border:1px solid #888;padding:5px 8px;font-weight:700">Total</td><td style="border:1px solid #888;padding:5px 8px"></td><td style="border:1px solid #888;padding:5px 8px"></td><td style="border:1px solid #888;padding:5px 8px;text-align:right;font-weight:700">' + fmtN(b.amt) + '</td></tr>'
     + '</tbody></table>'
-    + '<table style="margin-top:14px"><colgroup><col style="width:70%"><col style="width:30%"></colgroup><tbody>'
-    + '<tr><td ' + lab + '>Bill Amount (Rs)</td><td class="num" ' + val + '>' + fmtN(billAmt) + '</td></tr>'
-    + (paid > 0 ? '<tr><td ' + lab + '>Paid to Date (Rs)</td><td class="num" ' + val + '>' + fmtN(paid) + '</td></tr>' : '')
-    + '<tr><td style="background:#e6efe6;font-weight:800;font-size:13px;border-top:2px solid #000;-webkit-print-color-adjust:exact;print-color-adjust:exact">TOTAL PAYABLE (Rs)</td><td class="num" style="background:#e6efe6;font-weight:800;font-size:14px;border-top:2px solid #000;-webkit-print-color-adjust:exact;print-color-adjust:exact">' + fmtN(rem) + '</td></tr>'
-    + '<tr><td ' + lab + '>Amount in Words</td><td ' + val + '>' + esc(words) + '</td></tr>'
-    + '</tbody></table>'
-    + '<div style="margin-top:12px;font-size:12px">' + (hasPsid
-      ? 'Pay through 1Bill, any bank branch, ATM or mobile banking using the PSID above.'
-      : 'To be paid manually.') + '</div>'
-    + '<div style="border:2px solid #8a6d00;background:#fff3cd;padding:12px;margin-top:12px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
-    + '<div style="font-size:19px;font-weight:800">Last Date for Payment: 27 October 2026</div>'
-    + '<div style="margin-top:5px;font-size:12px">Please pay by the last date to avoid further charges.</div></div>'
-    + '<div style="text-align:center;font-size:11px;color:#555;margin-top:18px">This is a computer-generated bill.</div>';
-  doPrint(h, "en");
+    + '<div style="margin-bottom:12px">'
+    + sumRow("Current Amount", fmtN(b.amt), "")
+    + (paid > 0 ? sumRow("Paid to Date", fmtN(paid), "") : "")
+    + sumRow("Total Payable Amount", fmtN(rem), "#d9e8c9")
+    + sumRow("Payable Amount (Within Due Date)", fmtN(payDue), "")
+    + sumRow("Payable Amount (After Due Date)", fmtN(payAfter), "#fde8e8")
+    + '</div>'
+    + '<div style="font-size:16px;font-weight:800;margin:14px 0 2px">Last Date for Payment: 27 October 2026</div>'
+    + '<div style="font-size:12px;margin-bottom:14px">' + payLine + '</div>'
+    + '</div>';
+  var lower = '<div>'
+    + '<div style="font-size:15px;font-weight:800">E-Bill Abiana</div><div style="font-size:12px;margin-bottom:8px">Punjab Irrigation Department</div>'
+    + '<div style="font-size:12.5px;margin-bottom:10px">PSID# ' + esc(psidVal) + '&nbsp;&nbsp;&nbsp;Consumer ID ' + esc(consVal) + '&nbsp;&nbsp;&nbsp;Khata # ' + b.khata + '&nbsp;&nbsp;&nbsp;Bill Month ' + esc(seasonVal) + '</div>'
+    + '<div style="margin-bottom:10px">'
+    + sumRow("Current Amount", fmtN(b.amt), "")
+    + sumRow("Payable Amount (Within Due Date)", fmtN(payDue), "")
+    + sumRow("Payable Amount (After Due Date)", fmtN(payAfter), "")
+    + '</div>'
+    + '<div style="font-size:12px">' + payLine + '</div>'
+    + '</div>';
+  var h = '<div style="color:#000;padding:4px;font-size:13px">'
+    + upper
+    + '<div style="border-top:2px dashed #000;margin:10px 0 12px;padding-top:6px;text-align:center;font-size:12px">✂&nbsp; Cut here — bank copy below / customer copy above</div>'
+    + lower
+    + '</div>';
+  doPrint(h, "en", true);
 }
-
 /* ==================== INIT ==================== */
 fix264Correction();
 kindMigration();
