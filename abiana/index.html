@@ -1792,15 +1792,15 @@ function printReceipt(b, lang){
    part is the customer copy the farmer keeps; the LOWER part is cut off
    along the perforation and taken by the bank/collector. This is a BILL,
    not a challan: no bank/depositor copies, no challan fields, no QR, no
-   logos, no user name. The farmer copy prints the Numberdar's stamp +
-   signature, and when the bill is fully paid the paid date + PAID mark
-   (user, 26 Oct 2026 — the old hand-fill boxes are now pre-filled).
+   logos, no user name. The farmer copy keeps hand-fill Stamp / Signature /
+   Paid Date boxes for signing by hand — stamp + signature print on RECEIPTS
+   only (user, 26 Oct 2026: "just receipts mein lgana hai").
    English only. The last date shown to
    the farmer is ALWAYS 27 October 2026 (collection deadline), distinct
    from the bill's own Due Date box. Bills with no official PSID show
    'Manual Collection' (never a blank). */
 function printFarmerBill(b, lang){
-  var paid = paidCapped(b), rem = remaining(b), pd = paidDateStr(b);
+  var paid = paidCapped(b), rem = remaining(b);
   var hasPsid = !!b.ref;
   var psidVal = hasPsid ? b.ref : "Manual Collection";
   var consVal = b.cons || (b.khata + "0000" + "12925");
@@ -1845,10 +1845,9 @@ function printFarmerBill(b, lang){
     + '<div style="font-size:16px;font-weight:800;margin:14px 0 2px">Last Date for Payment: 27 October 2026</div>'
     + '<div style="font-size:12px;margin-bottom:18px">' + payLine + '</div>'
     + '<div style="display:flex;gap:28px;margin-bottom:6px">'
-    + '<div style="flex:0 0 auto"><div style="font-size:11px;color:#444;margin-bottom:4px">Stamp</div><div style="border:1px solid #888;width:150px;height:60px"><img src="' + STAMP_IMG + '" style="width:100%;height:100%;object-fit:contain" alt=""></div></div>'
-    + '<div style="flex:1"><div style="font-size:11px;color:#444;margin-bottom:4px">Signature</div><div style="border-bottom:1px solid #888;height:60px"><img src="' + SIGN_IMG + '" style="height:56px" alt=""></div></div>'
-    + '<div style="flex:1"><div style="font-size:11px;color:#444;margin-bottom:4px">Paid Date</div><div style="border-bottom:1px solid #888;height:60px;display:flex;align-items:flex-end;font-size:15px;font-weight:700">' + (pd ? esc(pd) : '') + '</div></div>'
-    + (pd ? '<div style="flex:0 0 auto;display:flex;align-items:flex-end"><div style="border:3px solid #1a7a1a;color:#1a7a1a;padding:6px 16px;font-size:20px;font-weight:800;letter-spacing:2px">PAID</div></div>' : '')
+    + '<div style="flex:0 0 auto"><div style="font-size:11px;color:#444;margin-bottom:4px">Stamp</div><div style="border:1px solid #888;width:95px;height:60px"></div></div>'
+    + '<div style="flex:1"><div style="font-size:11px;color:#444;margin-bottom:4px">Signature</div><div style="border-bottom:1px solid #888;height:60px"></div></div>'
+    + '<div style="flex:1"><div style="font-size:11px;color:#444;margin-bottom:4px">Paid Date</div><div style="border-bottom:1px solid #888;height:60px"></div></div>'
     + '</div>'
     + '</div>';
   var lower = '<div>'
