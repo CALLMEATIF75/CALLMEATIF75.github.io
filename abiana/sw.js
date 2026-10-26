@@ -1,6 +1,6 @@
 /* Abiana Manager — service worker (offline-capable; document is network-first
    so baked-data fixes reach the phone on the next open, assets cache-first) */
-var CACHE = 'abiana-manager-v26';
+var CACHE = 'abiana-manager-v27';
 var ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', function (e) {
